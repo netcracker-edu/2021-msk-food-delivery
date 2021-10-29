@@ -12,7 +12,7 @@ public class AboutController {
     @Autowired
     TestDbConnect testDbConnect;
 
-    @GetMapping("/api/v1/whoami")
+    @GetMapping("/api/v1/about")
     public AboutDTO about() {
         AboutDTO aboutDTO = new AboutDTO();
         aboutDTO.setDbName(testDbConnect.getDbName());
