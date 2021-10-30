@@ -12,7 +12,7 @@
 	<artifactId>food-delivery</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>food-delivery</name>
-	<description>Educational project</description>
+	<description>Service for ordering products and household goods at home from local warehouses</description>
 	<properties>
 		<java.version>11</java.version>
 	</properties>
