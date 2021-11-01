@@ -20,10 +20,6 @@ git clone https://github.com/iLeonidze/ncedu-food-delivery.git
 ```bash
 cd ncedu-food-delivery
 ```
-- build project with Maven (must create 'target' folder):
-```bash
-mvn clean package
-```
 - build Docker image:
 ```bash
 docker build . --tag ncedu/food-delivery
