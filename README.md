@@ -10,6 +10,7 @@ docker run --name pg-delivery -e POSTGRES_PASSWORD=postgres -d postgres
 ```
 - installed Git [Git Docs](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - installed Maven [Apache Docs](https://maven.apache.org/install.html) 
+- installed Java 11 or later [Oracle Docs](https://www.oracle.com/java/technologies/downloads/#java11)
 
 ### Start
 - get code from git repo:
@@ -30,10 +31,11 @@ docker images
 ```
 - run Docker container:
 ```bash
-docker run -d --name food-delivery -p 8080:8080 ncedu/food-delivery
+docker run -d --name food-delivery -p 8080:8080 -p 5005:5005 ncedu/food-delivery
 ```
 - check new container status:
 ```bash
 docker ps -a
 ```
-- work with food-delivery API on http://127.0.0.1:8080
+- work with food-delivery API on http://127.0.0.1:8080;
+- debug app on localhost:5005, for example with IDEA Intellij "Remote JVM debug".

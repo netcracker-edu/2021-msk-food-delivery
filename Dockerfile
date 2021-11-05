@@ -10,4 +10,4 @@ COPY --from=maven /opt/build/target/*.jar ./food-delivery.jar
 RUN groupadd -r runner -g 1000 && useradd -r -g 1000 runner -u 1000
 RUN chown runner -R /opt/app && chmod 700 -R /opt/app
 USER runner
-ENTRYPOINT ["java", "-jar", "food-delivery.jar"]
+ENTRYPOINT ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-Xms768M", "-jar", "food-delivery.jar"]
