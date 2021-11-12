@@ -6,7 +6,7 @@
 - installed PostgreSQL in Docker container [Official Docker image](https://hub.docker.com/_/postgres) 
 - run PostgeSQL image:
 ```bash
-docker run --name pg-delivery -e POSTGRES_PASSWORD=postgres -d postgres
+docker run --name pg-delivery -p 5432:5432 -e POSTGRES_PASSWORD=postgres -d postgres
 ```
 - installed Git [Git Docs](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - installed Maven [Apache Docs](https://maven.apache.org/install.html) 
