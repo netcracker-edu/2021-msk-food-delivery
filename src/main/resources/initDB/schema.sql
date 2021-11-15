@@ -1,7 +1,22 @@
-/*
-			USERS
-*/
-CREATE TYPE role_enum as ENUM ('client', 'admin', 'moderator', 'courier');
+CREATE TABLE IF NOT EXISTS warehouses
+(
+	warehouse_id BIGSERIAL PRIMARY KEY,
+	geo POINT NOT NULL,
+	address VARCHAR(50) NOT NULL,
+	name VARCHAR(50) NOT NULL UNIQUE,
+	delivery_zone CIRCLE NOT NULL
+);
+
+DO ' DECLARE
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ''role_enum'') THEN
+        CREATE TYPE role_enum AS ENUM
+        (
+           ''CLIENT'', ''ADMIN'', ''MODERATOR'', ''COURIER''
+        );
+    END IF;
+END;
+' LANGUAGE PLPGSQL;
 
 CREATE TABLE IF NOT EXISTS users
 (
@@ -16,9 +31,6 @@ CREATE TABLE IF NOT EXISTS users
 	lock_date TIMESTAMP
 );
 
-/*
-			CLIENTS
-*/
 CREATE TABLE IF NOT EXISTS clients
 (
 	client_id BIGINT PRIMARY KEY REFERENCES users (user_id) ON DELETE CASCADE,
@@ -27,18 +39,12 @@ CREATE TABLE IF NOT EXISTS clients
 	rating NUMERIC(3,2) CHECK ( (rating >= 0.00 AND rating <= 5.00) OR (rating is NULL) )
 );
 
-/*
-			MODERATORS
-*/
 CREATE TABLE IF NOT EXISTS moderators
 (
 	moderator_id BIGINT PRIMARY KEY REFERENCES users (user_id) ON DELETE CASCADE,
 	warehouse_id BIGINT REFERENCES warehouses (warehouse_id) ON DELETE SET NULL
 );
 
-/*
-			PRODUCTS
-*/
 CREATE TABLE IF NOT EXISTS products
 (
 	product_id BIGSERIAL PRIMARY KEY,
@@ -53,9 +59,7 @@ CREATE TABLE IF NOT EXISTS products
 	discount NUMERIC(7,2) NOT NULL DEFAULT 0 CHECK(discount >= 0)
 );
 
-/*
-		PROMOCODES
-*/
+
 CREATE TABLE IF NOT EXISTS promo_codes
 (
 	promo_code_id BIGSERIAL PRIMARY KEY,
@@ -79,7 +83,7 @@ CREATE TABLE IF NOT EXISTS promo_codes
 	(discount_percent IS NOT NULL) )
 );
 
-CREATE FUNCTION check_promo_amount_limit() RETURNS trigger AS $check_promo_amount_limit$
+CREATE OR REPLACE FUNCTION check_promo_amount_limit() RETURNS trigger AS '
 	BEGIN
 		IF (NEW.limit_amount IS NULL) THEN
 			RETURN NEW;
@@ -89,7 +93,9 @@ CREATE FUNCTION check_promo_amount_limit() RETURNS trigger AS $check_promo_amoun
 		END IF;
 		RETURN NEW;
 	END;
-$check_promo_amount_limit$ LANGUAGE plpgsql;
+' LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS check_promo_amount_limit ON promo_codes;
 
 CREATE TRIGGER check_promo_amount_limit
 	BEFORE UPDATE ON promo_codes
