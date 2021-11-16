@@ -1,12 +1,13 @@
 package com.ncedu.fooddelivery.api.v1.entities;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "user_id")
@@ -27,8 +28,16 @@ public class User {
     @Column(name = "lock_date")
     private Timestamp lockDate;
 
+    @OneToOne(mappedBy = "user")
+    private Client client;
+
+
     User() {
 
+    }
+
+    public User(Long id) {
+        this.id = id;
     }
 
     public Long getId() {
