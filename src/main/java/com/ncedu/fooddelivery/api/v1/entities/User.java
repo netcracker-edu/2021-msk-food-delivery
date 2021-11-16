@@ -31,6 +31,9 @@ public class User implements Serializable {
     @OneToOne(mappedBy = "user")
     private Client client;
 
+    @OneToOne(mappedBy = "user")
+    private Moderator moderator;
+
 
     User() {
 

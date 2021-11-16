@@ -7,16 +7,16 @@ CREATE TABLE IF NOT EXISTS warehouses
 	delivery_zone CIRCLE NOT NULL
 );
 
-DO $$ DECLARE
+DO ' DECLARE
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'role_enum') THEN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ''role_enum'') THEN
         CREATE TYPE role_enum AS ENUM
         (
-           'CLIENT', 'ADMIN', 'MODERATOR', 'COURIER'
+           ''CLIENT'', ''ADMIN'', ''MODERATOR'', ''COURIER''
         );
     END IF;
 END;
-$$ LANGUAGE PLPGSQL;
+' LANGUAGE PLPGSQL;
 
 CREATE TABLE IF NOT EXISTS users
 (
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS promo_codes
 	(discount_percent IS NOT NULL) )
 );
 
-CREATE FUNCTION check_promo_amount_limit() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION check_promo_amount_limit() RETURNS trigger AS '
 	BEGIN
 		IF (NEW.limit_amount IS NULL) THEN
 			RETURN NEW;
@@ -93,7 +93,9 @@ CREATE FUNCTION check_promo_amount_limit() RETURNS trigger AS $$
 		END IF;
 		RETURN NEW;
 	END;
-$$ LANGUAGE plpgsql;
+' LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS check_promo_amount_limit ON promo_codes;
 
 CREATE TRIGGER check_promo_amount_limit
 	BEFORE UPDATE ON promo_codes
