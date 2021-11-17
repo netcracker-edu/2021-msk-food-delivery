@@ -15,7 +15,7 @@ docker run --name pg-delivery -p 5432:5432 -e POSTGRES_PASSWORD=postgres -d post
 ### Start
 - get code from git repo:
 ```bash
-git clone https://github.com/iLeonidze/ncedu-food-delivery.git
+git clone https://github.com/netcracker-edu/2021-msk-food-delivery.git
 ```
 - change directory to ncedu-food-delivery:
 ```bash
