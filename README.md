@@ -3,10 +3,10 @@
 
 ### Prerequisites
 - installed Docker [Windows example](https://docs.docker.com/desktop/windows/install/#install-docker-desktop-on-windows)
-- installed PostgreSQL in Docker container [Official Docker image](https://hub.docker.com/_/postgres) 
-- run PostgeSQL image:
+- installed postgis in Docker container [Official Docker image](https://registry.hub.docker.com/r/postgis/postgis) 
+- run postgis image:
 ```bash
-docker run --name pg-delivery -p 5432:5432 -e POSTGRES_PASSWORD=postgres -d postgres
+docker run --name pg-delivery -p 5432:5432 -e POSTGRES_PASSWORD=postgis -e POSTGRES_USER=postgis -d postgis/postgis
 ```
 - installed Git [Git Docs](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - installed Maven [Apache Docs](https://maven.apache.org/install.html) 
