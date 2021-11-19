@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS users
 (
 	user_id BIGSERIAL PRIMARY KEY,
 	role ROLE_ENUM NOT NULL,
-	password BYTEA NOT NULL,
+	password TEXT NOT NULL,
 	full_name VARCHAR(50) NOT NULL CHECK(LENGTH(full_name) > 5),
 	email VARCHAR(50) NOT NULL UNIQUE CHECK (email != ''),
 	reg_date TIMESTAMP NOT NULL,
