@@ -15,7 +15,7 @@ public class User implements Serializable {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-    private byte[] password;
+    private String password;
     @Column(name = "full_name")
     private String fullName;
     private String email;
@@ -35,7 +35,7 @@ public class User implements Serializable {
     private Moderator moderator;
 
 
-    User() {
+    public User() {
 
     }
 
@@ -59,11 +59,11 @@ public class User implements Serializable {
         this.role = role;
     }
 
-    public byte[] getPassword() {
+    public String getPassword() {
         return password;
     }
 
-    public void setPassword(byte[] password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 
