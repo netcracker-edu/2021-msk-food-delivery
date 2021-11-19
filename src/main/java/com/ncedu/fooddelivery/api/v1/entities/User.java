@@ -1,5 +1,10 @@
 package com.ncedu.fooddelivery.api.v1.entities;
 
+
+import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -7,13 +12,19 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users")
+@TypeDef(
+        name = "role_enum",
+        typeClass = PostgreSQLEnumType.class
+)
 public class User implements Serializable {
+    //TODO: problems with sequences when add to DB. We populated DB from data.sql, but hibernate_sequence whatever start from 1
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "user_id")
     private Long id;
 
     @Enumerated(EnumType.STRING)
+    @Type( type = "role_enum" )
     private Role role;
     private String password;
     @Column(name = "full_name")

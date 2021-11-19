@@ -1,10 +1,18 @@
 package com.ncedu.fooddelivery.api.v1.entities;
 
+import com.vladmihalcea.hibernate.type.json.JsonType;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name = "clients")
+@TypeDef(
+        name = "json",
+        typeClass = JsonType.class
+)
 public class Client implements Serializable {
 
     @Id
@@ -12,6 +20,7 @@ public class Client implements Serializable {
     private Long id;
 
     @Column(name = "payment_data")
+    @Type(type = "json")
     private String paymentData;
 
     @Column(name = "phone_number")
