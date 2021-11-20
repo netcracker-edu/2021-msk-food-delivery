@@ -3,14 +3,16 @@ package com.ncedu.fooddelivery.api.v1.dto;
 import java.sql.Timestamp;
 import java.util.UUID;
 
-public class UserCommonInfoDTO {
+public class UserInfoDTO {
+    private Long id;
     private String role;
     private String fullName;
     private String email;
     private Timestamp lastSigninDate;
     private UUID avatarId;
 
-    public UserCommonInfoDTO(String role, String fullName, String email, Timestamp lastSigninDate, UUID avatarId) {
+    public UserInfoDTO(Long id, String role, String fullName, String email, Timestamp lastSigninDate, UUID avatarId) {
+        this.id = id;
         this.role = role;
         this.fullName = fullName;
         this.email = email;
@@ -56,5 +58,13 @@ public class UserCommonInfoDTO {
 
     public void setAvatarId(UUID avatarId) {
         this.avatarId = avatarId;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

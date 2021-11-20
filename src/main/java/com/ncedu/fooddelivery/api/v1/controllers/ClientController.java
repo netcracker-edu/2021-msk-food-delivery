@@ -14,7 +14,7 @@ public class ClientController {
 
     @GetMapping("/api/v1/client/{id}")
     public Client getClientById(@PathVariable Long id) {
-        Client client = clientService.findClientById(id);
+        Client client = clientService.getClientById(id);
         return  client;
     }
 }

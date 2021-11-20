@@ -1,6 +1,8 @@
 package com.ncedu.fooddelivery.api.v1.services;
 
+import com.ncedu.fooddelivery.api.v1.dto.ModeratorInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Moderator;
+import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.repos.ModeratorRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,5 +20,22 @@ public class ModeratorService {
             return moderator.get();
         }
         return null;
+    }
+
+    public ModeratorInfoDTO getModeratorDTOById(Long id) {
+        Optional<Moderator> optional = moderatorRepo.findById(id);
+        if (!optional.isPresent()) {
+            return null;
+        }
+        Moderator moderator = optional.get();
+        return createModeratorDTO(moderator);
+    }
+
+    private ModeratorInfoDTO createModeratorDTO(Moderator moderator) {
+        User user = moderator.getUser();
+        return new ModeratorInfoDTO(user.getId(), user.getRole().name(),
+                user.getFullName(), user.getEmail(),
+                user.getLastSigninDate(), user.getAvatarId(),
+                moderator.getWarehouseId());
     }
 }
