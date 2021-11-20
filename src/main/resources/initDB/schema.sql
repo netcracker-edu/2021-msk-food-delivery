@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS couriers(courier_id BIGINT PRIMARY KEY,
     address VARCHAR(50) NOT NULL,
     current_balance FLOAT4 NOT NULL CHECK(current_balance >= 0),
     rating NUMERIC(3, 2) CHECK((rating >= 0 AND rating <= 5) OR rating IS NULL),
-    FOREIGN KEY(warehouse_id) REFERENCES warehouses(warehouse_id) ON DELETE SET NULL);
+    FOREIGN KEY(warehouse_id) REFERENCES warehouses(warehouse_id) ON DELETE SET NULL,
     FOREIGN KEY(courier_id) REFERENCES users(user_id) ON DELETE CASCADE);
 
 DO '
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS orders(order_id BIGSERIAL PRIMARY KEY,
                     client_id BIGINT NOT NULL,
                     address VARCHAR(100) NOT NULL,
                     coordinates geometry NOT NULL,
-                    warehouse_id BIGINT ON DELETE CASCADE,
+                    warehouse_id BIGINT,
                     courier_id BIGINT, 
                     status order_status NOT NULL DEFAULT 'created',
                     date_start TIMESTAMP NOT NULL,
@@ -39,12 +39,12 @@ CREATE TABLE IF NOT EXISTS orders(order_id BIGSERIAL PRIMARY KEY,
                     overall_cost NUMERIC(7, 2) NOT NULL CHECK(overall_cost > 0), 
                     high_demand_coeff NUMERIC(3, 2) NOT NULL DEFAULT 1 CHECK(high_demand_coeff >= 1 AND high_demand_coeff < 3),
                     discount NUMERIC(7, 2) NOT NULL DEFAULT 0 CHECK(discount >= 0),
-                    promo_code_id BIGINT ON DELETE CASCADE, 
+                    promo_code_id BIGINT,
                     client_rating NUMERIC(3, 2) CHECK((client_rating IS NULL) OR (client_rating BETWEEN 0 AND 5)),
                     delivery_rating NUMERIC(3, 2) CHECK((delivery_rating IS NULL) OR (delivery_rating BETWEEN 0 AND 5)),
                     FOREIGN KEY(warehouse_id) REFERENCES warehouses(warehouse_id) ON DELETE CASCADE,
                     FOREIGN KEY(client_id) REFERENCES clients(client_id) ON DELETE CASCADE,
-                    FOREIGN KEY(courier_id) REFERENCES couriers(courier_id) ON DELETE SET NULL);
+                    FOREIGN KEY(courier_id) REFERENCES couriers(courier_id) ON DELETE SET NULL,
                     FOREIGN KEY(promo_code_id) REFERENCES promo_codes(promo_code_id) ON DELETE CASCADE);
 
 DROP FUNCTION IF EXISTS warehouse_update_is_deactivated() CASCADE;
