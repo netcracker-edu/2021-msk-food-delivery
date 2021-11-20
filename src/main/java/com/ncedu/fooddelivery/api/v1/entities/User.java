@@ -17,6 +17,7 @@ import java.util.UUID;
         typeClass = PostgreSQLEnumType.class
 )
 public class User implements Serializable {
+    //TODO: inherit from UserDetails for we can use @AuthenticationPrincipal on User
     //TODO: problems with sequences when add to DB. We populated DB from data.sql, but hibernate_sequence whatever start from 1
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -39,10 +40,12 @@ public class User implements Serializable {
     @Column(name = "lock_date")
     private Timestamp lockDate;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(cascade=CascadeType.ALL, mappedBy = "user")
+    @PrimaryKeyJoinColumn
     private Client client;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(cascade=CascadeType.ALL, mappedBy = "user")
+    @PrimaryKeyJoinColumn
     private Moderator moderator;
 
 

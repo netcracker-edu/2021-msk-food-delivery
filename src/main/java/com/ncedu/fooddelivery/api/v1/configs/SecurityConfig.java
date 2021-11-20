@@ -30,11 +30,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
-                    .antMatchers("/**/registration", "/**/login", "/**/logout").permitAll()
-                    .anyRequest().authenticated()
-                .and()
-                    .httpBasic();
+            .authorizeRequests()
+                .antMatchers("/**/registration", "/**/login", "/**/logout").permitAll()
+                .anyRequest().authenticated()
+            .and()
+                .httpBasic();
         http.csrf().disable().cors().disable();
         http.headers().frameOptions().disable();
 
@@ -43,8 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .eraseCredentials(true)
-                .userDetailsService(authService)
-                .passwordEncoder(encoder);
+            .userDetailsService(authService)
+            .passwordEncoder(encoder);
     }
 }

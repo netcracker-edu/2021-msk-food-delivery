@@ -28,8 +28,8 @@ public class Client implements Serializable {
 
     private Double rating;
 
-    @OneToOne
     @MapsId
+    @OneToOne
     @JoinColumn(name = "client_id", referencedColumnName = "user_id")
     private User user;
 

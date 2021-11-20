@@ -9,6 +9,7 @@ import com.ncedu.fooddelivery.api.v1.repos.ClientRepo;
 import com.ncedu.fooddelivery.api.v1.repos.ModeratorRepo;
 import com.ncedu.fooddelivery.api.v1.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -20,40 +21,38 @@ public class RegistrationService {
     @Autowired UserRepo userRepo;
     @Autowired ClientRepo clientRepo;
     @Autowired ModeratorRepo moderatorRepo;
+    @Autowired PasswordEncoder encoder;
 
     public Long addUser(RegistrationDTO userInfo) {
         //TODO: move set hell to "Map Struct"
         User user = new User();
         user.setEmail(userInfo.getEmail());
         user.setFullName(userInfo.getFullName());
-        user.setPassword(userInfo.getPassword());
+        user.setPassword(encoder.encode(userInfo.getPassword()));
         Role role = Role.valueOf(userInfo.getRole());
         user.setRole(role);
         user.setAvatarId(user.getAvatarId());
         user.setRegDate(Timestamp.valueOf(LocalDateTime.now()));
-        user = userRepo.save(user);
 
-        //TODO: validating on unique email and phoneNumber(for clients and couriers)
-        Long userId = user.getId();
-        if (userId == null) {
-            userId = -1L;
-            return userId;
-        }
-        String userRole = user.getRole().name();
+        Long userId = -1L;
 
-        if ("CLIENT".equals(userRole)) {
+        if ("CLIENT".equals(role.name())) {
             Client client = new Client();
-            client.setUser(user);
-            //TODO: problems with insert JSON type
             client.setPaymentData(userInfo.getPaymentData());
             client.setRating(userInfo.getRating());
             client.setPhoneNumber(userInfo.getPhoneNumber());
-            clientRepo.save(client);
-        } else if ("MODERATOR".equals(userRole)) {
+            client.setUser(user);
+            client = clientRepo.save(client);
+            userId = client.getId();
+        } else if ("MODERATOR".equals(role.name())) {
             Moderator moderator = new Moderator();
-            moderator.setId(userId);
             moderator.setWarehouseId(userInfo.getWarehouseId());
-            moderatorRepo.save(moderator);
+            moderator.setUser(user);
+            moderator = moderatorRepo.save(moderator);
+            userId = moderator.getId();
+        } else {
+            user = userRepo.save(user);
+            userId = user.getId();
         }
 
         return userId;
