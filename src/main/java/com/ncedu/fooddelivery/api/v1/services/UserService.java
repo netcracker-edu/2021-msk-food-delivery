@@ -40,4 +40,25 @@ public class UserService {
                 user.getFullName(), user.getEmail(),
                 user.getLastSigninDate(), user.getAvatarId());
     }
+
+    public List<UserInfoDTO> getAllAdmins() {
+        Role adminRole = Role.ADMIN;
+        List<User> admins = userRepo.findByRole(adminRole);
+        List<UserInfoDTO> adminsDTO = new ArrayList<>();
+        for (User admin : admins) {
+            adminsDTO.add(createUserDTO(admin));
+        }
+        return adminsDTO;
+    }
+
+    public List<UserInfoDTO> getAllUsers() {
+        Iterable<User> users = userRepo.findAll();
+        Iterator<User> iterator = users.iterator();
+
+        List<UserInfoDTO> usersDTO = new ArrayList<>();
+        while (iterator.hasNext()) {
+            usersDTO.add(createUserDTO(iterator.next()));
+        }
+        return usersDTO;
+    }
 }
