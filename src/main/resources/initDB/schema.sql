@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS clients
 (
 	client_id BIGINT PRIMARY KEY REFERENCES users (user_id) ON DELETE CASCADE,
 	payment_data JSON,
-	phone_number VARCHAR(20) NOT NULL UNIQUE CHECK (phone_number != ''),
+	phone_number VARCHAR(20) NOT NULL UNIQUE CHECK (phone_number SIMILAR TO '\+7 \(9\d\d\) \d\d\d-\d\d-\d\d'),
 	rating NUMERIC(3,2) CHECK ( (rating >= 0.00 AND rating <= 5.00) OR (rating is NULL) )
 );
 
