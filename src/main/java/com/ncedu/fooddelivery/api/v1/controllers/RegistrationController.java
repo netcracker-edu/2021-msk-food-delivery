@@ -19,7 +19,8 @@ public class RegistrationController {
     public isCreatedDTO registration(@RequestBody RegistrationDTO userInfo) {
 
         Long userId = registrationService.addUser(userInfo);
-        isCreatedDTO isCreated = new isCreatedDTO(userId);
+        isCreatedDTO isCreated = new isCreatedDTO();
+        isCreated.setId(userId);
 
         return isCreated;
     }
