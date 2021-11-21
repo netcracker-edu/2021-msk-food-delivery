@@ -36,7 +36,7 @@ public class RegistrationService {
 
         Long userId = -1L;
 
-        if ("CLIENT".equals(role.name())) {
+        if (Role.isCLIENT(userInfo.getRole())) {
             Client client = new Client();
             client.setPaymentData(userInfo.getPaymentData());
             client.setRating(userInfo.getRating());
@@ -44,7 +44,7 @@ public class RegistrationService {
             client.setUser(user);
             client = clientRepo.save(client);
             userId = client.getId();
-        } else if ("MODERATOR".equals(role.name())) {
+        } else if (Role.isMODERATOR(userInfo.getRole())) {
             Moderator moderator = new Moderator();
             moderator.setWarehouseId(userInfo.getWarehouseId());
             moderator.setUser(user);
