@@ -5,12 +5,14 @@ import com.ncedu.fooddelivery.api.v1.dto.ModeratorInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Client;
 import com.ncedu.fooddelivery.api.v1.entities.Moderator;
+import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.services.ClientService;
 import com.ncedu.fooddelivery.api.v1.services.ModeratorService;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
@@ -24,53 +26,55 @@ public class UserController {
     @Autowired ClientService clientService;
     @Autowired ModeratorService moderatorService;
 
-    @GetMapping("/api/v1/userFake/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'CLIENT', 'MODERATOR')")
-    public UserInfoDTO getUserFakeById(@PathVariable Long id) {
-
-        UserInfoDTO userDTO = new UserInfoDTO(
-                id,
-                "ADMIN",
-                "АЛЕША",
-                "admin@mail.ru",
-                Timestamp.valueOf(LocalDateTime.now()),
-                null);
-          return userDTO;
-    }
-
-    //TODO: check role for current user and add logic for other roles
     @GetMapping("/api/v1/user/{id}")
     @PreAuthorize("isAuthenticated()")
-    public UserInfoDTO getUserById(@PathVariable Long id) {
-        //TODO: error when user id is not presented
+    public UserInfoDTO getUserById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User authedUser
+    ) {
+
         UserInfoDTO userInfo = userService.getUserDTOById(id);
         if (userInfo == null) {
+            // TODO: error when user id is not presented
             return null;
         }
+
+        String authedUserRole = authedUser.getRole().name();
+        //client can watch only own profile
+        if (Role.isCLIENT(authedUserRole)) {
+            Long authedId = authedUser.getId();
+            if (userInfo.getId() == authedId) {
+                ClientInfoDTO  clientProfile = clientService.getClientDTOById(authedId);
+                return clientProfile;
+            }
+            // TODO: return 403 error (Forbidden) if requested not own profile
+            return null;
+        }
+
+        //get extended info depending on the role of the requested user
         String userRole = userInfo.getRole();
         Long userId = userInfo.getId();
-
-        if ("CLIENT".equals(userRole)) {
+        if (Role.isCLIENT(userRole)) {
             ClientInfoDTO clientInfo = clientService.getClientDTOById(userId);
             return clientInfo;
         }
-        if ("MODERATOR".equals(userRole)) {
+        if (Role.isMODERATOR(userRole)) {
             ModeratorInfoDTO moderatorInfo = moderatorService.getModeratorDTOById(userId);
             return moderatorInfo;
         }
-
+        //if user role is ADMIN
         return userInfo;
     }
 
     @GetMapping("/api/v1/admins")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public List<UserInfoDTO> getAdminList() {
         List<UserInfoDTO> userList = userService.getAllAdmins();
         return userList;
     }
 
     @GetMapping("/api/v1/users")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyAuthority('ADMIN', MODERATOR)")
     public List<UserInfoDTO> getUserList() {
         List<UserInfoDTO> userList = userService.getAllUsers();
         return userList;
