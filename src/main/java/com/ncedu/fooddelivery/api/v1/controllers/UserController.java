@@ -11,6 +11,8 @@ import com.ncedu.fooddelivery.api.v1.services.ClientService;
 import com.ncedu.fooddelivery.api.v1.services.ModeratorService;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,10 @@ import java.util.List;
 
 @RestController
 public class UserController {
+    //TODO: add errors and error wrappers
+    //TODO: replace returned object in methods on ResponseEntity
+    //TODO: add updating special fields with PATCH http verb
+    //TODO: add updating all fields with PUT http verb
 
     @Autowired UserService userService;
     @Autowired ClientService clientService;
@@ -66,6 +72,18 @@ public class UserController {
         return userInfo;
     }
 
+    @DeleteMapping("/api/v1/user/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> deleteUser(
+            @PathVariable Long id
+    ) {
+        boolean isDeleted = userService.deleteUserById(id);
+        if (isDeleted) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
     @GetMapping("/api/v1/admins")
     @PreAuthorize("hasAuthority('ADMIN')")
     public List<UserInfoDTO> getAdminList() {
@@ -74,7 +92,7 @@ public class UserController {
     }
 
     @GetMapping("/api/v1/users")
-    @PreAuthorize("hasAnyAuthority('ADMIN', MODERATOR)")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
     public List<UserInfoDTO> getUserList() {
         List<UserInfoDTO> userList = userService.getAllUsers();
         return userList;
