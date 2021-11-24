@@ -1,6 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.configs;
 
-import com.ncedu.fooddelivery.api.v1.services.AuthService;
+import com.ncedu.fooddelivery.api.v1.services.impls.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
-    private AuthService authService;
+    private UserDetailsServiceImpl authService;
 
     @Autowired
     private PasswordEncoder encoder;

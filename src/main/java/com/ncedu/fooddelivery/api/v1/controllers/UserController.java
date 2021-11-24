@@ -3,13 +3,9 @@ package com.ncedu.fooddelivery.api.v1.controllers;
 import com.ncedu.fooddelivery.api.v1.dto.ClientInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.ModeratorInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.UserInfoDTO;
-import com.ncedu.fooddelivery.api.v1.entities.Client;
-import com.ncedu.fooddelivery.api.v1.entities.Moderator;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
-import com.ncedu.fooddelivery.api.v1.services.ClientService;
-import com.ncedu.fooddelivery.api.v1.services.ModeratorService;
-import com.ncedu.fooddelivery.api.v1.services.UserService;
+import com.ncedu.fooddelivery.api.v1.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -70,6 +64,17 @@ public class UserController {
         }
         //if user role is ADMIN
         return userInfo;
+    }
+
+    @PatchMapping("/api/v1/user/{id}/role")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> changeUserRole(
+            @PathVariable Long id,
+            @RequestBody Role role
+    ) {
+        System.out.println("Requested id: " + id);
+        System.out.println("Requested role: " + role);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/api/v1/user/{id}")

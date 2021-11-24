@@ -1,4 +1,4 @@
-package com.ncedu.fooddelivery.api.v1.services;
+package com.ncedu.fooddelivery.api.v1.services.impls;
 
 import com.ncedu.fooddelivery.api.v1.entities.Client;
 import com.ncedu.fooddelivery.api.v1.entities.User;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @Service
-public class AuthService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     UserRepo userRepo;
