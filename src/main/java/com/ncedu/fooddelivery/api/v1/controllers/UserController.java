@@ -49,7 +49,7 @@ public class UserController {
         //client can watch only own profile
         if (Role.isCLIENT(authedUserRole)) {
             Long authedId = authedUser.getId();
-            if (userInfo.getId() == authedId) {
+            if (authedId.equals(userInfo.getId())) {
                 ClientInfoDTO  clientProfile = clientService.getClientDTOById(authedId);
                 return clientProfile;
             }
