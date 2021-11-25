@@ -5,10 +5,13 @@ import com.ncedu.fooddelivery.api.v1.dto.ModeratorInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
+import com.ncedu.fooddelivery.api.v1.errors.notfound.UserNotFoundException;
+import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
 import com.ncedu.fooddelivery.api.v1.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -35,8 +38,7 @@ public class UserController {
 
         UserInfoDTO userInfo = userService.getUserDTOById(id);
         if (userInfo == null) {
-            // TODO: error when user id is not presented
-            return null;
+            throw new UserNotFoundException("User not found id {" + id + "}");
         }
 
         String authedUserRole = authedUser.getRole().name();
@@ -47,8 +49,7 @@ public class UserController {
                 ClientInfoDTO  clientProfile = clientService.getClientDTOById(authedId);
                 return clientProfile;
             }
-            // TODO: return 403 error (Forbidden) if requested not own profile
-            return null;
+            throw new CustomAccessDeniedException();
         }
 
         //get extended info depending on the role of the requested user
