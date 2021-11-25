@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.configs;
 
+import com.ncedu.fooddelivery.api.v1.errors.security.CustomAuthenticationEntryPoint;
 import com.ncedu.fooddelivery.api.v1.services.impls.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -34,6 +36,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/*/registration", "/api/*/login", "/api/*/logout").permitAll()
                 .anyRequest().authenticated()
             .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+            .and()
                 .httpBasic();
         http.csrf().disable().cors().disable();
         http.headers().frameOptions().disable();
@@ -46,4 +51,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .userDetailsService(authService)
             .passwordEncoder(encoder);
     }
+
 }
