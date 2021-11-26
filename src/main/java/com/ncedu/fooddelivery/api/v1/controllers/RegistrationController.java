@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 public class RegistrationController {
 
@@ -15,7 +17,7 @@ public class RegistrationController {
     RegistrationService registrationService;
 
     @PostMapping("/api/v1/registration")
-    public isCreatedDTO registration(@RequestBody RegistrationDTO userInfo) {
+    public isCreatedDTO registration(@Valid @RequestBody RegistrationDTO userInfo) {
 
         Long userId = registrationService.addUser(userInfo);
         isCreatedDTO isCreated = new isCreatedDTO();
