@@ -1,4 +1,4 @@
-package com.ncedu.fooddelivery.api.v1.dto;
+package com.ncedu.fooddelivery.api.v1.dto.user;
 
 import lombok.Data;
 import javax.validation.constraints.Size;

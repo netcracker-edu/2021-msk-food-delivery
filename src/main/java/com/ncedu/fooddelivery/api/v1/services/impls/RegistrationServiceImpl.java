@@ -1,6 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
-import com.ncedu.fooddelivery.api.v1.dto.RegistrationDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.RegistrationDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Client;
 import com.ncedu.fooddelivery.api.v1.entities.Moderator;
 import com.ncedu.fooddelivery.api.v1.entities.Role;

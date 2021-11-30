@@ -1,7 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
-import com.ncedu.fooddelivery.api.v1.dto.UserChangeInfoDTO;
-import com.ncedu.fooddelivery.api.v1.dto.UserInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.UserChangeInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.services.ClientService;

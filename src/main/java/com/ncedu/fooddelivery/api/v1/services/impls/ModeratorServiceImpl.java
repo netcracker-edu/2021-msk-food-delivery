@@ -1,6 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
-import com.ncedu.fooddelivery.api.v1.dto.ModeratorInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.ModeratorInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Moderator;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.repos.ModeratorRepo;
