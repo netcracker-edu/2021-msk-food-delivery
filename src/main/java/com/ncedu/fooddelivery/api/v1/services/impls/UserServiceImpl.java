@@ -1,6 +1,8 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
+import com.ncedu.fooddelivery.api.v1.dto.UserChangeInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.UserInfoDTO;
+import com.ncedu.fooddelivery.api.v1.entities.Client;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.repos.ClientRepo;
@@ -30,11 +32,10 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserInfoDTO getUserDTOById(Long id) {
-        Optional<User> optional = userRepo.findById(id);
-        if (!optional.isPresent()) {
+        User user = getUserById(id);
+        if (user == null) {
             return null;
         }
-        User user = optional.get();
         return createUserDTO(user);
     }
 
@@ -51,6 +52,22 @@ public class UserServiceImpl implements UserService {
         }
         userRepo.delete(userForDelete);
         return true;
+    }
+
+    @Override
+    public boolean changeFullName(Long id, String newFullName) {
+        User user = getUserById(id);
+        boolean isModified = false;
+        if (user == null) {
+            return isModified;
+        }
+        if (newFullName != null) {
+            user.setFullName(newFullName);
+            userRepo.save(user);
+            isModified = true;
+            return isModified;
+        }
+        return isModified;
     }
 
     public List<UserInfoDTO> getAllAdmins() {

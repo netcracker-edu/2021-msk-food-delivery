@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.services;
 
+import com.ncedu.fooddelivery.api.v1.dto.UserChangeInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 
@@ -12,6 +13,9 @@ public interface UserService {
 
     public boolean deleteUserById(Long id);
 
+    public boolean changeFullName(Long authedUserId, String newFullName);
+
     public List<UserInfoDTO> getAllAdmins();
     public List<UserInfoDTO> getAllUsers();
+
 }

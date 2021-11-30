@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ncedu.fooddelivery.api.v1.validators.EnumValid;
 import lombok.Data;
 
@@ -8,7 +9,6 @@ import java.util.UUID;
 
 @Data
 public class RegistrationDTO {
-    //TODO: Custom enum validator
     //TODO: Class for converting phoneNumber in required format
 
     //common user info
@@ -31,7 +31,7 @@ public class RegistrationDTO {
 
     //client additional fields
     private String paymentData;
-    @Size(min=11)
+    @Size(min=11, max=20)
     private String phoneNumber;
     @Min(value = 0)
     @Max(value = 5)

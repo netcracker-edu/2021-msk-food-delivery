@@ -2,6 +2,7 @@ package com.ncedu.fooddelivery.api.v1.controllers;
 
 import com.ncedu.fooddelivery.api.v1.dto.ClientInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.ModeratorInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.UserChangeInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
@@ -16,21 +17,22 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
 public class UserController {
-    //TODO: add errors and error wrappers
     //TODO: replace returned object in methods on ResponseEntity
     //TODO: add updating special fields with PATCH http verb
-    //TODO: add updating all fields with PUT http verb
+    //TODO: add updating other fields with PUT http verb
 
     @Autowired UserService userService;
     @Autowired ClientService clientService;
     @Autowired ModeratorService moderatorService;
 
     @GetMapping("/api/v1/user/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN')")
     public UserInfoDTO getUserById(
             @PathVariable Long id,
             @AuthenticationPrincipal User authedUser
@@ -39,17 +41,6 @@ public class UserController {
         UserInfoDTO userInfo = userService.getUserDTOById(id);
         if (userInfo == null) {
             throw new UserNotFoundException("User not found id {" + id + "}");
-        }
-
-        String authedUserRole = authedUser.getRole().name();
-        //client can watch only own profile
-        if (Role.isCLIENT(authedUserRole)) {
-            Long authedId = authedUser.getId();
-            if (authedId.equals(userInfo.getId())) {
-                ClientInfoDTO  clientProfile = clientService.getClientDTOById(authedId);
-                return clientProfile;
-            }
-            throw new CustomAccessDeniedException();
         }
 
         //get extended info depending on the role of the requested user
@@ -67,14 +58,22 @@ public class UserController {
         return userInfo;
     }
 
-    @PatchMapping("/api/v1/user/{id}/role")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> changeUserRole(
+    @PutMapping("/api/v1/user/{id}")
+    @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN')")
+    public ResponseEntity<?> changeUserInfo(
             @PathVariable Long id,
-            @RequestBody Role role
-    ) {
-        System.out.println("Requested id: " + id);
-        System.out.println("Requested role: " + role);
+            @Valid @RequestBody UserChangeInfoDTO newUserInfo,
+            @AuthenticationPrincipal User authedUser) {
+
+        //client can change only own profile
+        String authedUserRole = authedUser.getRole().name();
+        if (Role.isCLIENT(authedUserRole)) {
+            if (id.equals(authedUser.getId())) {
+                boolean isModified = clientService.changeClientInfo(id, newUserInfo);
+                return new ResponseEntity<>(isModified, HttpStatus.OK);
+            }
+        }
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -88,6 +87,17 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @PatchMapping("/api/v1/user/{id}/role")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> changeUserRole(
+            @PathVariable Long id,
+            @RequestBody Role role
+    ) {
+        System.out.println("Requested id: " + id);
+        System.out.println("Requested role: " + role);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/api/v1/admins")
