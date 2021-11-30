@@ -7,6 +7,7 @@ import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.repos.UserRepo;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -108,8 +109,8 @@ public class UserServiceImpl implements UserService {
         return adminsDTO;
     }
 
-    public List<UserInfoDTO> getAllUsers() {
-        Iterable<User> users = userRepo.findAll();
+    public List<UserInfoDTO> getAllUsers(Pageable pageable) {
+        Iterable<User> users = userRepo.findAll(pageable);
         Iterator<User> iterator = users.iterator();
 
         List<UserInfoDTO> usersDTO = new ArrayList<>();

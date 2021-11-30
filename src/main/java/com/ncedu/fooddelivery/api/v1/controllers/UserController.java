@@ -9,6 +9,9 @@ import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.UserNotFoundException;
 import com.ncedu.fooddelivery.api.v1.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -106,8 +109,10 @@ public class UserController {
 
     @GetMapping("/api/v1/users")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public List<UserInfoDTO> getUserList() {
-        List<UserInfoDTO> userList = userService.getAllUsers();
+    public List<UserInfoDTO> getUserList(
+            @PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        List<UserInfoDTO> userList = userService.getAllUsers(pageable);
         return userList;
     }
 
