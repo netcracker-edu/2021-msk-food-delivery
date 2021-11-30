@@ -1,11 +1,13 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
+import com.ncedu.fooddelivery.api.v1.dto.user.EmailChangeDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.repos.UserRepo;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,6 +19,9 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     @Autowired
     UserRepo userRepo;
+
+    @Autowired
+    PasswordEncoder encoder;
 
     public User getUserById(Long id) {
         Optional<User> findedUser = userRepo.findById(id);
@@ -63,6 +68,34 @@ public class UserServiceImpl implements UserService {
             return isModified;
         }
         return isModified;
+    }
+
+    @Override
+    public boolean changeEmail(Long id, EmailChangeDTO newEmailInfo) {
+        User user = getUserById(id);
+        if (user == null) {
+            return false;
+        }
+        return changeEmail(user, newEmailInfo);
+    }
+
+    @Override
+    public boolean changeEmail(User user, EmailChangeDTO newEmailInfo) {
+        String newUserEmail = newEmailInfo.getEmail();
+        User userWithNewEmail = userRepo.findByEmail(newUserEmail);
+        //user with new email also exist throw exception!
+        if (userWithNewEmail != null) {
+            return false; //TODO create special exception and throw it
+        }
+        String inputPassword = newEmailInfo.getPassword();
+        String userEncodedPassword = user.getPassword();
+        boolean isPasswordsSame = encoder.matches(inputPassword, userEncodedPassword);
+        if (!isPasswordsSame) {
+            return false; //TODO throw special exception
+        }
+        user.setEmail(newUserEmail);
+        userRepo.save(user);
+        return true;
     }
 
     public List<UserInfoDTO> getAllAdmins() {

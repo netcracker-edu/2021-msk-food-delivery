@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
+import com.ncedu.fooddelivery.api.v1.dto.user.EmailChangeDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.UserChangeInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
@@ -63,6 +64,17 @@ public class ProfileController {
         String newFullName = newUserInfo.getFullName();
         isModified = userService.changeFullName(authedUserId, newFullName);
 
+        return createModifyResponse(isModified);
+    }
+
+    @PatchMapping("/api/v1/profile/email")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> changeUserEmail(
+            @Valid @RequestBody EmailChangeDTO newEmailInfo,
+            @AuthenticationPrincipal User authedUser
+    ) {
+        boolean isModified = false;
+        isModified = userService.changeEmail(authedUser, newEmailInfo);
         return createModifyResponse(isModified);
     }
 
