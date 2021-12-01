@@ -6,7 +6,7 @@ import com.ncedu.fooddelivery.api.v1.dto.user.UserChangeInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
-import com.ncedu.fooddelivery.api.v1.errors.notfound.UserNotFoundException;
+import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +40,7 @@ public class UserController {
 
         UserInfoDTO userInfo = userService.getUserDTOById(id);
         if (userInfo == null) {
-            throw new UserNotFoundException("User not found id {" + id + "}");
+            throw new NotFoundEx(id.toString());
         }
 
         //get extended info depending on the role of the requested user

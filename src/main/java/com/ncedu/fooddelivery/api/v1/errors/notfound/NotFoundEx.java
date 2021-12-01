@@ -5,15 +5,18 @@ import lombok.Data;
 @Data
 public class NotFoundEx extends RuntimeException{
 
-    private String uuid;
+    private final static String uuid = "b912070d-24ce-4a8e-a69d-528f1ce9bcef";
+    private final static String msg = "Entity with such value not found";
 
-    public NotFoundEx(String message) {
-        super(message);
+    public NotFoundEx(String value) {
+        super(String.format("%s: {%s}", msg, value));
     }
 
-    public NotFoundEx(String message, String uuid) {
-        super(message);
-       this.uuid = uuid;
+    public String getUuid() {
+        return uuid;
+    }
+    public String getMsg() {
+        return msg;
     }
 
 }
