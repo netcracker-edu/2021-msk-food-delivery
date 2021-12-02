@@ -3,15 +3,22 @@ package com.ncedu.fooddelivery.api.v1.services.impls;
 import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.AcceptSupplyDTO;
 import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.ProductPositionInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.*;
+import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPosition;
+import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPositionNotHierarchical;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.ProductNotFoundException;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.WarehouseNotFoundException;
 import com.ncedu.fooddelivery.api.v1.repos.OrderProductPositionRepo;
 import com.ncedu.fooddelivery.api.v1.repos.ProductRepo;
-import com.ncedu.fooddelivery.api.v1.repos.ProductPositionRepo;
+import com.ncedu.fooddelivery.api.v1.repos.productPosition.ProductPositionNotHierarchicalRepo;
+import com.ncedu.fooddelivery.api.v1.repos.productPosition.ProductPositionRepo;
 import com.ncedu.fooddelivery.api.v1.repos.WarehouseRepo;
 import com.ncedu.fooddelivery.api.v1.services.ProductPositionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,6 +28,9 @@ public class ProductPositionServiceImpl1 implements ProductPositionService {
 
     @Autowired
     ProductPositionRepo productPositionRepo;
+
+    @Autowired
+    ProductPositionNotHierarchicalRepo productPositionNotHierarchicalRepo;
 
     @Autowired
     WarehouseRepo warehouseRepo;
@@ -92,7 +102,7 @@ public class ProductPositionServiceImpl1 implements ProductPositionService {
 
     @Override
     public List<ProductPositionInfoDTO> getExpiredPositions(Long warehouseId) {
-        return null;
+        return productPositionRepo.findExpiredPositions(warehouseId).stream().map(p -> convertToInfoDTO(p)).collect(Collectors.toList());
     }
 
     @Override
@@ -105,9 +115,24 @@ public class ProductPositionServiceImpl1 implements ProductPositionService {
         return entries;
     }
 
+    @Override
+    public List<ProductPositionInfoDTO> findFiltered(Specification<ProductPositionNotHierarchical> spec, Pageable pageable) {
+        Page<ProductPositionNotHierarchical> productPositions = productPositionNotHierarchicalRepo.findAll(spec, pageable);
+        return productPositions.stream().map(position -> convertToInfoDTO(position)).collect(Collectors.toList());
+    }
+
     public ProductPositionInfoDTO convertToInfoDTO(ProductPosition productPosition){
         return new ProductPositionInfoDTO(productPosition.getId(), productPosition.getProduct(),
                 productPosition.getWarehouse(), productPosition.getWarehouseSection(),
+                productPosition.getSupplyAmount(), productPosition.getCurrentAmount(),
+                productPosition.getSupplyDate(), productPosition.getSupplierInvoice(),
+                productPosition.getSupplierName(), productPosition.getIsInvoicePaid(),
+                productPosition.getSupplyDate());
+    }
+
+    public ProductPositionInfoDTO convertToInfoDTO(ProductPositionNotHierarchical productPosition){
+        return new ProductPositionInfoDTO(productPosition.getId(), productRepo.findById(productPosition.getProductId()).get(),
+                warehouseRepo.findById(productPosition.getWarehouseId()).get(), productPosition.getWarehouseSection(),
                 productPosition.getSupplyAmount(), productPosition.getCurrentAmount(),
                 productPosition.getSupplyDate(), productPosition.getSupplierInvoice(),
                 productPosition.getSupplierName(), productPosition.getIsInvoicePaid(),

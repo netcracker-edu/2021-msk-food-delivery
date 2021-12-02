@@ -5,15 +5,24 @@ import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.ProductPositionInfo
 import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.UpdatePaymentStatusDTO;
 import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Order;
-import com.ncedu.fooddelivery.api.v1.entities.ProductPosition;
+import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPosition;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
+import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPositionNotHierarchical;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.OrderNotFoundException;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.ProductPositionNotFoundException;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
 import com.ncedu.fooddelivery.api.v1.services.OrderService;
 import com.ncedu.fooddelivery.api.v1.services.ProductPositionService;
+import net.kaczmarzyk.spring.data.jpa.domain.Equal;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.OnTypeMismatch;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +34,7 @@ import javax.validation.*;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // TODO: ask question about decreasing current amount of product_positions when order status is "created"
 
@@ -134,14 +144,40 @@ public class ProductPositionController {
     // TODO: ask about DTO: should we return exactly ProductPositionDTO?
     @GetMapping("/api/v1/order/{id}/productPositions")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public ResponseEntity<List<AbstractMap.SimpleEntry<Integer, ProductPositionInfoDTO>>> getProductPositionsInOrder(@AuthenticationPrincipal User user, @PathVariable Long id){
+    public ResponseEntity<List<AbstractMap.SimpleEntry<Integer, ProductPositionInfoDTO>>> getProductPositionsInOrder(@AuthenticationPrincipal User user,
+                                                                                                                     @PathVariable Long id){
         Order order = orderService.getOrder(id);
         if(order == null) throw new OrderNotFoundException(id);
 
         if(user.getRole() == Role.MODERATOR){
             if(!user.getModerator().getWarehouseId().equals(order.getWarehouse().getId())) throw new CustomAccessDeniedException();
         }
-        return new ResponseEntity<List<AbstractMap.SimpleEntry<Integer, ProductPositionInfoDTO>>>(productPositionService.getPositionsFromOrder(order), HttpStatus.OK);
+        return new ResponseEntity<>(productPositionService.getPositionsFromOrder(order), HttpStatus.OK);
+    }
+
+    @GetMapping("/api/v1/productPositions")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
+    public List<ProductPositionInfoDTO> helloAdmin(@AuthenticationPrincipal User user,
+                           @And({
+                                   @Spec(path="productId", params="productId", spec=Equal.class, onTypeMismatch= OnTypeMismatch.EXCEPTION),
+                                   @Spec(path="warehouseId", params="warehouseId", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
+                                   @Spec(path="warehouseSection", params="warehouseSection", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
+                                   @Spec(path="supplyAmount", params="supplyAmount", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
+                                   @Spec(path="currentAmount", params="currentAmount", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
+                                   @Spec(path="supplyDate", params="supplyDate", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
+                                   @Spec(path="supplierInvoice", params="supplierInvoice", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
+                                   @Spec(path="supplierName", params="supplierName", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
+                                   @Spec(path="isInvoicePaid", params="isInvoicePaid", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
+                                   @Spec(path="manufactureDate", params="manufactureDate", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
+                           }) Specification<ProductPositionNotHierarchical> productPositionSpecification,
+                           Pageable pageable){
+
+        List<ProductPositionInfoDTO> filteredPositions = productPositionService.findFiltered(productPositionSpecification, pageable);
+        if(user.getRole() == Role.MODERATOR){
+            Long moderatorWarehouseId = user.getModerator().getWarehouseId();
+            filteredPositions = filteredPositions.stream().filter(position -> position.getWarehouse().getId().equals(moderatorWarehouseId)).collect(Collectors.toList());
+        }
+        return filteredPositions;
     }
 
 }

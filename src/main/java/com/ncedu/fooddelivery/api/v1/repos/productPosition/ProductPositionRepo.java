@@ -1,6 +1,9 @@
-package com.ncedu.fooddelivery.api.v1.repos;
+package com.ncedu.fooddelivery.api.v1.repos.productPosition;
 
-import com.ncedu.fooddelivery.api.v1.entities.ProductPosition;
+import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPosition;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,4 +31,5 @@ public interface ProductPositionRepo extends JpaRepository<ProductPosition, Long
     )
     List<ProductPosition> findExpiredPositions(@Param(value = "id") Long id);
 
+    Page<ProductPosition> findAll(Specification<ProductPosition> spec, Pageable pageable);
 }

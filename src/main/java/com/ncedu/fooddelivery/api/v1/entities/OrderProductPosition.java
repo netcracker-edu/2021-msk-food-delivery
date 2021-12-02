@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.entities;
 
+import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPosition;
 import lombok.Data;
 
 import javax.persistence.*;
