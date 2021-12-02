@@ -1,11 +1,12 @@
 CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 CREATE TABLE IF NOT EXISTS warehouses(warehouse_id BIGSERIAL PRIMARY KEY,
                                       geo geometry(POINT) NOT NULL,
-    address VARCHAR(50) NOT NULL,
-    name VARCHAR(50) NOT NULL,
-    delivery_zone geometry NOT NULL,
-    is_deactivated BOOLEAN NOT NULL DEFAULT false);
+                                      address VARCHAR(50) NOT NULL,
+                                      name VARCHAR(50) NOT NULL,
+                                      delivery_zone geometry NOT NULL,
+                                      is_deactivated BOOLEAN NOT NULL DEFAULT false);
 
 CREATE TABLE IF NOT EXISTS couriers(courier_id BIGINT PRIMARY KEY,
                                     warehouse_id BIGINT,
@@ -22,7 +23,7 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ''order_status'') THEN
         CREATE TYPE order_status AS ENUM
         (
-            ''created'', ''courier_appointed'', ''packing'', ''delivering'', ''delivered'', ''cancelled''
+            ''CREATED'', ''COURIER_APPOINTED'', ''PACKING'', ''DELIVERING'', ''DELIVERED'', ''CANCELLED''
         );
     END IF;
 END' language plpgsql;
@@ -33,7 +34,7 @@ CREATE TABLE IF NOT EXISTS orders(order_id BIGSERIAL PRIMARY KEY,
                     coordinates geometry NOT NULL,
                     warehouse_id BIGINT,
                     courier_id BIGINT, 
-                    status order_status NOT NULL DEFAULT 'created',
+                    status order_status NOT NULL DEFAULT 'CREATED',
                     date_start TIMESTAMP NOT NULL,
                     date_end TIMESTAMP,
                     overall_cost NUMERIC(7, 2) NOT NULL CHECK(overall_cost > 0), 
@@ -71,14 +72,14 @@ DROP FUNCTION IF EXISTS order_update_status() CASCADE;
 CREATE OR REPLACE FUNCTION order_update_status() RETURNS TRIGGER
 AS '
 BEGIN
-        IF NEW.status = ''cancelled'' THEN
+        IF NEW.status = ''CANCELLED'' THEN
             DECLARE pos BIGINT;
             BEGIN
                 FOR pos IN (SELECT product_position_id FROM (SELECT * FROM orders INNER JOIN orders_product_positions USING(order_id) WHERE order_id = NEW.order_id) positions) LOOP
                 UPDATE product_positions orders_product_positions SET current_amount = current_amount + (SELECT amount FROM orders INNER JOIN orders_product_positions USING(order_id) WHERE order_id = NEW.order_id AND product_position_id = pos) WHERE product_position_id = pos; 
                 END LOOP;
             END;
-        ELSIF NEW.status = ''delivered'' THEN
+        ELSIF NEW.status = ''DELIVERED'' THEN
             UPDATE orders SET date_end = CURRENT_TIMESTAMP(0) WHERE order_id = NEW.order_id;
         END IF;
     RETURN NEW;
@@ -103,6 +104,7 @@ CREATE TABLE IF NOT EXISTS product_positions(product_position_id BIGSERIAL PRIMA
     supplier_name VARCHAR(30) NOT NULL,
     is_invoice_paid BOOLEAN NOT NULL DEFAULT false,
     manufacture_date DATE NOT NULL,
+    FOREIGN KEY(product_id) REFERENCES products (product_id) ON DELETE CASCADE,
     FOREIGN KEY(warehouse_id) REFERENCES warehouses (warehouse_id) ON DELETE CASCADE);
 
 

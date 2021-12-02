@@ -55,13 +55,13 @@ BEGIN
 IF NOT EXISTS (SELECT 1 FROM product_positions WHERE product_position_id = 1) THEN
 INSERT INTO product_positions(product_id, warehouse_id, warehouse_section, supply_amount, current_amount, supply_date, supplier_invoice, supplier_name, is_invoice_paid, manufacture_date)
     VALUES
-        (1, 1, ''Ц-1-100-Л'', 100, 50, date (CURRENT_DATE) - integer ''3'', 8435, ''ЭкоНива'', true, date (CURRENT_DATE) - integer ''3''),  -- 120.5 * 0.7 = 84,35р
+        (1, 1, ''Ц-1-100-Л'', 100, 50, date (CURRENT_DATE) - integer ''3'', 8435, ''ЭкоНива'', false, date (CURRENT_DATE) - integer ''3''),  -- 120.5 * 0.7 = 84,35р
         (1, 2, ''Ю-1-100-Л'', 100, 50, date (CURRENT_DATE) - integer ''3'', 8435, ''ЭкоНива'', true, date (CURRENT_DATE) - integer ''3''),
         (1, 3, ''З-1-100-Л'', 100, 50, date (CURRENT_DATE) - integer ''3'', 8435, ''ЭкоНива'', true, date (CURRENT_DATE) - integer ''3''),
         (1, 4, ''С-1-100-Л'', 100, 50, date (CURRENT_DATE) - integer ''3'', 8435, ''ЭкоНива'', true, date (CURRENT_DATE) - integer ''3''),
         (1, 5, ''В-1-100-Л'', 100, 50, date (CURRENT_DATE) - integer ''3'', 8435, ''ЭкоНива'', true, date (CURRENT_DATE) - integer ''3''),
 
-        (2, 1, ''Ц-1-101-Л'', 90, 45, date (CURRENT_DATE) - integer ''3'', 5040, ''ЭкоНива'', true, date (CURRENT_DATE) - integer ''3''),   -- 80 * 0.7 = 56р
+        (2, 1, ''Ц-1-101-Л'', 90, 45, date (CURRENT_DATE) - integer ''3'', 5040, ''ЭкоНива'', false, date (CURRENT_DATE) - integer ''3''),   -- 80 * 0.7 = 56р
         (2, 2, ''Ю-1-101-Л'', 90, 45, date (CURRENT_DATE) - integer ''3'', 5040, ''ЭкоНива'', true, date (CURRENT_DATE) - integer ''3''),
         (2, 3, ''З-1-101-Л'', 90, 45, date (CURRENT_DATE) - integer ''3'', 5040, ''ЭкоНива'', true, date (CURRENT_DATE) - integer ''3''),
         (2, 4, ''С-1-101-Л'', 90, 45, date (CURRENT_DATE) - integer ''3'', 5040, ''ЭкоНива'', true, date (CURRENT_DATE) - integer ''3''),
@@ -814,132 +814,132 @@ BEGIN
         INSERT INTO orders(client_id, address, coordinates, warehouse_id, courier_id, status, date_start, date_end, overall_cost, promo_code_id, discount)
         VALUES
             -- заказы с центрального склада,
-            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 1, 52, ''delivered'', CURRENT_DATE - integer ''3'' + time ''09:02'', CURRENT_DATE - integer ''3'' + time ''09:30'', 349.20, NULL, 0 ),
-            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607515), 4326), 1, 52, ''cancelled'', CURRENT_DATE - integer ''3'' + time ''14:19'', CURRENT_DATE - integer ''3'' + time ''14:20'', 587.09, NULL, 0 ),
-            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607512), 4326), 1, 52, ''delivered'', CURRENT_DATE - integer ''3'' + time ''18:10'', CURRENT_DATE - integer ''3'' + time ''18:47'', 324.69, NULL, 0 ),
-            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754583, 37.607513), 4326), 1, 54, ''delivered'', CURRENT_DATE - integer ''2'' + time ''10:22'', CURRENT_DATE - integer ''2'' + time ''10:49'', 817.80, NULL, 0 ),
-            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 1, 54, ''delivered'', CURRENT_DATE - integer ''2'' + time ''15:26'', CURRENT_DATE - integer ''2'' + time ''15:50'', 525.05, NULL, 0 ),
-            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 1, 55, ''delivered'', CURRENT_DATE - integer ''2'' + time ''19:22'', CURRENT_DATE - integer ''2'' + time ''19:54'', 1019.40, NULL, 0),
-            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 1, 55, ''delivered'', CURRENT_DATE - integer ''2'' + time ''22:01'', CURRENT_DATE - integer ''2'' + time ''22:40'', 1571.26, NULL, 0),
-            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 1, 53, ''delivered'', CURRENT_DATE - integer ''1'' + time ''10:22'', CURRENT_DATE - integer ''1'' + time ''10:49'', 971.20, NULL, 0),
-            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 1, 53, ''delivered'', CURRENT_DATE - integer ''1'' + time ''14:21'', CURRENT_DATE - integer ''1'' + time ''14:59'', 592.50, NULL, 0),
-            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 1, 53, ''delivered'', CURRENT_DATE - integer ''1'' + time ''20:53'', CURRENT_DATE - integer ''1'' + time ''21:29'', 689.70, NULL, 0),
+            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 1, 52, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''09:02'', CURRENT_DATE - integer ''3'' + time ''09:30'', 349.20, NULL, 0 ),
+            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607515), 4326), 1, 52, ''CANCELLED'', CURRENT_DATE - integer ''3'' + time ''14:19'', CURRENT_DATE - integer ''3'' + time ''14:20'', 587.09, NULL, 0 ),
+            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607512), 4326), 1, 52, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''18:10'', CURRENT_DATE - integer ''3'' + time ''18:47'', 324.69, NULL, 0 ),
+            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754583, 37.607513), 4326), 1, 54, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''10:22'', CURRENT_DATE - integer ''2'' + time ''10:49'', 817.80, NULL, 0 ),
+            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 1, 54, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''15:26'', CURRENT_DATE - integer ''2'' + time ''15:50'', 525.05, NULL, 0 ),
+            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 1, 55, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''19:22'', CURRENT_DATE - integer ''2'' + time ''19:54'', 1019.40, NULL, 0),
+            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 1, 55, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''22:01'', CURRENT_DATE - integer ''2'' + time ''22:40'', 1571.26, NULL, 0),
+            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 1, 53, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''10:22'', CURRENT_DATE - integer ''1'' + time ''10:49'', 971.20, NULL, 0),
+            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 1, 53, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''14:21'', CURRENT_DATE - integer ''1'' + time ''14:59'', 592.50, NULL, 0),
+            (2, ''42-й квартал, район Арбат'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 1, 53, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''20:53'', CURRENT_DATE - integer ''1'' + time ''21:29'', 689.70, NULL, 0),
 
-            (3, ''Берниковская набережная, 14'', ST_SetSRID(ST_MakePoint(55.748883, 37.652256), 4326), 1, 52, ''delivered'', CURRENT_DATE - integer ''3'' + time ''09:32'', CURRENT_DATE - integer ''3'' + time ''09:57'', 447.80, NULL, 0),
-            (4, ''Берниковская набережная, 14'', ST_SetSRID(ST_MakePoint(55.748884, 37.652253), 4326), 1, 53, ''delivered'', CURRENT_DATE - integer ''3'' + time ''09:02'', CURRENT_DATE - integer ''3'' + time ''09:40'', 371.40, NULL, 0),
-            (5, ''Берниковская набережная, 14'', ST_SetSRID(ST_MakePoint(55.748882, 37.652254), 4326), 1, 54, ''delivered'', CURRENT_DATE - integer ''3'' + time ''08:59'', CURRENT_DATE - integer ''3'' + time ''09:30'', 607.20, NULL, 0),
-            (6, ''Берниковская набережная, 14'', ST_SetSRID(ST_MakePoint(55.748886, 37.652255), 4326), 1, 55, ''delivered'', CURRENT_DATE - integer ''3'' + time ''16:22'', CURRENT_DATE - integer ''3'' + time ''16:56'', 759.60, NULL, 0),
-            (7, ''Берниковская набережная, 14'', ST_SetSRID(ST_MakePoint(55.748883, 37.652257), 4326), 1, 52, ''delivered'', CURRENT_DATE - integer ''2'' + time ''10:00'', CURRENT_DATE - integer ''2'' + time ''10:30'', 457.20, NULL, 0),
-            (8, ''Берниковская набережная, 14'', ST_SetSRID(ST_MakePoint(55.748885, 37.652258), 4326), 1, 53, ''delivered'', CURRENT_DATE - integer ''2'' + time ''15:02'', CURRENT_DATE - integer ''2'' + time ''15:45'', 983.80, NULL, 0),
-            (9, ''Берниковская набережная, 14'', ST_SetSRID(ST_MakePoint(55.748881, 37.652256), 4326), 1, 54, ''delivered'', CURRENT_DATE - integer ''2'' + time ''11:03'', CURRENT_DATE - integer ''2'' + time ''11:32'', 527.40, NULL, 0),
-            (10,''Берниковская набережная, 14'' ,ST_SetSRID(ST_MakePoint(55.748883, 37.652251), 4326) ,1 ,55 ,''delivered'' ,CURRENT_DATE - integer ''1'' + time ''09:02'', CURRENT_DATE - integer ''1'' + time ''09:30'', 488.80, NULL, 0),
-            (11,''Берниковская набережная, 14'' ,ST_SetSRID(ST_MakePoint(55.748884, 37.652252), 4326) ,1 ,52 ,''delivered'' ,CURRENT_DATE - integer ''1'' + time ''20:02'', CURRENT_DATE - integer ''1'' + time ''20:38'', 674.80, 24, 10.0),
-            (12,''Берниковская набережная, 14'' ,ST_SetSRID(ST_MakePoint(55.748883, 37.652253), 4326) ,1 ,53 ,''delivered'' ,CURRENT_DATE - integer ''1'' + time ''11:04'', CURRENT_DATE - integer ''1'' + time ''11:29'', 802.40, NULL, 0),
+            (3, ''Берниковская набережная, 14'', ST_SetSRID(ST_MakePoint(55.748883, 37.652256), 4326), 1, 52, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''09:32'', CURRENT_DATE - integer ''3'' + time ''09:57'', 447.80, NULL, 0),
+            (4, ''Берниковская набережная, 14'', ST_SetSRID(ST_MakePoint(55.748884, 37.652253), 4326), 1, 53, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''09:02'', CURRENT_DATE - integer ''3'' + time ''09:40'', 371.40, NULL, 0),
+            (5, ''Берниковская набережная, 14'', ST_SetSRID(ST_MakePoint(55.748882, 37.652254), 4326), 1, 54, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''08:59'', CURRENT_DATE - integer ''3'' + time ''09:30'', 607.20, NULL, 0),
+            (6, ''Берниковская набережная, 14'', ST_SetSRID(ST_MakePoint(55.748886, 37.652255), 4326), 1, 55, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''16:22'', CURRENT_DATE - integer ''3'' + time ''16:56'', 759.60, NULL, 0),
+            (7, ''Берниковская набережная, 14'', ST_SetSRID(ST_MakePoint(55.748883, 37.652257), 4326), 1, 52, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''10:00'', CURRENT_DATE - integer ''2'' + time ''10:30'', 457.20, NULL, 0),
+            (8, ''Берниковская набережная, 14'', ST_SetSRID(ST_MakePoint(55.748885, 37.652258), 4326), 1, 53, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''15:02'', CURRENT_DATE - integer ''2'' + time ''15:45'', 983.80, NULL, 0),
+            (9, ''Берниковская набережная, 14'', ST_SetSRID(ST_MakePoint(55.748881, 37.652256), 4326), 1, 54, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''11:03'', CURRENT_DATE - integer ''2'' + time ''11:32'', 527.40, NULL, 0),
+            (10,''Берниковская набережная, 14'' ,ST_SetSRID(ST_MakePoint(55.748883, 37.652251), 4326) ,1 ,55 ,''DELIVERED'' ,CURRENT_DATE - integer ''1'' + time ''09:02'', CURRENT_DATE - integer ''1'' + time ''09:30'', 488.80, NULL, 0),
+            (11,''Берниковская набережная, 14'' ,ST_SetSRID(ST_MakePoint(55.748884, 37.652252), 4326) ,1 ,52 ,''DELIVERED'' ,CURRENT_DATE - integer ''1'' + time ''20:02'', CURRENT_DATE - integer ''1'' + time ''20:38'', 674.80, 24, 10.0),
+            (12,''Берниковская набережная, 14'' ,ST_SetSRID(ST_MakePoint(55.748883, 37.652253), 4326) ,1 ,53 ,''DELIVERED'' ,CURRENT_DATE - integer ''1'' + time ''11:04'', CURRENT_DATE - integer ''1'' + time ''11:29'', 802.40, NULL, 0),
 
 
             -- заказы с южного склада
 
-            (33, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 2, NULL, ''cancelled'', CURRENT_DATE - integer ''3'' + time ''09:29'', CURRENT_DATE - integer ''3'' + time ''09:30'', 478.90, NULL, 0),
-            (34, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754583, 37.607516), 4326), 2, 56, ''delivered'', CURRENT_DATE - integer ''3'' + time ''09:34'', CURRENT_DATE - integer ''3'' + time ''10:00'',   922.40, NULL, 0),
-            (37, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754582, 37.607518), 4326), 2, 56, ''delivered'', CURRENT_DATE - integer ''3'' + time ''10:02'', CURRENT_DATE - integer ''3'' + time ''10:40'',   1316.40, NULL, 0),
-            (36, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754581, 37.607511), 4326), 2, 56, ''delivered'', CURRENT_DATE - integer ''1'' + time ''12:22'', CURRENT_DATE - integer ''1'' + time ''12:50'',   398.10, NULL, 0),
-            (37, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754583, 37.607512), 4326), 2, 56, ''delivered'', CURRENT_DATE - integer ''1'' + time ''12:55'', CURRENT_DATE - integer ''1'' + time ''13:30'',   537.0, NULL, 0),
+            (33, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 2, NULL, ''CANCELLED'', CURRENT_DATE - integer ''3'' + time ''09:29'', CURRENT_DATE - integer ''3'' + time ''09:30'', 478.90, NULL, 0),
+            (34, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754583, 37.607516), 4326), 2, 56, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''09:34'', CURRENT_DATE - integer ''3'' + time ''10:00'',   922.40, NULL, 0),
+            (37, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754582, 37.607518), 4326), 2, 56, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''10:02'', CURRENT_DATE - integer ''3'' + time ''10:40'',   1316.40, NULL, 0),
+            (36, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754581, 37.607511), 4326), 2, 56, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''12:22'', CURRENT_DATE - integer ''1'' + time ''12:50'',   398.10, NULL, 0),
+            (37, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754583, 37.607512), 4326), 2, 56, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''12:55'', CURRENT_DATE - integer ''1'' + time ''13:30'',   537.0, NULL, 0),
 
-            (38, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754584, 37.607514), 4326), 2, 57, ''delivered'', CURRENT_DATE - integer ''3'' + time ''12:05'', CURRENT_DATE - integer ''3'' + time ''12:36'', 1456.60, NULL, 0),
-            (39, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754585, 37.607515), 4326), 2, 57, ''delivered'', CURRENT_DATE - integer ''3'' + time ''12:55'', CURRENT_DATE - integer ''3'' + time ''13:32'', 677.80, NULL, 0),
-            (40, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754582, 37.607514), 4326), 2, 57, ''delivered'', CURRENT_DATE - integer ''2'' + time ''19:00'', CURRENT_DATE - integer ''2'' + time ''19:42'', 824.10, NULL, 0),
-            (41, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754581, 37.607511), 4326), 2, 57, ''delivered'', CURRENT_DATE - integer ''1'' + time ''10:55'', CURRENT_DATE - integer ''1'' + time ''11:35'', 501.30, NULL, 0),
-            (42, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754586, 37.607510), 4326), 2, 57, ''delivered'', CURRENT_DATE - integer ''1'' + time ''11:40'', CURRENT_DATE - integer ''1'' + time ''12:11'', 758.50, NULL, 0),
+            (38, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754584, 37.607514), 4326), 2, 57, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''12:05'', CURRENT_DATE - integer ''3'' + time ''12:36'', 1456.60, NULL, 0),
+            (39, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754585, 37.607515), 4326), 2, 57, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''12:55'', CURRENT_DATE - integer ''3'' + time ''13:32'', 677.80, NULL, 0),
+            (40, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754582, 37.607514), 4326), 2, 57, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''19:00'', CURRENT_DATE - integer ''2'' + time ''19:42'', 824.10, NULL, 0),
+            (41, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754581, 37.607511), 4326), 2, 57, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''10:55'', CURRENT_DATE - integer ''1'' + time ''11:35'', 501.30, NULL, 0),
+            (42, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754586, 37.607510), 4326), 2, 57, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''11:40'', CURRENT_DATE - integer ''1'' + time ''12:11'', 758.50, NULL, 0),
 
-            (43, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754584, 37.607515), 4326), 2, 58, ''delivered'', CURRENT_DATE - integer ''3'' + time ''09:17'', CURRENT_DATE - integer ''3'' + time ''09:40'', 643.00, NULL, 0),
-            (44, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754581, 37.607516), 4326), 2, 58, ''delivered'', CURRENT_DATE - integer ''3'' + time ''09:42'', CURRENT_DATE - integer ''3'' + time ''10:05'', 523.10, NULL, 0),
-            (44, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754583, 37.607511), 4326), 2, 58, ''delivered'', CURRENT_DATE - integer ''3'' + time ''10:07'', CURRENT_DATE - integer ''3'' + time ''10:50'', 804.00, 24, 10.0),
-            (46, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 2, 58, ''delivered'', CURRENT_DATE - integer ''3'' + time ''10:53'', CURRENT_DATE - integer ''3'' + time ''11:29'', 583.80, NULL, 0),
-            (47, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754584, 37.607514), 4326), 2, 58, ''delivered'', CURRENT_DATE - integer ''1'' + time ''19:07'', CURRENT_DATE - integer ''1'' + time ''19:47'', 746.10, NULL, 0),
+            (43, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754584, 37.607515), 4326), 2, 58, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''09:17'', CURRENT_DATE - integer ''3'' + time ''09:40'', 643.00, NULL, 0),
+            (44, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754581, 37.607516), 4326), 2, 58, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''09:42'', CURRENT_DATE - integer ''3'' + time ''10:05'', 523.10, NULL, 0),
+            (44, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754583, 37.607511), 4326), 2, 58, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''10:07'', CURRENT_DATE - integer ''3'' + time ''10:50'', 804.00, 24, 10.0),
+            (46, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754582, 37.607513), 4326), 2, 58, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''10:53'', CURRENT_DATE - integer ''3'' + time ''11:29'', 583.80, NULL, 0),
+            (47, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754584, 37.607514), 4326), 2, 58, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''19:07'', CURRENT_DATE - integer ''1'' + time ''19:47'', 746.10, NULL, 0),
 
-            (48, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754582, 37.607515), 4326), 2, 59, ''delivered'', CURRENT_DATE - integer ''1'' + time ''08:57'', CURRENT_DATE - integer ''1'' + time ''09:30'', 731.50, NULL, 0),
-            (49, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754581, 37.607515), 4326), 2, 59, ''delivered'', CURRENT_DATE - integer ''1'' + time ''09:34'', CURRENT_DATE - integer ''1'' + time ''10:01'', 1070.20, NULL, 0),
-            (50, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754583, 37.607516), 4326), 2, 59, ''delivered'', CURRENT_DATE - integer ''1'' + time ''10:06'', CURRENT_DATE - integer ''1'' + time ''10:32'', 415.10, NULL, 0),
-            (51, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754584, 37.607511), 4326), 2, 59, ''delivered'', CURRENT_DATE - integer ''1'' + time ''10:37'', CURRENT_DATE - integer ''1'' + time ''11:01'', 533.80, NULL, 0),
-            (3 , ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754585, 37.607514), 4326), 2, 59, ''delivered'', CURRENT_DATE - integer ''1'' + time ''11:02'', CURRENT_DATE - integer ''1'' + time ''11:39'', 432.80, NULL, 0),
+            (48, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754582, 37.607515), 4326), 2, 59, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''08:57'', CURRENT_DATE - integer ''1'' + time ''09:30'', 731.50, NULL, 0),
+            (49, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754581, 37.607515), 4326), 2, 59, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''09:34'', CURRENT_DATE - integer ''1'' + time ''10:01'', 1070.20, NULL, 0),
+            (50, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754583, 37.607516), 4326), 2, 59, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''10:06'', CURRENT_DATE - integer ''1'' + time ''10:32'', 415.10, NULL, 0),
+            (51, ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754584, 37.607511), 4326), 2, 59, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''10:37'', CURRENT_DATE - integer ''1'' + time ''11:01'', 533.80, NULL, 0),
+            (3 , ''Каширский проезд, 25к2'', ST_SetSRID(ST_MakePoint(55.754585, 37.607514), 4326), 2, 59, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''11:02'', CURRENT_DATE - integer ''1'' + time ''11:39'', 432.80, NULL, 0),
 
             -- заказы с западного склада
 
-            (4 , ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757318, 37.482154), 4326), 3, 60, ''delivered'', CURRENT_DATE - integer ''3'' + time ''09:01'', CURRENT_DATE - integer ''3'' + time ''09:30'', 535.90, NULL, 0),
-            (5 , ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757319, 37.482150), 4326), 3, 60, ''delivered'', CURRENT_DATE - integer ''3'' + time ''09:32'', CURRENT_DATE - integer ''3'' + time ''09:59'', 480.80, NULL, 0),
-            (6 , ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757310, 37.482151), 4326), 3, 60, ''delivered'', CURRENT_DATE - integer ''3'' + time ''10:02'', CURRENT_DATE - integer ''3'' + time ''10:39'', 586.70, NULL, 0),
-            (7 , ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757311, 37.482152), 4326), 3, 60, ''delivered'', CURRENT_DATE - integer ''2'' + time ''16:02'', CURRENT_DATE - integer ''2'' + time ''16:45'', 751.90, NULL, 0),
-            (8 , ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757312, 37.482153), 4326), 3, 60, ''delivered'', CURRENT_DATE - integer ''2'' + time ''16:48'', CURRENT_DATE - integer ''2'' + time ''17:36'', 492.0, NULL, 0),
+            (4 , ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757318, 37.482154), 4326), 3, 60, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''09:01'', CURRENT_DATE - integer ''3'' + time ''09:30'', 535.90, NULL, 0),
+            (5 , ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757319, 37.482150), 4326), 3, 60, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''09:32'', CURRENT_DATE - integer ''3'' + time ''09:59'', 480.80, NULL, 0),
+            (6 , ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757310, 37.482151), 4326), 3, 60, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''10:02'', CURRENT_DATE - integer ''3'' + time ''10:39'', 586.70, NULL, 0),
+            (7 , ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757311, 37.482152), 4326), 3, 60, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''16:02'', CURRENT_DATE - integer ''2'' + time ''16:45'', 751.90, NULL, 0),
+            (8 , ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757312, 37.482153), 4326), 3, 60, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''16:48'', CURRENT_DATE - integer ''2'' + time ''17:36'', 492.0, NULL, 0),
 
-            (9 , ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757313, 37.482154), 4326), 3, 61, ''delivered'', CURRENT_DATE - integer ''3'' + time ''10:22'', CURRENT_DATE - integer ''3'' + time ''10:58'', 643.70, NULL, 0),
-            (10, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757314, 37.482155), 4326), 3, NULL, ''cancelled'', CURRENT_DATE - integer ''3'' + time ''11:02'', CURRENT_DATE - integer ''3'' + time ''11:04'', 606.70, NULL, 0),
-            (11, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757315, 37.482156), 4326), 3, 61, ''delivered'', CURRENT_DATE - integer ''3'' + time ''11:06'', CURRENT_DATE - integer ''3'' + time ''11:45'', 465.00, NULL, 0),
-            (12, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757316, 37.482157), 4326), 3, 61, ''delivered'', CURRENT_DATE - integer ''1'' + time ''21:02'', CURRENT_DATE - integer ''1'' + time ''21:40'', 707.70, NULL, 0),
-            (13, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757317, 37.482158), 4326), 3, 61, ''delivered'', CURRENT_DATE - integer ''1'' + time ''21:42'', CURRENT_DATE - integer ''1'' + time ''22:34'', 373.60, NULL, 0),
+            (9 , ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757313, 37.482154), 4326), 3, 61, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''10:22'', CURRENT_DATE - integer ''3'' + time ''10:58'', 643.70, NULL, 0),
+            (10, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757314, 37.482155), 4326), 3, NULL, ''CANCELLED'', CURRENT_DATE - integer ''3'' + time ''11:02'', CURRENT_DATE - integer ''3'' + time ''11:04'', 606.70, NULL, 0),
+            (11, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757315, 37.482156), 4326), 3, 61, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''11:06'', CURRENT_DATE - integer ''3'' + time ''11:45'', 465.00, NULL, 0),
+            (12, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757316, 37.482157), 4326), 3, 61, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''21:02'', CURRENT_DATE - integer ''1'' + time ''21:40'', 707.70, NULL, 0),
+            (13, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757317, 37.482158), 4326), 3, 61, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''21:42'', CURRENT_DATE - integer ''1'' + time ''22:34'', 373.60, NULL, 0),
 
-            (14, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757310, 37.482151), 4326), 3, 62, ''delivered'', CURRENT_DATE - integer ''2'' + time ''20:25'', CURRENT_DATE - integer ''2'' + time ''20:56'', 1233.90, NULL, 0),
-            (15, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757311, 37.482152), 4326), 3, 62, ''delivered'', CURRENT_DATE - integer ''2'' + time ''21:00'', CURRENT_DATE - integer ''2'' + time ''21:39'', 748.70, 4, 50.0),
-            (16, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757312, 37.482153), 4326), 3, 62, ''delivered'', CURRENT_DATE - integer ''1'' + time ''13:22'', CURRENT_DATE - integer ''1'' + time ''13:59'', 474.60, NULL, 0),
-            (17, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757313, 37.482154), 4326), 3, 62, ''delivered'', CURRENT_DATE - integer ''1'' + time ''15:01'', CURRENT_DATE - integer ''1'' + time ''15:48'', 721.40, 5, 50.0),
-            (18, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757314, 37.482155), 4326), 3, 62, ''delivered'', CURRENT_DATE - integer ''1'' + time ''15:50'', CURRENT_DATE - integer ''1'' + time ''16:34'', 972.40, NULL, 0),
+            (14, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757310, 37.482151), 4326), 3, 62, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''20:25'', CURRENT_DATE - integer ''2'' + time ''20:56'', 1233.90, NULL, 0),
+            (15, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757311, 37.482152), 4326), 3, 62, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''21:00'', CURRENT_DATE - integer ''2'' + time ''21:39'', 748.70, 4, 50.0),
+            (16, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757312, 37.482153), 4326), 3, 62, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''13:22'', CURRENT_DATE - integer ''1'' + time ''13:59'', 474.60, NULL, 0),
+            (17, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757313, 37.482154), 4326), 3, 62, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''15:01'', CURRENT_DATE - integer ''1'' + time ''15:48'', 721.40, 5, 50.0),
+            (18, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757314, 37.482155), 4326), 3, 62, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''15:50'', CURRENT_DATE - integer ''1'' + time ''16:34'', 972.40, NULL, 0),
 
-            (19, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757315, 37.482156), 4326), 3, 63, ''delivered'', CURRENT_DATE - integer ''2'' + time ''16:43'', CURRENT_DATE - integer ''2'' + time ''17:20'', 370.60, 6, 50.0),
-            (20, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757316, 37.482157), 4326), 3, 63, ''delivered'', CURRENT_DATE - integer ''2'' + time ''17:22'', CURRENT_DATE - integer ''2'' + time ''17:58'', 544.90, NULL, 0),
-            (21, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757317, 37.482158), 4326), 3, 63, ''delivered'', CURRENT_DATE - integer ''2'' + time ''18:00'', CURRENT_DATE - integer ''2'' + time ''18:46'', 793.80, 7, 50.0),
-            (22, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757318, 37.482159), 4326), 3, 63, ''delivered'', CURRENT_DATE - integer ''2'' + time ''20:01'', CURRENT_DATE - integer ''2'' + time ''20:34'', 1724.70, NULL, 0),
-            (23, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757319, 37.482150), 4326), 3, 63, ''delivered'', CURRENT_DATE - integer ''2'' + time ''20:35'', CURRENT_DATE - integer ''2'' + time ''21:02'', 481.80, NULL, 0),
+            (19, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757315, 37.482156), 4326), 3, 63, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''16:43'', CURRENT_DATE - integer ''2'' + time ''17:20'', 370.60, 6, 50.0),
+            (20, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757316, 37.482157), 4326), 3, 63, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''17:22'', CURRENT_DATE - integer ''2'' + time ''17:58'', 544.90, NULL, 0),
+            (21, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757317, 37.482158), 4326), 3, 63, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''18:00'', CURRENT_DATE - integer ''2'' + time ''18:46'', 793.80, 7, 50.0),
+            (22, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757318, 37.482159), 4326), 3, 63, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''20:01'', CURRENT_DATE - integer ''2'' + time ''20:34'', 1724.70, NULL, 0),
+            (23, ''Новозаводская улица, 18с144'', ST_SetSRID(ST_MakePoint(55.757319, 37.482150), 4326), 3, 63, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''20:35'', CURRENT_DATE - integer ''2'' + time ''21:02'', 481.80, NULL, 0),
 
             -- заказы с северного склада
 
-            (24, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853279, 37.618241), 4326), 4, 64, ''delivered'', CURRENT_DATE - integer ''3'' + time ''12:10'', CURRENT_DATE - integer ''3'' + time ''12:48'', 405.69, 8, 50.0),
-            (25, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853278, 37.618242), 4326), 4, 64, ''delivered'', CURRENT_DATE - integer ''3'' + time ''12:51'', CURRENT_DATE - integer ''3'' + time ''13:30'', 897.60, NULL, 0),
-            (26, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853277, 37.618243), 4326), 4, 64, ''delivered'', CURRENT_DATE - integer ''3'' + time ''13:32'', CURRENT_DATE - integer ''3'' + time ''14:11'', 899.80, 9, 50.0),
-            (27, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853276, 37.618244), 4326), 4, 64, ''delivered'', CURRENT_DATE - integer ''2'' + time ''14:22'', CURRENT_DATE - integer ''2'' + time ''14:57'', 341.30, NULL, 0),
-            (28, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853275, 37.618245), 4326), 4, 64, ''delivered'', CURRENT_DATE - integer ''2'' + time ''14:59'', CURRENT_DATE - integer ''2'' + time ''15:45'', 830.50, 10, 50.0),
+            (24, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853279, 37.618241), 4326), 4, 64, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''12:10'', CURRENT_DATE - integer ''3'' + time ''12:48'', 405.69, 8, 50.0),
+            (25, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853278, 37.618242), 4326), 4, 64, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''12:51'', CURRENT_DATE - integer ''3'' + time ''13:30'', 897.60, NULL, 0),
+            (26, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853277, 37.618243), 4326), 4, 64, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''13:32'', CURRENT_DATE - integer ''3'' + time ''14:11'', 899.80, 9, 50.0),
+            (27, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853276, 37.618244), 4326), 4, 64, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''14:22'', CURRENT_DATE - integer ''2'' + time ''14:57'', 341.30, NULL, 0),
+            (28, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853275, 37.618245), 4326), 4, 64, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''14:59'', CURRENT_DATE - integer ''2'' + time ''15:45'', 830.50, 10, 50.0),
 
-            (29, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853278, 37.618246), 4326), 4, 65, ''delivered'', CURRENT_DATE - integer ''3'' + time ''16:12'', CURRENT_DATE - integer ''3'' + time ''16:56'', 1702.40, NULL, 0),
-            (30, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853277, 37.618247), 4326), 4, 65, ''delivered'', CURRENT_DATE - integer ''3'' + time ''16:59'', CURRENT_DATE - integer ''3'' + time ''17:41'', 468.60, 11, 50.0),
-            (31, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853276, 37.618248), 4326), 4, 65, ''delivered'', CURRENT_DATE - integer ''1'' + time ''09:42'', CURRENT_DATE - integer ''1'' + time ''10:29'', 845.70, NULL, 0),
-            (32, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853275, 37.618249), 4326), 4, 65, ''delivered'', CURRENT_DATE - integer ''1'' + time ''10:34'', CURRENT_DATE - integer ''1'' + time ''11:11'', 833.60, 12, 50.0),
-            (33, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853274, 37.618240), 4326), 4, 65, ''delivered'', CURRENT_DATE - integer ''1'' + time ''11:15'', CURRENT_DATE - integer ''1'' + time ''11:58'', 749.30, NULL, 0),
+            (29, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853278, 37.618246), 4326), 4, 65, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''16:12'', CURRENT_DATE - integer ''3'' + time ''16:56'', 1702.40, NULL, 0),
+            (30, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853277, 37.618247), 4326), 4, 65, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''16:59'', CURRENT_DATE - integer ''3'' + time ''17:41'', 468.60, 11, 50.0),
+            (31, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853276, 37.618248), 4326), 4, 65, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''09:42'', CURRENT_DATE - integer ''1'' + time ''10:29'', 845.70, NULL, 0),
+            (32, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853275, 37.618249), 4326), 4, 65, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''10:34'', CURRENT_DATE - integer ''1'' + time ''11:11'', 833.60, 12, 50.0),
+            (33, ''Олонецкая улица, 17'', ST_SetSRID(ST_MakePoint(55.853274, 37.618240), 4326), 4, 65, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''11:15'', CURRENT_DATE - integer ''1'' + time ''11:58'', 749.30, NULL, 0),
 
-            (34, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852525, 37.617640), 4326), 4, 66, ''delivered'', CURRENT_DATE - integer ''2'' + time ''11:12'', CURRENT_DATE - integer ''2'' + time ''11:57'', 1539.70, NULL, 0),
-            (34, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852528, 37.617641), 4326), 4, 66, ''delivered'', CURRENT_DATE - integer ''2'' + time ''12:02'', CURRENT_DATE - integer ''2'' + time ''12:49'', 535.30, 13, 50.0),
-            (36, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852527, 37.617642), 4326), 4, 66, ''delivered'', CURRENT_DATE - integer ''2'' + time ''12:50'', CURRENT_DATE - integer ''2'' + time ''13:37'', 361.60, NULL, 0),
-            (37, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852526, 37.617643), 4326), 4, 66, ''delivered'', CURRENT_DATE - integer ''2'' + time ''13:40'', CURRENT_DATE - integer ''2'' + time ''14:21'', 734.96, NULL, 0),
-            (38, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852525, 37.617644), 4326), 4, 66, ''delivered'', CURRENT_DATE - integer ''2'' + time ''14:24'', CURRENT_DATE - integer ''2'' + time ''15:10'', 426.41, NULL, 0),
+            (34, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852525, 37.617640), 4326), 4, 66, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''11:12'', CURRENT_DATE - integer ''2'' + time ''11:57'', 1539.70, NULL, 0),
+            (34, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852528, 37.617641), 4326), 4, 66, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''12:02'', CURRENT_DATE - integer ''2'' + time ''12:49'', 535.30, 13, 50.0),
+            (36, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852527, 37.617642), 4326), 4, 66, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''12:50'', CURRENT_DATE - integer ''2'' + time ''13:37'', 361.60, NULL, 0),
+            (37, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852526, 37.617643), 4326), 4, 66, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''13:40'', CURRENT_DATE - integer ''2'' + time ''14:21'', 734.96, NULL, 0),
+            (38, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852525, 37.617644), 4326), 4, 66, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''14:24'', CURRENT_DATE - integer ''2'' + time ''15:10'', 426.41, NULL, 0),
 
-            (39, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852524, 37.617645), 4326), 4, 67, ''delivered'', CURRENT_DATE - integer ''3'' + time ''18:12'', CURRENT_DATE - integer ''3'' + time ''18:50'', 892.10, 14, 50.0),
-            (40, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852523, 37.617646), 4326), 4, 67, ''delivered'', CURRENT_DATE - integer ''3'' + time ''18:52'', CURRENT_DATE - integer ''3'' + time ''19:36'', 367.90, NULL, 0),
-            (41, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852522, 37.617647), 4326), 4, 67, ''delivered'', CURRENT_DATE - integer ''3'' + time ''19:39'', CURRENT_DATE - integer ''3'' + time ''20:26'', 922.70, NULL, 0),
-            (42, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852521, 37.617648), 4326), 4, 67, ''cancelled'', CURRENT_DATE - integer ''3'' + time ''20:29'', CURRENT_DATE - integer ''3'' + time ''20:44'', 378.60, NULL, 0),
-            (43, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852520, 37.617640), 4326), 4, 67, ''delivered'', CURRENT_DATE - integer ''3'' + time ''20:53'', CURRENT_DATE - integer ''3'' + time ''21:35'', 393.10, NULL, 0),
+            (39, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852524, 37.617645), 4326), 4, 67, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''18:12'', CURRENT_DATE - integer ''3'' + time ''18:50'', 892.10, 14, 50.0),
+            (40, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852523, 37.617646), 4326), 4, 67, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''18:52'', CURRENT_DATE - integer ''3'' + time ''19:36'', 367.90, NULL, 0),
+            (41, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852522, 37.617647), 4326), 4, 67, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''19:39'', CURRENT_DATE - integer ''3'' + time ''20:26'', 922.70, NULL, 0),
+            (42, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852521, 37.617648), 4326), 4, 67, ''CANCELLED'', CURRENT_DATE - integer ''3'' + time ''20:29'', CURRENT_DATE - integer ''3'' + time ''20:44'', 378.60, NULL, 0),
+            (43, ''Олонецкая улица, 15'', ST_SetSRID(ST_MakePoint(55.852520, 37.617640), 4326), 4, 67, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''20:53'', CURRENT_DATE - integer ''3'' + time ''21:35'', 393.10, NULL, 0),
 
             -- заказы с восточного склада
 
-            (44, ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758412, 37.816477), 4326), 5, NULL, ''cancelled'', CURRENT_DATE - integer ''3'' + time ''10:32'', CURRENT_DATE - integer ''3'' + time ''10:33'', 555.50, 15, 50.0),
-            (46, ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758413, 37.816478), 4326), 5, 68,   ''delivered'', CURRENT_DATE - integer ''3'' + time ''10:23'', CURRENT_DATE - integer ''3'' + time ''11:01'', 1249.40, NULL, 0),
-            (47, ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758414, 37.816479), 4326), 5, 68,   ''delivered'', CURRENT_DATE - integer ''3'' + time ''11:03'', CURRENT_DATE - integer ''3'' + time ''11:49'', 347.30, NULL, 0),
-            (48, ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758415, 37.816470), 4326), 5, 68,   ''delivered'', CURRENT_DATE - integer ''1'' + time ''16:13'', CURRENT_DATE - integer ''1'' + time ''16:46'', 594.00, NULL, 0),
-            (49, ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758416, 37.816471), 4326), 5, 68,   ''delivered'', CURRENT_DATE - integer ''1'' + time ''16:49'', CURRENT_DATE - integer ''1'' + time ''17:30'', 373.70, 16, 50.0),
+            (44, ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758412, 37.816477), 4326), 5, NULL, ''CANCELLED'', CURRENT_DATE - integer ''3'' + time ''10:32'', CURRENT_DATE - integer ''3'' + time ''10:33'', 555.50, 15, 50.0),
+            (46, ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758413, 37.816478), 4326), 5, 68,   ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''10:23'', CURRENT_DATE - integer ''3'' + time ''11:01'', 1249.40, NULL, 0),
+            (47, ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758414, 37.816479), 4326), 5, 68,   ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''11:03'', CURRENT_DATE - integer ''3'' + time ''11:49'', 347.30, NULL, 0),
+            (48, ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758415, 37.816470), 4326), 5, 68,   ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''16:13'', CURRENT_DATE - integer ''1'' + time ''16:46'', 594.00, NULL, 0),
+            (49, ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758416, 37.816471), 4326), 5, 68,   ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''16:49'', CURRENT_DATE - integer ''1'' + time ''17:30'', 373.70, 16, 50.0),
 
-            (50, ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758417, 37.816472), 4326), 5, 69, ''delivered'', CURRENT_DATE - integer ''3'' + time ''19:31'', CURRENT_DATE - integer ''3'' + time ''20:13'', 564.70, NULL, 0),
-            (51, ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758418, 37.816473), 4326), 5, 69, ''delivered'', CURRENT_DATE - integer ''3'' + time ''20:17'', CURRENT_DATE - integer ''3'' + time ''20:52'', 530.90, 24, 10.0),
-            (3 , ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758419, 37.816474), 4326), 5, 69, ''delivered'', CURRENT_DATE - integer ''2'' + time ''11:32'', CURRENT_DATE - integer ''2'' + time ''12:20'', 571.10, NULL, 0),
-            (4 , ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758410, 37.816475), 4326), 5, 69, ''delivered'', CURRENT_DATE - integer ''2'' + time ''12:24'', CURRENT_DATE - integer ''2'' + time ''13:04'', 650.80, NULL, 0),
-            (5 , ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758411, 37.816476), 4326), 5, 69, ''delivered'', CURRENT_DATE - integer ''2'' + time ''13:09'', CURRENT_DATE - integer ''2'' + time ''13:51'', 652.60, NULL, 0),
+            (50, ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758417, 37.816472), 4326), 5, 69, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''19:31'', CURRENT_DATE - integer ''3'' + time ''20:13'', 564.70, NULL, 0),
+            (51, ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758418, 37.816473), 4326), 5, 69, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''20:17'', CURRENT_DATE - integer ''3'' + time ''20:52'', 530.90, 24, 10.0),
+            (3 , ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758419, 37.816474), 4326), 5, 69, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''11:32'', CURRENT_DATE - integer ''2'' + time ''12:20'', 571.10, NULL, 0),
+            (4 , ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758410, 37.816475), 4326), 5, 69, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''12:24'', CURRENT_DATE - integer ''2'' + time ''13:04'', 650.80, NULL, 0),
+            (5 , ''Свободный проспект, 6к3'', ST_SetSRID(ST_MakePoint(55.758411, 37.816476), 4326), 5, 69, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''13:09'', CURRENT_DATE - integer ''2'' + time ''13:51'', 652.60, NULL, 0),
 
-            (6 , ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743758, 37.827537), 4326), 5, 70, ''delivered'', CURRENT_DATE - integer ''3'' + time ''08:12'', CURRENT_DATE - integer ''3'' + time ''08:54'', 976.49, NULL, 0),
-            (7 , ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743759, 37.827538), 4326), 5, 70, ''delivered'', CURRENT_DATE - integer ''3'' + time ''08:57'', CURRENT_DATE - integer ''3'' + time ''09:39'', 208.59, NULL, 0),
-            (8 , ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743750, 37.827539), 4326), 5, 70, ''delivered'', CURRENT_DATE - integer ''3'' + time ''09:42'', CURRENT_DATE - integer ''3'' + time ''10:25'', 354.80, NULL, 0),
-            (9 , ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743751, 37.827530), 4326), 5, 70, ''delivered'', CURRENT_DATE - integer ''1'' + time ''19:42'', CURRENT_DATE - integer ''1'' + time ''20:14'', 407.60, 24, 10.0),
-            (10, ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743752, 37.827531), 4326), 5, 70, ''delivered'', CURRENT_DATE - integer ''1'' + time ''20:18'', CURRENT_DATE - integer ''1'' + time ''20:57'', 765.60, NULL, 0),
+            (6 , ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743758, 37.827537), 4326), 5, 70, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''08:12'', CURRENT_DATE - integer ''3'' + time ''08:54'', 976.49, NULL, 0),
+            (7 , ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743759, 37.827538), 4326), 5, 70, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''08:57'', CURRENT_DATE - integer ''3'' + time ''09:39'', 208.59, NULL, 0),
+            (8 , ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743750, 37.827539), 4326), 5, 70, ''DELIVERED'', CURRENT_DATE - integer ''3'' + time ''09:42'', CURRENT_DATE - integer ''3'' + time ''10:25'', 354.80, NULL, 0),
+            (9 , ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743751, 37.827530), 4326), 5, 70, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''19:42'', CURRENT_DATE - integer ''1'' + time ''20:14'', 407.60, 24, 10.0),
+            (10, ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743752, 37.827531), 4326), 5, 70, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''20:18'', CURRENT_DATE - integer ''1'' + time ''20:57'', 765.60, NULL, 0),
 
-            (11, ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743753, 37.827532), 4326), 5, 71, ''delivered'', CURRENT_DATE - integer ''2'' + time ''13:22'', CURRENT_DATE - integer ''2'' + time ''13:56'', 580.10, NULL, 0),
-            (12, ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743754, 37.827533), 4326), 5, 71, ''delivered'', CURRENT_DATE - integer ''2'' + time ''13:59'', CURRENT_DATE - integer ''2'' + time ''14:43'', 985.50, NULL, 0),
-            (13, ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743755, 37.827534), 4326), 5, 71, ''delivered'', CURRENT_DATE - integer ''1'' + time ''13:01'', CURRENT_DATE - integer ''1'' + time ''13:54'', 529.40, NULL, 0),
-            (14, ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743756, 37.827535), 4326), 5, 71, ''delivered'', CURRENT_DATE - integer ''1'' + time ''13:59'', CURRENT_DATE - integer ''1'' + time ''14:42'', 777.60, NULL, 0),
-            (15, ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743757, 37.827536), 4326), 5, 71, ''delivered'', CURRENT_DATE - integer ''1'' + time ''14:45'', CURRENT_DATE - integer ''1'' + time ''15:33'', 374.50, NULL, 0);
+            (11, ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743753, 37.827532), 4326), 5, 71, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''13:22'', CURRENT_DATE - integer ''2'' + time ''13:56'', 580.10, NULL, 0),
+            (12, ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743754, 37.827533), 4326), 5, 71, ''DELIVERED'', CURRENT_DATE - integer ''2'' + time ''13:59'', CURRENT_DATE - integer ''2'' + time ''14:43'', 985.50, NULL, 0),
+            (13, ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743755, 37.827534), 4326), 5, 71, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''13:01'', CURRENT_DATE - integer ''1'' + time ''13:54'', 529.40, NULL, 0),
+            (14, ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743756, 37.827535), 4326), 5, 71, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''13:59'', CURRENT_DATE - integer ''1'' + time ''14:42'', 777.60, NULL, 0),
+            (15, ''Кетчерская улица, 10'', ST_SetSRID(ST_MakePoint(55.743757, 37.827536), 4326), 5, 71, ''DELIVERED'', CURRENT_DATE - integer ''1'' + time ''14:45'', CURRENT_DATE - integer ''1'' + time ''15:33'', 374.50, NULL, 0);
 
     END IF;
 END;
@@ -1472,9 +1472,9 @@ DO ' DECLARE
 BEGIN
 IF NOT EXISTS (SELECT 1 FROM delivery_sessions WHERE delivery_session_id = 1) THEN
     INSERT INTO delivery_sessions(courier_id, start_time, end_time, orders_completed, average_time_per_order, money_earned)
-        SELECT courier_id, date_start, date_end, 1, (date_end - date_start)::INTERVAL, ROUND(overall_cost / 10, 2) FROM orders WHERE (courier_id IS NOT NULL AND status = ''delivered'') ORDER BY courier_id ASC;
+        SELECT courier_id, date_start, date_end, 1, (date_end - date_start)::INTERVAL, ROUND(overall_cost / 10, 2) FROM orders WHERE (courier_id IS NOT NULL AND status = ''DELIVERED'') ORDER BY courier_id ASC;
     INSERT INTO delivery_sessions(courier_id, start_time, end_time, orders_completed, average_time_per_order, money_earned)
-        SELECT courier_id, date_start, date_end, 1, (date_end - date_start)::INTERVAL, 0.0 FROM orders WHERE (courier_id IS NOT NULL AND status = ''cancelled'') ORDER BY courier_id ASC;
+        SELECT courier_id, date_start, date_end, 1, (date_end - date_start)::INTERVAL, 0.0 FROM orders WHERE (courier_id IS NOT NULL AND status = ''CANCELLED'') ORDER BY courier_id ASC;
 END IF;
 END;
 ' language plpgsql;
