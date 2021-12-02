@@ -14,4 +14,7 @@ public class ModeratorInfoDTO extends UserInfoDTO {
         super(id, role, fullName, email, lastSigninDate, avatarId);
         this.warehouseId = warehouseId;
     }
+    public ModeratorInfoDTO(Long id, String role, String email) {
+        super(id, role, email);
+    }
 }

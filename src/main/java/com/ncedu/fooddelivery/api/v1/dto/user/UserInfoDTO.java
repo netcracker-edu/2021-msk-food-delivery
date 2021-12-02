@@ -24,4 +24,10 @@ public class UserInfoDTO {
     }
 
     public UserInfoDTO() {};
+
+    public UserInfoDTO(Long id, String role, String email) {
+        this.id = id;
+        this.role = role;
+        this.email = email;
+    }
 }

@@ -17,4 +17,7 @@ public class ClientInfoDTO extends UserInfoDTO {
         this.phoneNumber = phoneNumber;
         this.rating = rating;
     }
+    public ClientInfoDTO(Long id, String role, String email) {
+        super(id, role, email);
+    }
 }
