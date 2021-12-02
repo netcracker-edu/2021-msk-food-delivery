@@ -75,7 +75,7 @@ BEGIN
             DECLARE pos BIGINT;
             BEGIN
                 FOR pos IN (SELECT product_position_id FROM (SELECT * FROM orders INNER JOIN orders_product_positions USING(order_id) WHERE order_id = NEW.order_id) positions) LOOP
-                UPDATE product_positions SET current_amount = current_amount + (SELECT amount FROM orders INNER JOIN orders_product_positions USING(order_id) WHERE order_id = NEW.order_id AND product_position_id = pos) WHERE product_position_id = pos; 
+                UPDATE product_positions orders_product_positions SET current_amount = current_amount + (SELECT amount FROM orders INNER JOIN orders_product_positions USING(order_id) WHERE order_id = NEW.order_id AND product_position_id = pos) WHERE product_position_id = pos; 
                 END LOOP;
             END;
         ELSIF NEW.status = ''delivered'' THEN
