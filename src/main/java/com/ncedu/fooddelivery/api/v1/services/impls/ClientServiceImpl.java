@@ -4,6 +4,7 @@ import com.ncedu.fooddelivery.api.v1.dto.user.ClientInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.UserChangeInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Client;
 import com.ncedu.fooddelivery.api.v1.entities.User;
+import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.repos.ClientRepo;
 import com.ncedu.fooddelivery.api.v1.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,26 +15,21 @@ import java.util.Optional;
 @Service
 public class ClientServiceImpl implements ClientService {
 
-    //TODO: throw notFoundEx forward from service
-
     @Autowired
     ClientRepo clientRepo;
 
     @Override
     public Client getClientById(Long id) {
-        Optional<Client> findedClient = clientRepo.findById(id);
-        if (findedClient.isPresent()) {
-            return findedClient.get();
+        Optional<Client> client = clientRepo.findById(id);
+        if (!client.isPresent()) {
+            throw new NotFoundEx(id.toString());
         }
-        return null;
+        return client.get();
     }
 
     @Override
     public ClientInfoDTO getClientDTOById(Long id) {
         Client client = getClientById(id);
-        if (client == null) {
-            return null;
-        }
         return createClientInfoDTO(client);
     }
 
@@ -48,10 +44,6 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public boolean changeClientInfo(Long id, UserChangeInfoDTO newUserInfo) {
         Client client = getClientById(id);
-        if (client == null) {
-            return false;
-        }
-        //TODO: rewrite this logic for using MapStruct
         String newFullName = newUserInfo.getFullName();
         if (newFullName != null) {
             User user = client.getUser();

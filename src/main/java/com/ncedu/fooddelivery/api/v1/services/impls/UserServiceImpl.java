@@ -4,6 +4,7 @@ import com.ncedu.fooddelivery.api.v1.dto.user.EmailChangeDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
+import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.repos.UserRepo;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,18 +26,15 @@ public class UserServiceImpl implements UserService {
     PasswordEncoder encoder;
 
     public User getUserById(Long id) {
-        Optional<User> findedUser = userRepo.findById(id);
-        if (findedUser.isPresent()) {
-            return findedUser.get();
+        Optional<User> user = userRepo.findById(id);
+        if (!user.isPresent()) {
+            throw new NotFoundEx(id.toString());
         }
-        return null;
+        return user.get();
     }
 
     public UserInfoDTO getUserDTOById(Long id) {
         User user = getUserById(id);
-        if (user == null) {
-            return null;
-        }
         return createUserDTO(user);
     }
 
@@ -48,9 +46,6 @@ public class UserServiceImpl implements UserService {
 
     public boolean deleteUserById(Long id) {
         User userForDelete = getUserById(id);
-        if (userForDelete == null) {
-            return false;
-        }
         userRepo.delete(userForDelete);
         return true;
     }
@@ -58,25 +53,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean changeFullName(Long id, String newFullName) {
         User user = getUserById(id);
-        boolean isModified = false;
-        if (user == null) {
-            return isModified;
-        }
         if (newFullName != null) {
             user.setFullName(newFullName);
             userRepo.save(user);
-            isModified = true;
-            return isModified;
+            return true;
         }
-        return isModified;
+        return false;
     }
 
     @Override
     public boolean changeEmail(Long id, EmailChangeDTO newEmailInfo) {
         User user = getUserById(id);
-        if (user == null) {
-            return false;
-        }
         return changeEmail(user, newEmailInfo);
     }
 
