@@ -30,7 +30,6 @@ public class ProfileController {
     ModeratorService moderatorService;
 
     @GetMapping("/api/v1/profile")
-    @PreAuthorize("isAuthenticated()")
     public UserInfoDTO getProfile(
             @AuthenticationPrincipal User authedUser) {
 
@@ -48,7 +47,6 @@ public class ProfileController {
     }
 
     @PutMapping("/api/v1/profile")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> changeUserInfo(
             @Valid @RequestBody UserChangeInfoDTO newUserInfo,
             @AuthenticationPrincipal User authedUser) {
@@ -68,11 +66,9 @@ public class ProfileController {
     }
 
     @PatchMapping("/api/v1/profile/email")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> changeUserEmail(
             @Valid @RequestBody EmailChangeDTO newEmailInfo,
-            @AuthenticationPrincipal User authedUser
-    ) {
+            @AuthenticationPrincipal User authedUser) {
         boolean isModified = false;
         isModified = userService.changeEmail(authedUser, newEmailInfo);
         return createModifyResponse(isModified);
