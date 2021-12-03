@@ -89,6 +89,21 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID));
     }
 
+    @ExceptionHandler(IncorrectProductPositionWarehouseBindingException.class)
+    protected ResponseEntity<Object> handleIncorrectProductPositionWarehouseBindingException(IncorrectProductPositionWarehouseBindingException ex){
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), IncorrectProductPositionWarehouseBindingException.UUID));
+    }
+
+    @ExceptionHandler(NotUniqueIdException.class)
+    protected ResponseEntity<Object> handleNotUniqueIdException (NotUniqueIdException ex){
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, NotUniqueIdException.message, NotUniqueIdException.UUID));
+    }
+
+    @ExceptionHandler(ProductPositionNotEnoughException.class)
+    protected ResponseEntity<Object> handleProductPositionNotEnoughException (ProductPositionNotEnoughException ex){
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ProductPositionNotEnoughException.UUID));
+    }
+
     private List<ApiSubError> getValidationErrors(MethodArgumentNotValidException notValidEx) {
         List<ApiSubError> validationErrors = new ArrayList<>();
         List<ObjectError> objectErrors = notValidEx.getBindingResult().getAllErrors();
