@@ -4,11 +4,20 @@ import com.bedatadriven.jackson.datatype.jts.serialization.GeometryDeserializer;
 import com.bedatadriven.jackson.datatype.jts.serialization.GeometrySerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.Data;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
+
+@TypeDef(
+        name = "order_status",
+        typeClass = PostgreSQLEnumType.class
+)
 
 @Data
 @Entity
@@ -33,7 +42,7 @@ public class Order {
     @JsonSerialize(using = GeometrySerializer.class)
     @JsonDeserialize(contentUsing = GeometryDeserializer.class)
     @Column(name = "coordinates", columnDefinition = "geometry")
-    private String coordinates;
+    private Geometry coordinates;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
@@ -46,6 +55,7 @@ public class Order {
 
     @NotNull
     @Enumerated(EnumType.STRING)
+    @Type(type = "order_status")
     @Column(name = "status")
     private OrderStatus status;     /* TODO: don't forget to check if status is null - change it for "CREATED"
                                        then */
@@ -80,7 +90,7 @@ public class Order {
 
     public Order(){}
 
-    public Order(Long id, Client client, String address, String coordinates, Warehouse warehouse, Courier courier, OrderStatus status, Timestamp dateStart, Timestamp dateEnd, Float overallCost, Float highDemandCoeff, Float discount, Long promoCodeId, Float clientRating, Float deliveryRating) {
+    public Order(Long id, Client client, String address, Geometry coordinates, Warehouse warehouse, Courier courier, OrderStatus status, Timestamp dateStart, Timestamp dateEnd, Float overallCost, Float highDemandCoeff, Float discount, Long promoCodeId, Float clientRating, Float deliveryRating) {
         this.id = id;
         this.client = client;
         this.address = address;

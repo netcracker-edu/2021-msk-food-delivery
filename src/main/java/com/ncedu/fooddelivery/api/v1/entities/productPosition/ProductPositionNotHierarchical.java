@@ -1,7 +1,5 @@
 package com.ncedu.fooddelivery.api.v1.entities.productPosition;
 
-import com.ncedu.fooddelivery.api.v1.entities.Product;
-import com.ncedu.fooddelivery.api.v1.entities.Warehouse;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 

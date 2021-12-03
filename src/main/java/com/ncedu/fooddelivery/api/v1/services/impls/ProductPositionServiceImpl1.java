@@ -2,12 +2,16 @@ package com.ncedu.fooddelivery.api.v1.services.impls;
 
 import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.AcceptSupplyDTO;
 import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.ProductPositionInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.ProductPositionsShipmentDTO;
 import com.ncedu.fooddelivery.api.v1.entities.*;
 import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPosition;
 import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPositionNotHierarchical;
-import com.ncedu.fooddelivery.api.v1.errors.notfound.ProductNotFoundException;
-import com.ncedu.fooddelivery.api.v1.errors.notfound.WarehouseNotFoundException;
+import com.ncedu.fooddelivery.api.v1.errors.IncorrectProductPositionWarehouseBindingException;
+import com.ncedu.fooddelivery.api.v1.errors.NotUniqueIdException;
+import com.ncedu.fooddelivery.api.v1.errors.ProductPositionNotEnoughException;
+import com.ncedu.fooddelivery.api.v1.errors.notfound.*;
 import com.ncedu.fooddelivery.api.v1.repos.OrderProductPositionRepo;
+import com.ncedu.fooddelivery.api.v1.repos.OrderRepo;
 import com.ncedu.fooddelivery.api.v1.repos.ProductRepo;
 import com.ncedu.fooddelivery.api.v1.repos.productPosition.ProductPositionNotHierarchicalRepo;
 import com.ncedu.fooddelivery.api.v1.repos.productPosition.ProductPositionRepo;
@@ -21,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +45,9 @@ public class ProductPositionServiceImpl1 implements ProductPositionService {
 
     @Autowired
     OrderProductPositionRepo orderProductPositionRepo;
+
+    @Autowired
+    OrderRepo orderRepo;
 
     @Override
     public ProductPositionInfoDTO getProductPositionInfoDTOById(Long id) {
@@ -119,6 +127,62 @@ public class ProductPositionServiceImpl1 implements ProductPositionService {
     public List<ProductPositionInfoDTO> findFiltered(Specification<ProductPositionNotHierarchical> spec, Pageable pageable) {
         Page<ProductPositionNotHierarchical> productPositions = productPositionNotHierarchicalRepo.findAll(spec, pageable);
         return productPositions.stream().map(position -> convertToInfoDTO(position)).collect(Collectors.toList());
+    }
+
+    @Override
+    public void shipProductPositions(Long orderId, ProductPositionsShipmentDTO productPositionsShipmentDTO) {
+        Optional<Order> optionalOrder = orderRepo.findById(orderId);
+        if(optionalOrder.isEmpty()) throw new OrderNotFoundException(orderId);
+        Order order = optionalOrder.get();
+
+        Long orderWarehouseId = order.getWarehouse().getId();
+        List<ProductPositionsShipmentDTO.ProductPositionAmountPair> positionAmountPairs = productPositionsShipmentDTO.getPositionAmountPairs();
+
+        // checking that every product position id is unique
+        List<Long> ids = positionAmountPairs.stream().map(pair -> pair.getId()).collect(Collectors.toList());
+        List<Long> uniqueIds = ids.stream().distinct().collect(Collectors.toList());
+        if(ids.size() != uniqueIds.size()) throw new NotUniqueIdException();
+
+        // checking product positions in given DTO
+        positionAmountPairs.stream().map(pair -> pair.getId()).forEach(new Consumer<Long>() {
+            @Override
+            public void accept(Long positionId) {
+                Optional<ProductPosition> optionalProductPosition = productPositionRepo.findById(positionId);
+                if(optionalProductPosition.isEmpty()) throw new ProductPositionNotFoundException(positionId);
+                ProductPosition productPosition = optionalProductPosition.get();
+                if(!productPosition.getWarehouse().getId().equals(orderWarehouseId)) throw new IncorrectProductPositionWarehouseBindingException(productPosition.getId());
+            }
+        });
+
+        // checking: is every position has enough current amount in warehouse
+        positionAmountPairs.forEach(new Consumer<ProductPositionsShipmentDTO.ProductPositionAmountPair>() {
+            @Override
+            public void accept(ProductPositionsShipmentDTO.ProductPositionAmountPair productPositionAmountPair) {
+                Integer requestedAmount = productPositionAmountPair.getAmount();
+                ProductPosition productPosition = productPositionRepo.findById(productPositionAmountPair.getId()).get();
+                Integer currentAmount = productPosition.getCurrentAmount();
+                if(requestedAmount > currentAmount) throw new ProductPositionNotEnoughException(productPosition.getId());
+            }
+        });
+
+        // if everything is ok, we can finally manipulate with database
+        order.setStatus(OrderStatus.DELIVERING);    // updating order status
+        orderRepo.save(order);
+
+        positionAmountPairs.stream().forEach(new Consumer<ProductPositionsShipmentDTO.ProductPositionAmountPair>() {
+            @Override
+            public void accept(ProductPositionsShipmentDTO.ProductPositionAmountPair productPositionAmountPair) {
+
+                Integer amount = productPositionAmountPair.getAmount();
+                Long positionId = productPositionAmountPair.getId();
+                ProductPosition productPosition = productPositionRepo.findById(positionId).get();
+
+                // here we're changing current amount for every single product position
+                productPosition.setCurrentAmount(productPosition.getCurrentAmount() - productPositionAmountPair.getAmount());
+                productPositionRepo.save(productPosition);
+            }
+        });
+
     }
 
     public ProductPositionInfoDTO convertToInfoDTO(ProductPosition productPosition){

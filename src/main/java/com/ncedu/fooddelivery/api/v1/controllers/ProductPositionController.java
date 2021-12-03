@@ -2,6 +2,7 @@ package com.ncedu.fooddelivery.api.v1.controllers;
 
 import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.AcceptSupplyDTO;
 import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.ProductPositionInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.ProductPositionsShipmentDTO;
 import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.UpdatePaymentStatusDTO;
 import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Order;
@@ -19,8 +20,6 @@ import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.OnTypeMismatch;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -34,10 +33,7 @@ import javax.validation.*;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
-// TODO: ask question about decreasing current amount of product_positions when order status is "created"
 
 @RestController
 public class ProductPositionController {
@@ -158,7 +154,7 @@ public class ProductPositionController {
 
     @GetMapping("/api/v1/productPositions")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public List<ProductPositionInfoDTO> helloAdmin(@AuthenticationPrincipal User user,
+    public ResponseEntity<List<ProductPositionInfoDTO>> helloAdmin(@AuthenticationPrincipal User user,
                            @And({
                                    @Spec(path="productId", params="productId", spec=Equal.class, onTypeMismatch= OnTypeMismatch.EXCEPTION),
                                    @Spec(path="warehouseId", params="warehouseId", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
@@ -182,7 +178,23 @@ public class ProductPositionController {
 
             filteredPositions = filteredPositions.stream().filter(position -> position.getWarehouse().getId().equals(moderatorWarehouseId)).collect(Collectors.toList());
         }
-        return filteredPositions;
+        return ResponseEntity.status(HttpStatus.OK).body(filteredPositions);
+    }
+
+    @PatchMapping("/api/v1/order/{id}/productPositions")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
+    public ResponseEntity<?> shipProductPositionsFromOrder(@PathVariable(name = "id") Long id,
+                                                           @Valid @RequestBody ProductPositionsShipmentDTO productPositionsShipmentDTO,
+                                                           @AuthenticationPrincipal User user){
+        Order order = orderService.getOrder(id);
+        if(order == null) throw new OrderNotFoundException(id);
+
+        if(user.getRole() == Role.MODERATOR){
+            if(!user.getModerator().getWarehouseId().equals(order.getWarehouse().getId())) throw new CustomAccessDeniedException();
+        }
+
+        productPositionService.shipProductPositions(id, productPositionsShipmentDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
