@@ -34,6 +34,7 @@ import javax.validation.*;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 // TODO: ask question about decreasing current amount of product_positions when order status is "created"
@@ -175,6 +176,10 @@ public class ProductPositionController {
         List<ProductPositionInfoDTO> filteredPositions = productPositionService.findFiltered(productPositionSpecification, pageable);
         if(user.getRole() == Role.MODERATOR){
             Long moderatorWarehouseId = user.getModerator().getWarehouseId();
+
+            // if moderator tries to use forbidden for him "warehouseId" (not his warehouse id)
+            if(filteredPositions.stream().allMatch(position -> position.getWarehouse().getId().equals(moderatorWarehouseId))) throw new CustomAccessDeniedException();
+
             filteredPositions = filteredPositions.stream().filter(position -> position.getWarehouse().getId().equals(moderatorWarehouseId)).collect(Collectors.toList());
         }
         return filteredPositions;
