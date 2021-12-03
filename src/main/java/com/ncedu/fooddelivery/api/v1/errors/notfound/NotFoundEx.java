@@ -15,8 +15,4 @@ public class NotFoundEx extends RuntimeException{
     public String getUuid() {
         return uuid;
     }
-    public String getMsg() {
-        return msg;
-    }
-
 }

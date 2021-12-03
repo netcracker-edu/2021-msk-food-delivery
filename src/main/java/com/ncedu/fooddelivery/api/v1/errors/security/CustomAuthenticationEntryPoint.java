@@ -17,7 +17,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    private static final String message = "You are not authenticated";
+    private static final String msg = "You are not authenticated";
     private static final String uuid = "670acb10-7498-4a9a-bafe-7c0c98747653";
 
     @Override
@@ -27,7 +27,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         ObjectMapper objectMapper = new ObjectMapper();
         HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
         // create custom error wrapper for response
-        ApiError apiError = new ApiError(httpStatus, message, uuid);
+        ApiError apiError = new ApiError(httpStatus, msg, uuid);
         // setting the response HTTP status and content type
         response.setStatus(httpStatus.value());
         response.setContentType(APPLICATION_JSON_VALUE);
