@@ -1,6 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
 import com.ncedu.fooddelivery.api.v1.dto.user.EmailChangeDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.PasswordChangeDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
@@ -64,12 +65,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean changeEmail(Long id, EmailChangeDTO newEmailInfo) {
-        User user = getUserById(id);
-        return changeEmail(user, newEmailInfo);
-    }
-
-    @Override
     public boolean changeEmail(User user, EmailChangeDTO newEmailInfo) {
         String newUserEmail = newEmailInfo.getEmail();
         User userWithNewEmail = userRepo.findByEmail(newUserEmail);
@@ -85,6 +80,26 @@ public class UserServiceImpl implements UserService {
         }
         user.setEmail(newUserEmail);
         userRepo.save(user);
+        return true;
+    }
+
+    @Override
+    public boolean changePassword(User authedUser, PasswordChangeDTO passwordChangeDTO) {
+        String inputOldPassword = passwordChangeDTO.getOldPassword();
+        String userEncodedPassword = authedUser.getPassword();
+        boolean isPasswordsMismatch = !encoder.matches(inputOldPassword, userEncodedPassword);
+        if (isPasswordsMismatch) {
+            throw  new PasswordsMismatchException();
+        }
+        String newPassword = passwordChangeDTO.getNewPassword();
+        String newPasswordConfirm = passwordChangeDTO.getNewPasswordConfirm();
+        isPasswordsMismatch = !newPassword.equals(newPasswordConfirm);
+        if (isPasswordsMismatch) {
+            throw  new PasswordsMismatchException();
+        }
+
+        authedUser.setPassword(encoder.encode(newPassword));
+        userRepo.save(authedUser);
         return true;
     }
 

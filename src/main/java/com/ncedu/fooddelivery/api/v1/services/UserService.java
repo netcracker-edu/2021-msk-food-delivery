@@ -1,6 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.services;
 
 import com.ncedu.fooddelivery.api.v1.dto.user.EmailChangeDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.PasswordChangeDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import org.springframework.data.domain.Pageable;
@@ -15,11 +16,12 @@ public interface UserService {
     public boolean deleteUserById(Long id);
 
     public boolean changeFullName(Long authedUserId, String newFullName);
-    public boolean changeEmail(Long id, EmailChangeDTO newEmailInfo);
     public boolean changeEmail(User user, EmailChangeDTO newEmailInfo);
+    boolean changePassword(User authedUser, PasswordChangeDTO passwordChangeDTO);
 
     public List<UserInfoDTO> getAllAdmins();
     public List<UserInfoDTO> getAllUsers(Pageable pageable);
+
 
 
 }
