@@ -7,6 +7,7 @@ import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException
 import com.ncedu.fooddelivery.api.v1.errors.wrappers.ApiError;
 import com.ncedu.fooddelivery.api.v1.errors.wrappers.ApiSubError;
 import com.ncedu.fooddelivery.api.v1.errors.wrappers.ValidationSubError;
+import net.kaczmarzyk.spring.data.jpa.utils.Converter;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -79,6 +80,13 @@ public class GlobalExceptionHandler {
         apiError.setSubErrors(validationErrors);
 
         return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(Converter.ValueRejectedException.class)
+    protected ResponseEntity<Object> handleConverterValueRejectedException(Converter.ValueRejectedException valueRejectedException){
+        final String mainMessage = "Incorrect type of value in query params. Rejected value: {" + valueRejectedException.getRejectedValue() + "}.";
+        final String UUID = "0ba9b57a-dd20-4be6-9346-bcd3aebddead";
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID));
     }
 
     private List<ApiSubError> getValidationErrors(MethodArgumentNotValidException notValidEx) {
