@@ -4,6 +4,8 @@ import com.ncedu.fooddelivery.api.v1.dto.user.EmailChangeDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.AlreadyExistsException;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.PasswordsMismatchException;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.repos.UserRepo;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
@@ -73,13 +75,13 @@ public class UserServiceImpl implements UserService {
         User userWithNewEmail = userRepo.findByEmail(newUserEmail);
         //user with new email also exist throw exception!
         if (userWithNewEmail != null) {
-            return false; //TODO create special exception and throw it
+            throw new AlreadyExistsException(newUserEmail);
         }
         String inputPassword = newEmailInfo.getPassword();
         String userEncodedPassword = user.getPassword();
         boolean isPasswordsSame = encoder.matches(inputPassword, userEncodedPassword);
         if (!isPasswordsSame) {
-            return false; //TODO throw special exception
+           throw new PasswordsMismatchException();
         }
         user.setEmail(newUserEmail);
         userRepo.save(user);

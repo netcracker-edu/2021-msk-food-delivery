@@ -1,5 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.errors;
 
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.AlreadyExistsException;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.PasswordsMismatchException;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
 import com.ncedu.fooddelivery.api.v1.errors.wrappers.ApiError;
@@ -70,6 +72,18 @@ public class GlobalExceptionHandler {
             Exception ex, WebRequest request) {
         CustomAccessDeniedException accessEx = new CustomAccessDeniedException();
         return buildResponseEntity(new ApiError(HttpStatus.FORBIDDEN, accessEx.getMessage(), accessEx.getUuid()));
+    }
+
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ResponseEntity<Object> handleAlreadyExistsException(
+            AlreadyExistsException ex) {
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
+    }
+
+    @ExceptionHandler(PasswordsMismatchException.class)
+    public ResponseEntity<Object> handlePasswordsMismatchException(
+            PasswordsMismatchException ex) {
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
