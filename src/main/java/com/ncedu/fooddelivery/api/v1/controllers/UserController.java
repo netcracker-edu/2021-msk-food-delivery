@@ -19,7 +19,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class UserController {
@@ -35,8 +37,7 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN')")
     public UserInfoDTO getUserById(
             @PathVariable Long id,
-            @AuthenticationPrincipal User authedUser
-    ) {
+            @AuthenticationPrincipal User authedUser) {
 
         UserInfoDTO userInfo = userService.getUserDTOById(id);
         if (userInfo == null) {
@@ -62,26 +63,24 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN')")
     public ResponseEntity<?> changeUserInfo(
             @PathVariable Long id,
-            @Valid @RequestBody UserChangeInfoDTO newUserInfo,
-            @AuthenticationPrincipal User authedUser) {
-
-        //client can change only own profile
-        String authedUserRole = authedUser.getRole().name();
-        if (Role.isCLIENT(authedUserRole)) {
-            if (id.equals(authedUser.getId())) {
-                boolean isModified = clientService.changeClientInfo(id, newUserInfo);
-                return new ResponseEntity<>(isModified, HttpStatus.OK);
-            }
+            @Valid @RequestBody UserChangeInfoDTO newUserInfo) {
+        User user = userService.getUserById(id);
+        String userRole = user.getRole().name();
+        boolean isModified = false;
+        if (Role.isCLIENT(userRole)) {
+            isModified = clientService.changeClientInfo(id, newUserInfo);
         }
+        //for admin and moderator we can change only full name
+        String newFullName = newUserInfo.getFullName();
+        isModified = userService.changeFullName(id, newFullName);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return createModifyResponse(isModified);
     }
 
     @DeleteMapping("/api/v1/user/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteUser(
-            @PathVariable Long id
-    ) {
+            @PathVariable Long id) {
         boolean isDeleted = userService.deleteUserById(id);
         if (isDeleted) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -89,15 +88,21 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    //TODO: finish endpoint
     @PatchMapping("/api/v1/user/{id}/role")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> changeUserRole(
             @PathVariable Long id,
-            @RequestBody Role role
-    ) {
+            @RequestBody Role role) {
         System.out.println("Requested id: " + id);
         System.out.println("Requested role: " + role);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private ResponseEntity<?> createModifyResponse(boolean isModified) {
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isModified", isModified);
+        return  new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/api/v1/admins")

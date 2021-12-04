@@ -4,6 +4,7 @@ import com.ncedu.fooddelivery.api.v1.dto.user.ClientInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.UserChangeInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Client;
 import com.ncedu.fooddelivery.api.v1.entities.User;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.AlreadyExistsException;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.repos.ClientRepo;
 import com.ncedu.fooddelivery.api.v1.services.ClientService;
@@ -53,6 +54,10 @@ public class ClientServiceImpl implements ClientService {
 
         String newPhoneNumber = newUserInfo.getPhoneNumber();
         if (newPhoneNumber != null) {
+            Client clientWithNewNumber = clientRepo.findByPhoneNumber(newPhoneNumber);
+            if (clientWithNewNumber != null) {
+                throw new AlreadyExistsException(newPhoneNumber);
+            }
             client.setPhoneNumber(newPhoneNumber);
         }
         clientRepo.save(client);
