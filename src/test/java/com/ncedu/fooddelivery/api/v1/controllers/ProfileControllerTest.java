@@ -3,6 +3,7 @@ package com.ncedu.fooddelivery.api.v1.controllers;
 import com.ncedu.fooddelivery.api.v1.dto.user.*;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.PasswordsMismatchException;
 import com.ncedu.fooddelivery.api.v1.services.ClientService;
 import com.ncedu.fooddelivery.api.v1.services.ModeratorService;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
@@ -17,7 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class ProfileControllerTest {
@@ -146,6 +148,48 @@ public class ProfileControllerTest {
 
         ResponseEntity<?> perfectResponse = createModifyResponse(false);
         assertEquals(perfectResponse, resultResponse);
+    }
+
+    @Test
+    public void changePasswordSuccess() {
+        PasswordChangeDTO pwdChangeDTO = new PasswordChangeDTO();
+        pwdChangeDTO.setOldPassword("password");
+        pwdChangeDTO.setNewPassword("qwerty123");
+        pwdChangeDTO.setNewPasswordConfirm("qwerty123");
+        User user = new User();
+        user.setId(1L);
+        when(userServiceMock.changePassword(user, pwdChangeDTO)).thenReturn(true);
+
+        ResponseEntity<?> resultResponse =
+                profileController.changeUserPassword(pwdChangeDTO, user);
+
+        ResponseEntity<?> perfectResponse = createModifyResponse(true);
+
+        verify(userServiceMock, times(1))
+                .changePassword(user, pwdChangeDTO);
+        assertEquals(perfectResponse, resultResponse);
+    }
+
+    @Test
+    public void changePasswordMismatchError() {
+        PasswordChangeDTO pwdChangeDTO = new PasswordChangeDTO();
+        pwdChangeDTO.setOldPassword("password");
+        pwdChangeDTO.setNewPassword("qwerty123");
+        pwdChangeDTO.setNewPasswordConfirm("INCORRECT");
+        User user = new User();
+        user.setId(1L);
+        when(userServiceMock.changePassword(user, pwdChangeDTO))
+                .thenThrow(new PasswordsMismatchException());
+
+        Exception exception = assertThrows(PasswordsMismatchException.class, () -> {
+            profileController.changeUserPassword(pwdChangeDTO, user);
+        });
+        String resultMessage = exception.getMessage();
+        String perfectMessage = new PasswordsMismatchException().getMessage();
+
+        verify(userServiceMock, times(1))
+                .changePassword(user, pwdChangeDTO);
+        assertEquals(perfectMessage, resultMessage);
     }
 
     private ResponseEntity<?> createModifyResponse(boolean isModified) {
