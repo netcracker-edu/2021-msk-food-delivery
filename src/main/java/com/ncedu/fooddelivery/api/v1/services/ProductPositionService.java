@@ -25,9 +25,9 @@ public interface ProductPositionService {
 
     boolean updatePaymentStatus(List<Long> ids);
 
-    List<ProductPositionInfoDTO> getExpiredPositions();
+    List<ProductPositionInfoDTO> getExpiredPositions(Pageable pageable);
 
-    List<ProductPositionInfoDTO> getExpiredPositions(Long warehouseId);
+    List<ProductPositionInfoDTO> getExpiredPositions(Long warehouseId, Pageable pageable);
 
     List<AbstractMap.SimpleEntry<Integer, ProductPositionInfoDTO>> getPositionsFromOrder(Order order);
 

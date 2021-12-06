@@ -104,13 +104,13 @@ public class ProductPositionServiceImpl1 implements ProductPositionService {
     }
 
     @Override
-    public List<ProductPositionInfoDTO> getExpiredPositions() {
-        return productPositionRepo.findExpiredPositions().stream().map(p -> convertToInfoDTO(p)).collect(Collectors.toList());
+    public List<ProductPositionInfoDTO> getExpiredPositions(Pageable pageable) {
+        return productPositionRepo.findExpiredPositions(pageable).stream().map(p -> convertToInfoDTO(p)).collect(Collectors.toList());
     }
 
     @Override
-    public List<ProductPositionInfoDTO> getExpiredPositions(Long warehouseId) {
-        return productPositionRepo.findExpiredPositions(warehouseId).stream().map(p -> convertToInfoDTO(p)).collect(Collectors.toList());
+    public List<ProductPositionInfoDTO> getExpiredPositions(Long warehouseId, Pageable pageable) {
+        return productPositionRepo.findExpiredPositions(warehouseId, pageable).stream().map(p -> convertToInfoDTO(p)).collect(Collectors.toList());
     }
 
     @Override

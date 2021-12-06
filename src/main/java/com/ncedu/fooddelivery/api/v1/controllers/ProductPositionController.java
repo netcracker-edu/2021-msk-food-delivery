@@ -128,12 +128,12 @@ public class ProductPositionController {
 
     @GetMapping("/api/v1/productPosition/expired")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public ResponseEntity<List<ProductPositionInfoDTO>> getExpiredPositions(@AuthenticationPrincipal User user){
+    public ResponseEntity<List<ProductPositionInfoDTO>> getExpiredPositions(@AuthenticationPrincipal User user, Pageable pageable){
         List<ProductPositionInfoDTO> expiredPositions = new ArrayList<>();
         if(Role.isMODERATOR(user.getRole().toString())){
-            expiredPositions = productPositionService.getExpiredPositions(user.getModerator().getWarehouseId());
+            expiredPositions = productPositionService.getExpiredPositions(user.getModerator().getWarehouseId(), pageable);
         } else {
-            expiredPositions = productPositionService.getExpiredPositions();
+            expiredPositions = productPositionService.getExpiredPositions(pageable);
         }
         return ResponseEntity.status(HttpStatus.OK).body(expiredPositions);
     }
