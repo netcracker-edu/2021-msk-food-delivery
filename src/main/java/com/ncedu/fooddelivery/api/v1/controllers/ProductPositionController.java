@@ -73,7 +73,7 @@ public class ProductPositionController {
         return isCreated;
     }
 
-    @DeleteMapping("/api/v1/productPosition/{id}")   // TODO: check delete (delete cascade on orderProductPositon entity would work ok?)
+    @DeleteMapping("/api/v1/productPosition/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
     public ResponseEntity<?> deleteProductPosition(@PathVariable Long id, @AuthenticationPrincipal User user){
         ProductPosition productPositionToDelete = productPositionService.getProductPosition(id);
@@ -154,7 +154,7 @@ public class ProductPositionController {
 
     @GetMapping("/api/v1/productPositions")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public ResponseEntity<List<ProductPositionInfoDTO>> helloAdmin(@AuthenticationPrincipal User user,
+    public ResponseEntity<List<ProductPositionInfoDTO>> findFiltered(@AuthenticationPrincipal User user,
                            @And({
                                    @Spec(path="productId", params="productId", spec=Equal.class, onTypeMismatch= OnTypeMismatch.EXCEPTION),
                                    @Spec(path="warehouseId", params="warehouseId", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
