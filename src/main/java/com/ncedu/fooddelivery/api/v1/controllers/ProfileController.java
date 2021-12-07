@@ -1,9 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
-import com.ncedu.fooddelivery.api.v1.dto.user.EmailChangeDTO;
-import com.ncedu.fooddelivery.api.v1.dto.user.PasswordChangeDTO;
-import com.ncedu.fooddelivery.api.v1.dto.user.UserChangeInfoDTO;
-import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.*;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.services.ClientService;
@@ -12,7 +9,6 @@ import com.ncedu.fooddelivery.api.v1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,7 +57,7 @@ public class ProfileController {
         }
         //for moderator and admin allow only fullNameChange
         String newFullName = newUserInfo.getFullName();
-        isModified = userService.changeFullName(authedUserId, newFullName);
+        isModified = userService.changeFullName(authedUserId, newFullName); //TODO: change id on user entity!
 
         return createModifyResponse(isModified);
     }
