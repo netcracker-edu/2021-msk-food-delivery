@@ -5,7 +5,7 @@ import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.ProductPositionInfo
 import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.ProductPositionsShipmentDTO;
 import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.UpdatePaymentStatusDTO;
 import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
-import com.ncedu.fooddelivery.api.v1.entities.Order;
+import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPosition;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
