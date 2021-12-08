@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS clients
 (
 	client_id BIGINT PRIMARY KEY REFERENCES users (user_id) ON DELETE CASCADE,
 	payment_data JSON,
-	phone_number VARCHAR(20) NOT NULL UNIQUE CHECK (phone_number != ''),
+	phone_number VARCHAR(20) NOT NULL UNIQUE CHECK (phone_number SIMILAR TO '\+7 \(9\d\d\) \d\d\d-\d\d-\d\d'),
 	rating NUMERIC(3,2) CHECK ( (rating >= 0.00 AND rating <= 5.00) OR (rating is NULL) )
 );
 
@@ -101,3 +101,61 @@ CREATE TRIGGER check_promo_amount_limit
 	BEFORE UPDATE ON promo_codes
 	FOR EACH ROW
 	EXECUTE FUNCTION check_promo_amount_limit();
+
+DO ' DECLARE
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ''file_type'') THEN
+        CREATE TYPE file_type as ENUM (''PNG'', ''JPEG'');
+    END IF;
+END;
+' LANGUAGE PLPGSQL;
+
+CREATE TABLE IF NOT EXISTS files
+(
+	file_id UUID PRIMARY KEY,
+	owner_id BIGINT REFERENCES users (user_id) ON DELETE SET NULL,
+	type FILE_TYPE NOT NULL,
+	size FLOAT4 NOT NULL CHECK (size > 0),
+	upload_date TIMESTAMP NOT NULL
+
+);
+
+/* Добавляем FK files на таблицы users, products, потому что до этого таблицы files еще не существовало.
+*/
+DO ' DECLARE
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_constraint WHERE conname = ''fk_users_files'') THEN
+        ALTER TABLE users
+        	ADD CONSTRAINT fk_users_files FOREIGN KEY (avatar_id) REFERENCES files (file_id) ON DELETE SET NULL;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_constraint WHERE conname = ''fk_products_files'') THEN
+            ALTER TABLE products
+            	ADD CONSTRAINT fk_products_files FOREIGN KEY (picture_id) REFERENCES files (file_id) ON DELETE SET NULL;
+    END IF;
+END;
+' LANGUAGE PLPGSQL;
+
+CREATE TABLE IF NOT EXISTS chats
+(
+	chat_id BIGSERIAL PRIMARY KEY,
+	user_id BIGINT NOT NULL REFERENCES users (user_id) ON DELETE CASCADE,
+	create_date TIMESTAMP NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS messages
+(
+	message_id BIGSERIAL PRIMARY KEY,
+	replier_id BIGINT REFERENCES moderators (moderator_id),
+	chat_id BIGINT NOT NULL REFERENCES chats (chat_id) ON DELETE CASCADE,
+	send_date TIMESTAMP NOT NULL,
+	message_text VARCHAR(200),
+	picture_id UUID,
+	has_been_read BOOLEAN NOT NULL DEFAULT FALSE,
+
+	CONSTRAINT text_or_picture_notnull
+	CHECK (
+		(message_text IS NOT NULL AND message_text != '')
+		OR
+		(picture_id IS NOT NULL)
+	)
+);
