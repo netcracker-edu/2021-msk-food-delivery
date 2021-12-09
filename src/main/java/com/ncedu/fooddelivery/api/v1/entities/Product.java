@@ -44,7 +44,7 @@ public class Product {
     @Min(1)
     private Double price;
     @NotNull
-    private Double discount = 0.0; //default value
+    private Double discount; //default value
 
     public Product(){}
 }
