@@ -59,6 +59,10 @@ CREATE TABLE IF NOT EXISTS products
 	discount NUMERIC(7,2) NOT NULL DEFAULT 0 CHECK(discount >= 0)
 );
 
+CREATE TABLE IF NOT EXISTS products_search (
+	product_search_id BIGINT PRIMARY KEY REFERENCES products (product_id) ON DELETE CASCADE,
+	search_vector tsvector
+);
 
 CREATE TABLE IF NOT EXISTS promo_codes
 (
