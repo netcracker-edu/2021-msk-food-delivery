@@ -1,24 +1,21 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
 import com.ncedu.fooddelivery.api.v1.dto.SearchDTO;
+import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
+import com.ncedu.fooddelivery.api.v1.dto.product.ProductCreateDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
-import com.ncedu.fooddelivery.api.v1.entities.Product;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
-import com.ncedu.fooddelivery.api.v1.repos.ProductRepo;
 import com.ncedu.fooddelivery.api.v1.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -38,6 +35,15 @@ public class ProductController {
         }
         return productService.getProductDTOById(id);
     }
+
+    @PostMapping("/api/v1/product")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public isCreatedDTO createProduct(
+            @Valid @RequestBody ProductCreateDTO newProduct) {
+        isCreatedDTO createdDTO = productService.createProduct(newProduct);
+        return createdDTO;
+    }
+
 
     //TODO: modify with warehouse and product positions limits
     @GetMapping("/api/v1/products")

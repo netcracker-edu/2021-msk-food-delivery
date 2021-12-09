@@ -16,34 +16,22 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="product")
+    @SequenceGenerator(name="product", sequenceName = "products_product_id_seq", allocationSize = 1)
     @Column(name = "product_id")
     private Long id;
-
-    @NotBlank
-    @Size(max = 50)
     private String name;
     private String description;
 
     @Column(name = "picture_id")
     private UUID pictureUUID;
-
-    @NotBlank
     private Integer weight;
-    @Size(max = 250)
     private String composition;
-
     @Column(name = "expiration_days")
     private Short expirationDays;
-
-    @NotBlank
     @Column(name = "in_showcase")
     private Boolean inShowcase;
-
-    @NotBlank
-    @Min(1)
     private Double price;
-    @NotNull
     private Double discount; //default value
 
     public Product(){}

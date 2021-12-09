@@ -1,8 +1,11 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
+import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
+import com.ncedu.fooddelivery.api.v1.dto.product.ProductCreateDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Product;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
+import com.ncedu.fooddelivery.api.v1.mappers.ProductMapper;
 import com.ncedu.fooddelivery.api.v1.repos.ProductRepo;
 import com.ncedu.fooddelivery.api.v1.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,8 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     ProductRepo productRepo;
 
+    ProductMapper productMapper = ProductMapper.INSTANCE;
+
     @Override
     public Product getProductById(Long productId) {
         Optional<Product> optional = productRepo.findById(productId);
@@ -37,7 +42,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDTO getProductDTOById(Long productId) {
         Product product = getProductById(productId);
-        return createProductDTO(product);
+        return productMapper.mapToDTO(product);
     }
 
     @Override
@@ -46,7 +51,17 @@ public class ProductServiceImpl implements ProductService {
         if (product.getInShowcase().equals(false)) {
             throw new NotFoundEx(productId.toString());
         }
-        return createProductDTO(product);
+        return productMapper.mapToDTO(product);
+    }
+
+    @Override
+    public isCreatedDTO createProduct(ProductCreateDTO newProduct) {
+        ProductMapper productMapper = ProductMapper.INSTANCE;
+        Product product = productMapper.mapToEntity(newProduct);
+        product = productRepo.save(product);
+        isCreatedDTO createdDTO = new isCreatedDTO();
+        createdDTO.setId(product.getId());
+        return createdDTO;
     }
 
     @Override
@@ -55,7 +70,7 @@ public class ProductServiceImpl implements ProductService {
         Iterator<Product> iterator = products.iterator();
         List<ProductDTO> productsDTO = new ArrayList<>();
         while (iterator.hasNext()) {
-            productsDTO.add(createProductDTO(iterator.next()));
+            productsDTO.add(productMapper.mapToDTO(iterator.next()));
         }
         return productsDTO;
     }
@@ -66,7 +81,7 @@ public class ProductServiceImpl implements ProductService {
         Iterator<Product> iterator = products.iterator();
         List<ProductDTO> productsDTO = new ArrayList<>();
         while (iterator.hasNext()) {
-            productsDTO.add(createProductDTO(iterator.next()));
+            productsDTO.add(productMapper.mapToDTO(iterator.next()));
         }
         return productsDTO;
     }
@@ -81,7 +96,7 @@ public class ProductServiceImpl implements ProductService {
         Iterator<Product> iterator = products.iterator();
         List<ProductDTO> productsDTO = new ArrayList<>();
         while (iterator.hasNext()) {
-            productsDTO.add(createProductDTO(iterator.next()));
+            productsDTO.add(productMapper.mapToDTO(iterator.next()));
         }
         return productsDTO;
     }
@@ -95,7 +110,7 @@ public class ProductServiceImpl implements ProductService {
         Iterator<Product> iterator = products.iterator();
         List<ProductDTO> productsDTO = new ArrayList<>();
         while (iterator.hasNext()) {
-            productsDTO.add(createProductDTO(iterator.next()));
+            productsDTO.add(productMapper.mapToDTO(iterator.next()));
         }
         return productsDTO;
     }
@@ -109,11 +124,5 @@ public class ProductServiceImpl implements ProductService {
             splitedPhrase[i] += ":*";
         }
         return String.join(" & ", splitedPhrase);
-    }
-
-    private ProductDTO createProductDTO(Product p) {
-        return new ProductDTO(p.getId(), p.getName(), p.getDescription(),
-                p.getPictureUUID(), p.getWeight(), p.getComposition(),
-                p.getExpirationDays(), p.getInShowcase(), p.getPrice(), p.getDiscount());
     }
 }
