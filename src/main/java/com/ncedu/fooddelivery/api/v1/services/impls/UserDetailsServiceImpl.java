@@ -5,15 +5,10 @@ import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.repos.ClientRepo;
 import com.ncedu.fooddelivery.api.v1.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {

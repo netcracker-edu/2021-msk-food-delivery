@@ -1,5 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.errors;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.AlreadyExistsException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.PasswordsMismatchException;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
@@ -18,7 +20,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +35,37 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<?> handleNotFoundExceptions(
             NotFoundEx ex) {
         return buildResponseEntity(new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), ex.getUuid()));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Object> handleAccessDeniedException(
+            Exception ex, WebRequest request) {
+        CustomAccessDeniedException accessEx = new CustomAccessDeniedException();
+        return buildResponseEntity(new ApiError(HttpStatus.FORBIDDEN, accessEx.getMessage(), accessEx.getUuid()));
+    }
+
+    // in case of invalid type of properties
+    @ExceptionHandler(InvalidFormatException.class)
+    protected ResponseEntity<?> handleInvalidFormatException(
+            InvalidFormatException invalidFormatException) {
+
+        final String UUID = "9ff6f740-3f66-42d9-b6c2-06e79691ef9e";
+        final String mainMessage = "Properties have incorrect type.";
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID);
+        return buildResponseEntity(apiError);
+    }
+
+    // in case of unknown fields
+    @ExceptionHandler(UnrecognizedPropertyException.class)
+    protected ResponseEntity<?> handleUnrecognizedPropertyException(
+            UnrecognizedPropertyException unrecognizedPropertyException) {
+
+        final String UUID = "ba4382b3-10e4-47ab-a8e7-ffd10579b553";
+        final String mainMessage = "Unknown properties are not allowed.";
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID);
+        return buildResponseEntity(apiError);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -49,6 +85,40 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    protected ResponseEntity<Object> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex){
+        final String mainMessage = "Type mismatch for argument {" + ex.getName() + "}.";
+        final String UUID = "ff574a23-d676-4738-8785-1f8840df03f9";
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex){
+        ConstraintViolation cv = ex.getConstraintViolations().iterator().next();
+        String fullParam = cv.getPropertyPath().toString();
+        String param = fullParam.substring(fullParam.lastIndexOf('.') + 1);
+        String value = cv.getInvalidValue().toString();
+
+        final String mainMessage = "Constraint violation! Param: {" + param + "}; Value: {" + value + "}.";
+        final String UUID = "2a7b40a2-faf8-4a6c-b6a5-84fb7162f8b7";
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID));
+    }
+
+    @ExceptionHandler(IncorrectProductPositionWarehouseBindingException.class)
+    protected ResponseEntity<Object> handleIncorrectProductPositionWarehouseBindingException(IncorrectProductPositionWarehouseBindingException ex){
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), IncorrectProductPositionWarehouseBindingException.UUID));
+    }
+
+    @ExceptionHandler(NotUniqueIdException.class)
+    protected ResponseEntity<Object> handleNotUniqueIdException (NotUniqueIdException ex){
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, NotUniqueIdException.message, NotUniqueIdException.UUID));
+    }
+
+    @ExceptionHandler(ProductPositionNotEnoughException.class)
+    protected ResponseEntity<Object> handleProductPositionNotEnoughException (ProductPositionNotEnoughException ex){
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ProductPositionNotEnoughException.UUID));
+    }
+
     private List<ApiSubError> getValidationErrors(MethodArgumentNotValidException notValidEx) {
         List<ApiSubError> validationErrors = new ArrayList<>();
         List<ObjectError> objectErrors = notValidEx.getBindingResult().getAllErrors();
@@ -65,13 +135,6 @@ public class GlobalExceptionHandler {
         Object rejectedValue = fieldError.getRejectedValue();
         String errorMessage = fieldError.getDefaultMessage();
         return new ValidationSubError(objectName, fieldName, rejectedValue, errorMessage);
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Object> handleAccessDeniedException(
-            Exception ex, WebRequest request) {
-        CustomAccessDeniedException accessEx = new CustomAccessDeniedException();
-        return buildResponseEntity(new ApiError(HttpStatus.FORBIDDEN, accessEx.getMessage(), accessEx.getUuid()));
     }
 
     @ExceptionHandler(AlreadyExistsException.class)
