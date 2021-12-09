@@ -20,7 +20,6 @@ BEGIN
                 USERS
     */
     IF NOT EXISTS (SELECT 1 FROM users WHERE user_id = 1) THEN
-
         INSERT INTO users
             VALUES  (1, ''ADMIN'', crypt(''adminadmin'', gen_salt(''bf'', 8)), ''Админов Админ Админович'', ''admin@mail.ru'', now(), null, null, null),
                     (2, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Aнтонов Антон Антонович'', ''antonov@mail.ru'', now(), null, null, null),
@@ -175,6 +174,7 @@ END;
     */
 DO ' DECLARE
 BEGIN
+
     IF NOT EXISTS (SELECT 1 FROM moderators WHERE moderator_id=72) THEN
         INSERT INTO moderators
             VALUES  (72, 1),
@@ -570,6 +570,7 @@ END;
     */
 DO ' DECLARE
 BEGIN
+
     IF NOT EXISTS (SELECT 1 FROM promo_codes WHERE promo_code_id=1) THEN
        INSERT INTO promo_codes
         VALUES  (1, 1, ''2021-11-01 19:10:25'', ''Прекрасный промокод, только на 1 неделю ноября.'',
@@ -650,6 +651,7 @@ END;
 
 DO ' DECLARE
 BEGIN
+
     IF NOT EXISTS (SELECT 1 FROM chats WHERE chat_id=2) THEN
         INSERT INTO chats
         	VALUES 	(2, 2, ''2021-10-28 10:01:25''),
@@ -662,6 +664,7 @@ BEGIN
         			(9, 9, ''2021-11-04 11:17:51''),
         			(10, 10, ''2021-11-05 02:31:55''),
         			(11, 11, ''2021-11-07 21:26:22'');
+
         END IF;
 END;
 ' language plpgsql;
@@ -2027,6 +2030,7 @@ END;
 
 DO ' DECLARE
 BEGIN
+
     IF NOT EXISTS (SELECT 1 FROM messages WHERE message_id=1) THEN
             INSERT INTO messages
             	VALUES 	(1, null, 2, ''2021-10-28 10:01:25'',

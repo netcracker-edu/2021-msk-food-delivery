@@ -33,6 +33,7 @@ END;
 
 CREATE TABLE IF NOT EXISTS users
 (
+
 	user_id BIGSERIAL PRIMARY KEY,
 	role ROLE_ENUM NOT NULL,
 	password TEXT NOT NULL,
@@ -241,6 +242,7 @@ CREATE TABLE IF NOT EXISTS orders_product_positions(order_product_position_id BI
                                                     price NUMERIC(7, 2) NOT NULL CHECK(price > 0),
                                                     FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
                                                     FOREIGN KEY (product_position_id) REFERENCES product_positions(product_position_id) ON DELETE CASCADE);
+
 
 CREATE TABLE IF NOT EXISTS files
 (
