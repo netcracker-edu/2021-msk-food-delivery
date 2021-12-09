@@ -16,6 +16,7 @@ public class ProductDTO {
     private Integer weight;
     private String composition;
     private Short expirationDays;
+    private Boolean inShowcase;
     private Double price;
     private Double discount;
 

@@ -41,6 +41,37 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ProductDTO getProductDTOByIdInShowcase(Long productId) {
+        Product product = getProductById(productId);
+        if (product.getInShowcase().equals(false)) {
+            throw new NotFoundEx(productId.toString());
+        }
+        return createProductDTO(product);
+    }
+
+    @Override
+    public List<ProductDTO> getProducts(Pageable pageable) {
+        Iterable<Product> products = productRepo.findAll(pageable);
+        Iterator<Product> iterator = products.iterator();
+        List<ProductDTO> productsDTO = new ArrayList<>();
+        while (iterator.hasNext()) {
+            productsDTO.add(createProductDTO(iterator.next()));
+        }
+        return productsDTO;
+    }
+
+    @Override
+    public List<ProductDTO> getProductsInShowcase(Pageable pageable) {
+        Iterable<Product> products = productRepo.findAllByInShowcase(true, pageable);
+        Iterator<Product> iterator = products.iterator();
+        List<ProductDTO> productsDTO = new ArrayList<>();
+        while (iterator.hasNext()) {
+            productsDTO.add(createProductDTO(iterator.next()));
+        }
+        return productsDTO;
+    }
+
+    @Override
     public List<ProductDTO> searchProducts(String phrase, Pageable pageable) {
 
         String resultPhrase = preparePhraseToSearch(phrase);
@@ -71,6 +102,9 @@ public class ProductServiceImpl implements ProductService {
 
     private String preparePhraseToSearch(String phrase) {
         String[] splitedPhrase = phrase.split(" ");
+        if (splitedPhrase.length == 1) {
+            return phrase + ":*";
+        }
         for (int i = 0; i < splitedPhrase.length; i++) {
             splitedPhrase[i] += ":*";
         }
@@ -80,6 +114,6 @@ public class ProductServiceImpl implements ProductService {
     private ProductDTO createProductDTO(Product p) {
         return new ProductDTO(p.getId(), p.getName(), p.getDescription(),
                 p.getPictureUUID(), p.getWeight(), p.getComposition(),
-                p.getExpirationDays(), p.getPrice(), p.getDiscount());
+                p.getExpirationDays(), p.getInShowcase(), p.getPrice(), p.getDiscount());
     }
 }

@@ -12,6 +12,9 @@ import java.util.List;
 @Repository
 public interface ProductRepo extends CrudRepository<Product, Long> {
 
+    Page<Product> findAll(Pageable pageable);
+    Page<Product> findAllByInShowcase(Boolean inShowcase, Pageable pageable);
+
     @Query(value = "SELECT p.* , ts_rank_cd(s.search_vector, query, 1) AS rank" +
                 " FROM to_tsquery('russian', ?1) AS query, products AS p" +
                 " JOIN products_search AS s" +
