@@ -547,7 +547,7 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM products_search WHERE product_search_id=1) THEN
         INSERT INTO products_search
         	SELECT p.product_id, setweight(to_tsvector(''russian'', p.name), ''A'') ||
-        						  setweight(to_tsvector('russian', p.description), ''B'') ||
+        						  setweight(to_tsvector(''russian'', p.description), ''B'') ||
         						  setweight(to_tsvector(''russian'', p.composition), ''C'') AS tsv
         	FROM products AS p;
     END IF;
