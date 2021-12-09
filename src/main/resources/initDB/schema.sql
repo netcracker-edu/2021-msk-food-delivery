@@ -64,6 +64,50 @@ CREATE TABLE IF NOT EXISTS products_search (
 	search_vector tsvector
 );
 
+/*
+    INSERT TO PRODUCTS_SEARCH if NEW PRODUCT ADDED
+*/
+CREATE OR REPLACE FUNCTION copy_products_to_search() RETURNS TRIGGER AS '
+BEGIN
+    INSERT INTO products_search
+        VALUES(new.product_id,
+			   setweight(to_tsvector(''russian'', new.name), ''A'') ||
+			   setweight(to_tsvector(''russian'', new.description), ''B'') ||
+			   setweight(to_tsvector(''russian'', new.composition), ''C''));
+    RETURN new;
+END;
+' language plpgsql;
+
+DROP TRIGGER IF EXISTS copy_products_to_search ON products;
+
+CREATE TRIGGER copy_products_to_search
+	 AFTER INSERT ON products
+     FOR EACH ROW
+     EXECUTE PROCEDURE copy_products_to_search();
+
+/*
+    UPDATE PRODUCTS_SEARCH if PRODUCTS UPDATED
+*/
+CREATE OR REPLACE FUNCTION update_products_in_search() RETURNS TRIGGER AS '
+BEGIN
+    UPDATE products_search
+        SET search_vector =
+			   setweight(to_tsvector(''russian'', new.name), ''A'') ||
+			   setweight(to_tsvector(''russian'', new.description), ''B'') ||
+			   setweight(to_tsvector(''russian'', new.composition), ''C'')
+		WHERE product_search_id = new.product_id;
+    RETURN new;
+END;
+'
+language plpgsql;
+
+DROP TRIGGER IF EXISTS update_products_in_search ON products;
+
+CREATE TRIGGER update_products_in_search
+	 AFTER UPDATE ON products
+     FOR EACH ROW
+     EXECUTE PROCEDURE update_products_in_search();
+
 CREATE TABLE IF NOT EXISTS promo_codes
 (
 	promo_code_id BIGSERIAL PRIMARY KEY,
