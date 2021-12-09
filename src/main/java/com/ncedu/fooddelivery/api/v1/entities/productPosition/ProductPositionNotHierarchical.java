@@ -33,7 +33,7 @@ public class ProductPositionNotHierarchical {
     private Integer currentAmount;
 
     @Column(name = "supply_date")
-    private Date supplyDate;
+    private java.sql.Date supplyDate;
 
     @Column(name = "supplier_invoice")
     private BigDecimal supplierInvoice;
@@ -47,7 +47,7 @@ public class ProductPositionNotHierarchical {
     @Column(name = "manufacture_date")
     private Date manufactureDate;
 
-    public ProductPositionNotHierarchical(Long id, Long productId, Long warehouseId, String warehouseSection, Integer supplyAmount, Integer currentAmount, Date supplyDate, BigDecimal supplierInvoice, String supplierName, Boolean isInvoicePaid, Date manufactureDate) {
+    public ProductPositionNotHierarchical(Long id, Long productId, Long warehouseId, String warehouseSection, Integer supplyAmount, Integer currentAmount, java.sql.Date supplyDate, BigDecimal supplierInvoice, String supplierName, Boolean isInvoicePaid, Date manufactureDate) {
         this.id = id;
         this.productId = productId;
         this.warehouseId = warehouseId;

@@ -1,40 +1,40 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
-import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.AcceptSupplyDTO;
-import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.ProductPositionInfoDTO;
-import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.ProductPositionsShipmentDTO;
-import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.UpdatePaymentStatusDTO;
+import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.*;
 import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPosition;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPositionNotHierarchical;
-import com.ncedu.fooddelivery.api.v1.errors.notfound.OrderNotFoundException;
-import com.ncedu.fooddelivery.api.v1.errors.notfound.ProductPositionNotFoundException;
+import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
 import com.ncedu.fooddelivery.api.v1.services.OrderService;
 import com.ncedu.fooddelivery.api.v1.services.ProductPositionService;
-import net.kaczmarzyk.spring.data.jpa.domain.Equal;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.OnTypeMismatch;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
+import com.ncedu.fooddelivery.api.v1.specifications.ProductPositionSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.*;
-import java.util.AbstractMap;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
+@Validated
 @RestController
 public class ProductPositionController {
 
@@ -50,7 +50,7 @@ public class ProductPositionController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
     public ResponseEntity<ProductPositionInfoDTO> getFullInfoById(@AuthenticationPrincipal User user, @PathVariable Long id){
         ProductPositionInfoDTO productPositionInfoDTO = productPositionService.getProductPositionInfoDTOById(id);
-        if(productPositionInfoDTO == null) throw new ProductPositionNotFoundException(id);
+        if(productPositionInfoDTO == null) throw new NotFoundEx(String.valueOf(id));
         if(Role.isMODERATOR(user.getRole().toString())){
             if(!user.getModerator().getWarehouseId().equals(productPositionInfoDTO.getWarehouse().getId())){
                 throw new CustomAccessDeniedException();
@@ -77,7 +77,7 @@ public class ProductPositionController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
     public ResponseEntity<?> deleteProductPosition(@PathVariable Long id, @AuthenticationPrincipal User user){
         ProductPosition productPositionToDelete = productPositionService.getProductPosition(id);
-        if(productPositionToDelete == null) throw new ProductPositionNotFoundException(id);
+        if(productPositionToDelete == null) throw new NotFoundEx(String.valueOf(id));
         if(Role.isMODERATOR(user.getRole().toString())){
             if(!user.getModerator().getWarehouseId().equals(productPositionToDelete.getWarehouse().getId())){
                 throw new CustomAccessDeniedException();
@@ -93,7 +93,7 @@ public class ProductPositionController {
     public ResponseEntity<?> nullifyProductPosition(@PathVariable Long id, @AuthenticationPrincipal User user) {
         ProductPosition productPositionToNullify = productPositionService.getProductPosition(id);
         if (productPositionToNullify == null)
-            throw new ProductPositionNotFoundException(id);
+            throw new NotFoundEx(String.valueOf(id));
         if (Role.isMODERATOR(user.getRole().toString())) {
             if (!user.getModerator().getWarehouseId().equals(productPositionToNullify.getWarehouse().getId())) {
                 throw new CustomAccessDeniedException();
@@ -111,7 +111,7 @@ public class ProductPositionController {
 
         for(Long id: updatePaymentStatusDTO.getProductPositions()){
             ProductPosition productPosition = productPositionService.getProductPosition(id);
-            if(productPosition == null) throw new ProductPositionNotFoundException(id);
+            if(productPosition == null) throw new NotFoundEx(String.valueOf(id));
             productPositionList.add(productPosition);
         }
 
@@ -138,56 +138,65 @@ public class ProductPositionController {
         return ResponseEntity.status(HttpStatus.OK).body(expiredPositions);
     }
 
-    // TODO: ask about DTO: should we return exactly ProductPositionDTO?
     @GetMapping("/api/v1/order/{id}/productPositions")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public ResponseEntity<List<AbstractMap.SimpleEntry<Integer, ProductPositionInfoDTO>>> getProductPositionsInOrder(@AuthenticationPrincipal User user,
-                                                                                                                     @PathVariable Long id){
+    public ResponseEntity<ProductPositionsFromOrderDTO> getProductPositionsFromOrder(@AuthenticationPrincipal User user,
+                                                                                     @PathVariable Long id){
         Order order = orderService.getOrder(id);
-        if(order == null) throw new OrderNotFoundException(id);
+        if(order == null) throw new NotFoundEx(String.valueOf(id));
 
         if(user.getRole() == Role.MODERATOR){
             if(!user.getModerator().getWarehouseId().equals(order.getWarehouse().getId())) throw new CustomAccessDeniedException();
         }
-        return new ResponseEntity<>(productPositionService.getPositionsFromOrder(order), HttpStatus.OK);
+        return new ResponseEntity<ProductPositionsFromOrderDTO>(productPositionService.getPositionsFromOrder(order), HttpStatus.OK);
     }
 
     @GetMapping("/api/v1/productPositions")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
     public ResponseEntity<List<ProductPositionInfoDTO>> findFiltered(@AuthenticationPrincipal User user,
-                           @And({
-                                   @Spec(path="productId", params="productId", spec=Equal.class, onTypeMismatch= OnTypeMismatch.EXCEPTION),
-                                   @Spec(path="warehouseId", params="warehouseId", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
-                                   @Spec(path="warehouseSection", params="warehouseSection", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
-                                   @Spec(path="supplyAmount", params="supplyAmount", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
-                                   @Spec(path="currentAmount", params="currentAmount", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
-                                   @Spec(path="supplyDate", params="supplyDate", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
-                                   @Spec(path="supplierInvoice", params="supplierInvoice", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
-                                   @Spec(path="supplierName", params="supplierName", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
-                                   @Spec(path="isInvoicePaid", params="isInvoicePaid", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
-                                   @Spec(path="manufactureDate", params="manufactureDate", spec=Equal.class, onTypeMismatch=OnTypeMismatch.EXCEPTION),
-                           }) Specification<ProductPositionNotHierarchical> productPositionSpecification,
+                           @RequestParam(name = "warehouseId", required = false) @Min(value = 1) @Max(value = Long.MAX_VALUE) Long warehouseId,
+                           @RequestParam(name = "productId", required = false) @Min(value = 1) @Max(value = Long.MAX_VALUE) Long productId,
+                           @RequestParam(name = "warehouseSection", required = false) String warehouseSection,
+                           @RequestParam(name = "supplyAmount", required = false) @Min(value = 1) @Max(value = Integer.MAX_VALUE) Integer supplyAmount,
+                           @RequestParam(name = "currentAmount", required = false) @Min(value = 1) @Max(value = Integer.MAX_VALUE) Integer currentAmount,
+                           @RequestParam(name = "supplierInvoice", required = false) @Digits(integer = 10, fraction = 2) @DecimalMin(value = "0.0", inclusive = false) BigDecimal supplierInvoice,
+                           @RequestParam(name = "supplierName", required = false) String supplierName,
+                           @RequestParam(name = "isInvoicePaid", required = false) Boolean isInvoicePaid,
+                           @RequestParam(name = "supplyDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date supplyDate,
+                           @RequestParam(name = "manufactureDate", required = false)  @DateTimeFormat(pattern="yyyy-MM-dd") Date manufactureDate,
                            Pageable pageable){
 
-        List<ProductPositionInfoDTO> filteredPositions = productPositionService.findFiltered(productPositionSpecification, pageable);
+        List<ProductPositionInfoDTO> filteredPositions;
         if(user.getRole() == Role.MODERATOR){
             Long moderatorWarehouseId = user.getModerator().getWarehouseId();
+            if(warehouseId != null){
+                if(!warehouseId.equals(moderatorWarehouseId)) throw new CustomAccessDeniedException();
+            }
 
-            // if moderator tries to use forbidden for him "warehouseId" (not his warehouse id)
-            if(filteredPositions.stream().allMatch(position -> position.getWarehouse().getId().equals(moderatorWarehouseId))) throw new CustomAccessDeniedException();
+            Specification<ProductPositionNotHierarchical> spec = ProductPositionSpecifications.getFilterSpecification(
+                    productId, moderatorWarehouseId, currentAmount, supplyAmount, manufactureDate, supplierInvoice,
+                    supplyDate, supplierName, warehouseSection, isInvoicePaid
+            );
+            filteredPositions = productPositionService.findFiltered(spec, pageable);
 
-            filteredPositions = filteredPositions.stream().filter(position -> position.getWarehouse().getId().equals(moderatorWarehouseId)).collect(Collectors.toList());
+        } else {
+            Specification<ProductPositionNotHierarchical> spec = ProductPositionSpecifications.getFilterSpecification(
+                    productId, null, currentAmount, supplyAmount, manufactureDate, supplierInvoice,
+                    supplyDate, supplierName, warehouseSection, isInvoicePaid
+            );
+            filteredPositions = productPositionService.findFiltered(spec, pageable);
         }
         return ResponseEntity.status(HttpStatus.OK).body(filteredPositions);
     }
 
-    @PatchMapping("/api/v1/order/{id}/productPositions")
+
+    @PatchMapping("/api/v1/order/{id}/productPositions/currentAmount")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
     public ResponseEntity<?> shipProductPositionsFromOrder(@PathVariable(name = "id") Long id,
                                                            @Valid @RequestBody ProductPositionsShipmentDTO productPositionsShipmentDTO,
                                                            @AuthenticationPrincipal User user){
         Order order = orderService.getOrder(id);
-        if(order == null) throw new OrderNotFoundException(id);
+        if(order == null) throw new NotFoundEx(String.valueOf(id));
 
         if(user.getRole() == Role.MODERATOR){
             if(!user.getModerator().getWarehouseId().equals(order.getWarehouse().getId())) throw new CustomAccessDeniedException();

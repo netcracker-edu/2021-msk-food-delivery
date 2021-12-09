@@ -2,6 +2,7 @@ package com.ncedu.fooddelivery.api.v1.services.impls;
 
 import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.AcceptSupplyDTO;
 import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.ProductPositionInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.ProductPositionsFromOrderDTO;
 import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.ProductPositionsShipmentDTO;
 import com.ncedu.fooddelivery.api.v1.entities.*;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
@@ -115,13 +116,16 @@ public class ProductPositionServiceImpl1 implements ProductPositionService {
     }
 
     @Override
-    public List<AbstractMap.SimpleEntry<Integer, ProductPositionInfoDTO>> getPositionsFromOrder(Order order) {
+    public ProductPositionsFromOrderDTO getPositionsFromOrder(Order order) {
         List<OrderProductPosition> ordersProductPositions = orderProductPositionRepo.findAllByOrder(order);
-        List<AbstractMap.SimpleEntry<Integer, ProductPositionInfoDTO>> entries = new ArrayList<AbstractMap.SimpleEntry<Integer, ProductPositionInfoDTO>>();
+        ProductPositionsFromOrderDTO dto = new ProductPositionsFromOrderDTO();
+        List<ProductPositionsFromOrderDTO.ProductPositionAmountPair> pairs = new ArrayList<>();
         for(OrderProductPosition orderProductPosition: ordersProductPositions){
-            entries.add(new AbstractMap.SimpleEntry<Integer, ProductPositionInfoDTO>(orderProductPosition.getAmount(), convertToInfoDTO(orderProductPosition.getProductPosition())));
+            pairs.add(new ProductPositionsFromOrderDTO.ProductPositionAmountPair(orderProductPosition.getProductPosition(),
+                                                                                 orderProductPosition.getAmount()));
         }
-        return entries;
+        dto.setProductPositions(pairs);
+        return dto;
     }
 
     @Override
@@ -133,29 +137,41 @@ public class ProductPositionServiceImpl1 implements ProductPositionService {
     @Override
     public void shipProductPositions(Long orderId, ProductPositionsShipmentDTO productPositionsShipmentDTO) {
         Optional<Order> optionalOrder = orderRepo.findById(orderId);
-        if(optionalOrder.isEmpty()) throw new OrderNotFoundException(orderId);
+        if(optionalOrder.isEmpty()) throw new NotFoundEx(String.valueOf(orderId));
         Order order = optionalOrder.get();
 
         Long orderWarehouseId = order.getWarehouse().getId();
         List<ProductPositionsShipmentDTO.ProductPositionAmountPair> positionAmountPairs = productPositionsShipmentDTO.getPositionAmountPairs();
 
-        // checking that every product position id is unique
+        checkIdsUnique(positionAmountPairs);
+        checkPositionsExist(positionAmountPairs, orderWarehouseId);
+        checkPositionsCurrentAmount(positionAmountPairs);
+
+        // if everything is ok, we can finally manipulate with database
+        order.setStatus(OrderStatus.DELIVERING);    // updating order status
+        orderRepo.save(order);
+        shipPositionsFromWarehouse(positionAmountPairs);
+    }
+
+    private void checkIdsUnique(List<ProductPositionsShipmentDTO.ProductPositionAmountPair> positionAmountPairs){
         List<Long> ids = positionAmountPairs.stream().map(pair -> pair.getId()).collect(Collectors.toList());
         List<Long> uniqueIds = ids.stream().distinct().collect(Collectors.toList());
         if(ids.size() != uniqueIds.size()) throw new NotUniqueIdException();
+    }
 
-        // checking product positions in given DTO
+    private void checkPositionsExist(List<ProductPositionsShipmentDTO.ProductPositionAmountPair> positionAmountPairs, Long orderWarehouseId){
         positionAmountPairs.stream().map(pair -> pair.getId()).forEach(new Consumer<Long>() {
             @Override
             public void accept(Long positionId) {
                 Optional<ProductPosition> optionalProductPosition = productPositionRepo.findById(positionId);
-                if(optionalProductPosition.isEmpty()) throw new ProductPositionNotFoundException(positionId);
+                if(optionalProductPosition.isEmpty()) throw new NotFoundEx(String.valueOf(positionId));
                 ProductPosition productPosition = optionalProductPosition.get();
                 if(!productPosition.getWarehouse().getId().equals(orderWarehouseId)) throw new IncorrectProductPositionWarehouseBindingException(productPosition.getId());
             }
         });
+    }
 
-        // checking: is every position has enough current amount in warehouse
+    private void checkPositionsCurrentAmount(List<ProductPositionsShipmentDTO.ProductPositionAmountPair> positionAmountPairs){
         positionAmountPairs.forEach(new Consumer<ProductPositionsShipmentDTO.ProductPositionAmountPair>() {
             @Override
             public void accept(ProductPositionsShipmentDTO.ProductPositionAmountPair productPositionAmountPair) {
@@ -165,11 +181,9 @@ public class ProductPositionServiceImpl1 implements ProductPositionService {
                 if(requestedAmount > currentAmount) throw new ProductPositionNotEnoughException(productPosition.getId());
             }
         });
+    }
 
-        // if everything is ok, we can finally manipulate with database
-        order.setStatus(OrderStatus.DELIVERING);    // updating order status
-        orderRepo.save(order);
-
+    private void shipPositionsFromWarehouse(List<ProductPositionsShipmentDTO.ProductPositionAmountPair> positionAmountPairs){
         positionAmountPairs.stream().forEach(new Consumer<ProductPositionsShipmentDTO.ProductPositionAmountPair>() {
             @Override
             public void accept(ProductPositionsShipmentDTO.ProductPositionAmountPair productPositionAmountPair) {
@@ -183,7 +197,6 @@ public class ProductPositionServiceImpl1 implements ProductPositionService {
                 productPositionRepo.save(productPosition);
             }
         });
-
     }
 
     public ProductPositionInfoDTO convertToInfoDTO(ProductPosition productPosition){
@@ -217,8 +230,8 @@ public class ProductPositionServiceImpl1 implements ProductPositionService {
         Optional<Product> productOptional = productRepo.findById(acceptSupplyDTO.getProductId());
         Optional<Warehouse> warehouseOptional = warehouseRepo.findById(acceptSupplyDTO.getWarehouseId());
 
-        if(warehouseOptional.isEmpty()) throw new WarehouseNotFoundException(acceptSupplyDTO.getWarehouseId());
-        if(productOptional.isEmpty()) throw new ProductNotFoundException(acceptSupplyDTO.getProductId());
+        if(warehouseOptional.isEmpty()) throw new NotFoundEx(String.valueOf(acceptSupplyDTO.getWarehouseId()));
+        if(productOptional.isEmpty()) throw new NotFoundEx(String.valueOf(acceptSupplyDTO.getProductId()));
 
         Product product = productOptional.get();
         Warehouse warehouse = warehouseOptional.get();
