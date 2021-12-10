@@ -2,6 +2,7 @@ package com.ncedu.fooddelivery.api.v1.services;
 
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Product;
+import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.repos.ProductRepo;
 import org.junit.jupiter.api.Test;
@@ -27,14 +28,8 @@ public class ProductServiceTest {
 
     @Test
     public void getProductByIdSuccess() {
-        //TODO product utils with several product entities and helper methods
         Long productId = 1L;
-        Product product = new Product();
-        product.setId(productId);
-        product.setName("Milk");
-        product.setWeight(400);
-        product.setPrice(30.4);
-        product.setInShowcase(true);
+        Product product = ProductUtils.createMilkInShowcase(productId);
         when(productRepoMock.findById(productId))
                 .thenReturn(Optional.of(product));
 
@@ -63,15 +58,8 @@ public class ProductServiceTest {
 
     @Test
     public void getProductDTOByIDSuccess() {
-        Long productId = 0L;
-        Product product = new Product();
-        product.setId(productId);
-        product.setName("Milk");
-        product.setDescription("Awesome taste!!!");
-        product.setExpirationDays(Short.valueOf("5"));
-        product.setWeight(400);
-        product.setPrice(30.4);
-        product.setInShowcase(true);
+        Long productId = 1L;
+        Product product = ProductUtils.createMilkInShowcase(productId);
         when(productRepoMock.findById(productId)).thenReturn(Optional.of(product));
 
         ProductDTO resultDTO = productService.getProductDTOById(productId);
@@ -98,9 +86,40 @@ public class ProductServiceTest {
         assertEquals(perfectMessage, resultMessage);
     }
 
+    @Test
+    public void getProductDTOByIdInShowCaseSuccess() {
+        Long productId = 1L;
+        Product product = ProductUtils.createMilkInShowcase(productId);
+        when(productRepoMock.findById(productId))
+                .thenReturn(Optional.of(product));
+
+        ProductDTO resultDTO = productService.getProductDTOByIdInShowcase(productId);
+        ProductDTO perfectDTO = ProductUtils.createProductDTO(product);
+
+        verify(productRepoMock, times(1)).findById(productId);
+        assertEquals(perfectDTO, resultDTO);
+    }
+
+    @Test
+    public void getProductDTOByIdInShowCaseError() {
+        Long productId = 1L;
+        Product product = ProductUtils.createMilkNOTinShowcase(productId);
+        when(productRepoMock.findById(productId))
+                .thenReturn(Optional.of(product));
+
+        Exception exception = assertThrows(NotFoundEx.class, () -> {
+            productService.getProductDTOByIdInShowcase(productId);
+        });
+        String resultMessage = exception.getMessage();
+        String perfectMessage = new NotFoundEx(productId.toString()).getMessage();
+
+        verify(productRepoMock, times(1)).findById(productId);
+        assertEquals(perfectMessage, resultMessage);
+    }
+
     private ProductDTO createProductDTO(Product p) {
         return new ProductDTO(p.getId(), p.getName(), p.getDescription(),
                 p.getPictureUUID(), p.getWeight(), p.getComposition(),
-                p.getExpirationDays(), p.getPrice(), p.getDiscount());
+                p.getExpirationDays(), p.getInShowcase(), p.getPrice(), p.getDiscount());
     }
 }
