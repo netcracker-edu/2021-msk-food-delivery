@@ -102,6 +102,7 @@ BEGIN
                     (79, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов8 Модератор8 Модераторович8'', ''moderatorov8@mail.ru'', now(), null, null, null),
                     (80, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов9 Модератор9 Модераторович9'', ''moderatorov9@mail.ru'', now(), null, null, null),
                     (81, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов10 Модератор10 Модераторович10'', ''moderatorov10@mail.ru'', now(), null, null, null);
+        ALTER SEQUENCE IF EXISTS users_user_id_seq RESTART WITH 81;
         END IF;
     END;
 ' language plpgsql;
@@ -561,6 +562,7 @@ BEGIN
                 (121, ''Кетчуп Итальянский'',
                 ''Незаменим в приготовлении спагетти Бoлоньезе, пиццы и других блюд итальянской кухни.'',
                 null, 350, ''Вода, паста томатная, сахар, уксус, соль, специи.'', 365, TRUE, 85.90, 0);
+        ALTER SEQUENCE IF EXISTS products_product_id_seq RESTART WITH 121;
         END IF;
 END;
 ' language plpgsql;
@@ -645,6 +647,7 @@ BEGIN
                 (24, 1, ''2021-10-28 20:01:51'', ''Нет подходящих промокодов? Встречайте, безлимитный промокод на 10 рублей всегда!'',
                 ''ДЕСЯТОЧКА'', TRUE, null, null,
                 null, 0, 10.0, null, null, FALSE);
+        ALTER SEQUENCE IF EXISTS promo_codes_promo_code_id_seq RESTART WITH 24;
         END IF;
 END;
 ' language plpgsql;
@@ -664,7 +667,7 @@ BEGIN
         			(9, 9, ''2021-11-04 11:17:51''),
         			(10, 10, ''2021-11-05 02:31:55''),
         			(11, 11, ''2021-11-07 21:26:22'');
-
+        ALTER SEQUENCE IF EXISTS chats_chat_id_seq RESTART WITH 11;
         END IF;
 END;
 ' language plpgsql;
@@ -2170,6 +2173,7 @@ BEGIN
             			(42, null, 11, ''2021-11-07 21:45:22'',
             				''Спасибо, обязательно подпишусь!'',
             				null, FALSE);
+        ALTER SEQUENCE IF EXISTS messages_message_id_seq RESTART WITH 42;
         END IF;
 END;
 ' LANGUAGE PLPGSQL;
