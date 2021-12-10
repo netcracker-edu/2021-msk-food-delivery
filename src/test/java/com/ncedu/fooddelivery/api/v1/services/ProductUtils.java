@@ -5,6 +5,12 @@ import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductUpdateDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Product;
 import com.ncedu.fooddelivery.api.v1.mappers.ProductMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProductUtils {
 
@@ -78,5 +84,30 @@ public class ProductUtils {
         return productDTO;
     }
 
+    public static Page<Product> createPageWithMilkProducts(Pageable pageable) {
+        Product milk = createMilkInShowcase(1L);
+        Product milkElite = createMilkNOTinShowcase(2L);
+        List<Product> products = new ArrayList<>();
+        products.add(milkElite);
+        products.add(milk);
+        return new PageImpl<Product>(products, pageable, products.size());
+    }
+    public static List<ProductDTO> createProductDTOListFromPage(Page<Product> page) {
+        List<Product> products = page.getContent();
+        List<ProductDTO> productsDTO = new ArrayList<>();
+        for (Product p : products) {
+            productsDTO.add(createProductDTO(p));
+        }
+        return productsDTO;
+    }
 
+
+    public static Page<Product> createPageProductsInShowcase(Pageable pageable) {
+        Product milk = createMilkInShowcase(1L);
+        Product bread = createBreadInShowcase(2L);
+        List<Product> products = new ArrayList<>();
+        products.add(milk);
+        products.add(bread);
+        return new PageImpl<Product>(products, pageable, products.size());
+    }
 }

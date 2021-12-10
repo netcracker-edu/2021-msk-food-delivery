@@ -86,6 +86,7 @@ public class ProductServiceImpl implements ProductService {
         productRepo.delete(product);
     }
 
+    //TODO: rewrite with extracting List forward from page.
     @Override
     public List<ProductDTO> getProducts(Pageable pageable) {
         Iterable<Product> products = productRepo.findAll(pageable);

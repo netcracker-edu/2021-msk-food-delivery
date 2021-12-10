@@ -11,7 +11,7 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ProductMapper {
-
+    //TODO: see MapStruct functionality for mapping List's
     public ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
     public Product mapToEntity(ProductCreateDTO productCreateDTO);
