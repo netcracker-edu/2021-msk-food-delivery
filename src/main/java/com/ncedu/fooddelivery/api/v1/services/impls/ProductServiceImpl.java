@@ -3,6 +3,7 @@ package com.ncedu.fooddelivery.api.v1.services.impls;
 import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductCreateDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
+import com.ncedu.fooddelivery.api.v1.dto.product.ProductUpdateDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Product;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.mappers.ProductMapper;
@@ -56,12 +57,33 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public isCreatedDTO createProduct(ProductCreateDTO newProduct) {
-        ProductMapper productMapper = ProductMapper.INSTANCE;
         Product product = productMapper.mapToEntity(newProduct);
         product = productRepo.save(product);
         isCreatedDTO createdDTO = new isCreatedDTO();
         createdDTO.setId(product.getId());
         return createdDTO;
+    }
+
+    @Override
+    public void updateProduct(Long id, ProductUpdateDTO updatedProduct) {
+        Product product = getProductById(id);
+        productMapper.updateToEntity(product, updatedProduct);
+        productRepo.save(product);
+    }
+
+    @Override
+    public boolean switchInShowcaseStatus(Long id) {
+        Product product = getProductById(id);
+        boolean newInShowcase = !product.getInShowcase();
+        product.setInShowcase(newInShowcase);
+        productRepo.save(product);
+        return newInShowcase;
+    }
+
+    @Override
+    public void deleteProduct(Long id) {
+        Product product = getProductById(id);
+        productRepo.delete(product);
     }
 
     @Override
