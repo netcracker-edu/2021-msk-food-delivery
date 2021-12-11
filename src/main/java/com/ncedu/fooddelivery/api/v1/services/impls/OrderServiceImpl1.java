@@ -1,7 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
-import com.ncedu.fooddelivery.api.v1.entities.Order;
-import com.ncedu.fooddelivery.api.v1.repos.OrderRepo;
+import com.ncedu.fooddelivery.api.v1.entities.order.Order;
+import com.ncedu.fooddelivery.api.v1.repos.order.OrderRepo;
 import com.ncedu.fooddelivery.api.v1.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

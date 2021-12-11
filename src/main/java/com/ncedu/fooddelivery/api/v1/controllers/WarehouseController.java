@@ -3,7 +3,7 @@ package com.ncedu.fooddelivery.api.v1.controllers;
 import com.ncedu.fooddelivery.api.v1.dto.WarehouseInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
-import com.ncedu.fooddelivery.api.v1.errors.notfound.WarehouseNotFoundException;
+import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
 import com.ncedu.fooddelivery.api.v1.services.WarehouseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class WarehouseController {
             }
         }
         WarehouseInfoDTO warehouseInfoDTO = this.warehouseService.getWarehouseInfoDTOById(id);
-        if(warehouseInfoDTO == null) throw new WarehouseNotFoundException(id);
+        if(warehouseInfoDTO == null) throw new NotFoundEx(String.valueOf(id));
         return ResponseEntity.status(HttpStatus.OK).body(warehouseInfoDTO);
     }
 }

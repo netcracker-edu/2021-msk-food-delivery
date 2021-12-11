@@ -1,9 +1,13 @@
-package com.ncedu.fooddelivery.api.v1.entities;
+package com.ncedu.fooddelivery.api.v1.entities.order;
 
 import com.bedatadriven.jackson.datatype.jts.serialization.GeometryDeserializer;
 import com.bedatadriven.jackson.datatype.jts.serialization.GeometrySerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.ncedu.fooddelivery.api.v1.entities.Client;
+import com.ncedu.fooddelivery.api.v1.entities.Courier;
+import com.ncedu.fooddelivery.api.v1.entities.OrderStatus;
+import com.ncedu.fooddelivery.api.v1.entities.Warehouse;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.Data;
