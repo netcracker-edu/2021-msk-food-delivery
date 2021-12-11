@@ -15,6 +15,9 @@
 	<description>Service for ordering products and household goods at home from local warehouses</description>
 	<properties>
 		<java.version>11</java.version>
+		<start-class>com.ncedu.fooddelivery.FoodDeliveryApplication</start-class>
+		<org.mapstruct.version>1.4.1.Final</org.mapstruct.version>
+		<org.projectlombok.version>1.18.20</org.projectlombok.version>
 	</properties>
 	<dependencies>
 
@@ -108,10 +111,11 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${project.parent.version}</version>
+			</plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
