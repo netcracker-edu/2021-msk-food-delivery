@@ -94,8 +94,8 @@ public class ProductPositionServiceImpl1 implements ProductPositionService {
     public boolean updatePaymentStatus(List<Long> ids) {
         List<ProductPosition> productPositionList = new ArrayList<>();
         for(Long id: ids){
-            ProductPosition productPosition = getProductPosition(id);
             if(id == null) return false;
+            ProductPosition productPosition = getProductPosition(id);
             productPositionList.add(productPosition);
         }
         for(ProductPosition productPosition: productPositionList){

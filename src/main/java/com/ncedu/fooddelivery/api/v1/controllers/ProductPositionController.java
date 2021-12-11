@@ -105,7 +105,7 @@ public class ProductPositionController {
 
     @PatchMapping("/api/v1/productPositions/paymentState")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public ResponseEntity<?> updatePaymentState(@AuthenticationPrincipal User user, @Valid @RequestBody UpdatePaymentStatusDTO updatePaymentStatusDTO){
+    public ResponseEntity<?> updatePaymentStatus(@AuthenticationPrincipal User user, @Valid @RequestBody UpdatePaymentStatusDTO updatePaymentStatusDTO){
 
         List<ProductPosition> productPositionList = new ArrayList<>();
 
