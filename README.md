@@ -3,8 +3,8 @@
 
 ### Prerequisites
 - installed Docker [Windows example](https://docs.docker.com/desktop/windows/install/#install-docker-desktop-on-windows)
-- installed PostgreSQL in Docker container [Official Docker image](https://hub.docker.com/_/postgres) 
-- run PostgeSQL image:
+- installed postgis in Docker container [Official Docker image](https://registry.hub.docker.com/r/postgis/postgis) 
+- run postgis image:
 ```bash
 docker run --name pg-delivery -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -d postgis/postgis
 ```

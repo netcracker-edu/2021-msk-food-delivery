@@ -1,10 +1,11 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
-import com.ncedu.fooddelivery.api.v1.dto.RegistrationDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.RegistrationDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Client;
 import com.ncedu.fooddelivery.api.v1.entities.Moderator;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
+import com.ncedu.fooddelivery.api.v1.mappers.RegistrationMapper;
 import com.ncedu.fooddelivery.api.v1.repos.ClientRepo;
 import com.ncedu.fooddelivery.api.v1.repos.ModeratorRepo;
 import com.ncedu.fooddelivery.api.v1.repos.UserRepo;
@@ -25,29 +26,20 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Autowired PasswordEncoder encoder;
 
     public Long addUser(RegistrationDTO userInfo) {
-        //TODO: move set hell to "Map Struct"
-        User user = new User();
-        user.setEmail(userInfo.getEmail());
-        user.setFullName(userInfo.getFullName());
-        user.setPassword(encoder.encode(userInfo.getPassword()));
-        Role role = Role.valueOf(userInfo.getRole());
-        user.setRole(role);
-        user.setAvatarId(user.getAvatarId());
+        RegistrationMapper regMapper = RegistrationMapper.INSTANCE;
+        userInfo.setPassword(encoder.encode(userInfo.getPassword()));
+        User user = regMapper.dtoToUser(userInfo);
         user.setRegDate(Timestamp.valueOf(LocalDateTime.now()));
 
         Long userId = -1L;
 
         if (Role.isCLIENT(userInfo.getRole())) {
-            Client client = new Client();
-            client.setPaymentData(userInfo.getPaymentData());
-            client.setRating(userInfo.getRating());
-            client.setPhoneNumber(userInfo.getPhoneNumber());
+            Client client = regMapper.dtoToClient(userInfo);
             client.setUser(user);
             client = clientRepo.save(client);
             userId = client.getId();
         } else if (Role.isMODERATOR(userInfo.getRole())) {
-            Moderator moderator = new Moderator();
-            moderator.setWarehouseId(userInfo.getWarehouseId());
+            Moderator moderator = regMapper.dtoToModerator(userInfo);
             moderator.setUser(user);
             moderator = moderatorRepo.save(moderator);
             userId = moderator.getId();

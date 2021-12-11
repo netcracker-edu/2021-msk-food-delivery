@@ -1,14 +1,18 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
-import com.ncedu.fooddelivery.api.v1.dto.UserInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.EmailChangeDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.PasswordChangeDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
-import com.ncedu.fooddelivery.api.v1.repos.ClientRepo;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.AlreadyExistsException;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.PasswordsMismatchException;
+import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.repos.UserRepo;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,20 +25,19 @@ public class UserServiceImpl implements UserService {
     @Autowired
     UserRepo userRepo;
 
+    @Autowired
+    PasswordEncoder encoder;
+
     public User getUserById(Long id) {
-        Optional<User> findedUser = userRepo.findById(id);
-        if (findedUser.isPresent()) {
-            return findedUser.get();
+        Optional<User> user = userRepo.findById(id);
+        if (!user.isPresent()) {
+            throw new NotFoundEx(id.toString());
         }
-        return null;
+        return user.get();
     }
 
     public UserInfoDTO getUserDTOById(Long id) {
-        Optional<User> optional = userRepo.findById(id);
-        if (!optional.isPresent()) {
-            return null;
-        }
-        User user = optional.get();
+        User user = getUserById(id);
         return createUserDTO(user);
     }
 
@@ -46,10 +49,57 @@ public class UserServiceImpl implements UserService {
 
     public boolean deleteUserById(Long id) {
         User userForDelete = getUserById(id);
-        if (userForDelete == null) {
-            return false;
-        }
         userRepo.delete(userForDelete);
+        return true;
+    }
+
+    @Override
+    public boolean changeFullName(Long id, String newFullName) {
+        User user = getUserById(id);
+        if (newFullName != null) {
+            user.setFullName(newFullName);
+            userRepo.save(user);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean changeEmail(User user, EmailChangeDTO newEmailInfo) {
+        String newUserEmail = newEmailInfo.getEmail();
+        User userWithNewEmail = userRepo.findByEmail(newUserEmail);
+        //user with new email also exist throw exception!
+        if (userWithNewEmail != null) {
+            throw new AlreadyExistsException(newUserEmail);
+        }
+        String inputPassword = newEmailInfo.getPassword();
+        String userEncodedPassword = user.getPassword();
+        boolean isPasswordsSame = encoder.matches(inputPassword, userEncodedPassword);
+        if (!isPasswordsSame) {
+           throw new PasswordsMismatchException();
+        }
+        user.setEmail(newUserEmail);
+        userRepo.save(user);
+        return true;
+    }
+
+    @Override
+    public boolean changePassword(User authedUser, PasswordChangeDTO passwordChangeDTO) {
+        String inputOldPassword = passwordChangeDTO.getOldPassword();
+        String userEncodedPassword = authedUser.getPassword();
+        boolean isPasswordsMismatch = !encoder.matches(inputOldPassword, userEncodedPassword);
+        if (isPasswordsMismatch) {
+            throw  new PasswordsMismatchException();
+        }
+        String newPassword = passwordChangeDTO.getNewPassword();
+        String newPasswordConfirm = passwordChangeDTO.getNewPasswordConfirm();
+        isPasswordsMismatch = !newPassword.equals(newPasswordConfirm);
+        if (isPasswordsMismatch) {
+            throw  new PasswordsMismatchException();
+        }
+
+        authedUser.setPassword(encoder.encode(newPassword));
+        userRepo.save(authedUser);
         return true;
     }
 
@@ -63,8 +113,8 @@ public class UserServiceImpl implements UserService {
         return adminsDTO;
     }
 
-    public List<UserInfoDTO> getAllUsers() {
-        Iterable<User> users = userRepo.findAll();
+    public List<UserInfoDTO> getAllUsers(Pageable pageable) {
+        Iterable<User> users = userRepo.findAll(pageable);
         Iterator<User> iterator = users.iterator();
 
         List<UserInfoDTO> usersDTO = new ArrayList<>();

@@ -1,55 +1,47 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
-import com.ncedu.fooddelivery.api.v1.dto.ClientInfoDTO;
-import com.ncedu.fooddelivery.api.v1.dto.ModeratorInfoDTO;
-import com.ncedu.fooddelivery.api.v1.dto.UserInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.ClientInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.ModeratorInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.UserChangeInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
-import com.ncedu.fooddelivery.api.v1.errors.notfound.UserNotFoundException;
-import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
+import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class UserController {
-    //TODO: add errors and error wrappers
     //TODO: replace returned object in methods on ResponseEntity
     //TODO: add updating special fields with PATCH http verb
-    //TODO: add updating all fields with PUT http verb
+    //TODO: add updating other fields with PUT http verb
 
     @Autowired UserService userService;
     @Autowired ClientService clientService;
     @Autowired ModeratorService moderatorService;
 
     @GetMapping("/api/v1/user/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN')")
     public UserInfoDTO getUserById(
             @PathVariable Long id,
-            @AuthenticationPrincipal User authedUser
-    ) {
+            @AuthenticationPrincipal User authedUser) {
 
         UserInfoDTO userInfo = userService.getUserDTOById(id);
         if (userInfo == null) {
-            throw new UserNotFoundException("User not found id {" + id + "}");
-        }
-
-        String authedUserRole = authedUser.getRole().name();
-        //client can watch only own profile
-        if (Role.isCLIENT(authedUserRole)) {
-            Long authedId = authedUser.getId();
-            if (authedId.equals(userInfo.getId())) {
-                ClientInfoDTO  clientProfile = clientService.getClientDTOById(authedId);
-                return clientProfile;
-            }
-            throw new CustomAccessDeniedException();
+            throw new NotFoundEx(id.toString());
         }
 
         //get extended info depending on the role of the requested user
@@ -67,27 +59,50 @@ public class UserController {
         return userInfo;
     }
 
-    @PatchMapping("/api/v1/user/{id}/role")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> changeUserRole(
+    @PutMapping("/api/v1/user/{id}")
+    @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN')")
+    public ResponseEntity<?> changeUserInfo(
             @PathVariable Long id,
-            @RequestBody Role role
-    ) {
-        System.out.println("Requested id: " + id);
-        System.out.println("Requested role: " + role);
-        return new ResponseEntity<>(HttpStatus.OK);
+            @Valid @RequestBody UserChangeInfoDTO newUserInfo) {
+        User user = userService.getUserById(id);
+        String userRole = user.getRole().name();
+        boolean isModified = false;
+        if (Role.isCLIENT(userRole)) {
+            isModified = clientService.changeClientInfo(id, newUserInfo);
+        }
+        //for admin and moderator we can change only full name
+        String newFullName = newUserInfo.getFullName();
+        isModified = userService.changeFullName(id, newFullName);
+
+        return createModifyResponse(isModified);
     }
 
     @DeleteMapping("/api/v1/user/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteUser(
-            @PathVariable Long id
-    ) {
+            @PathVariable Long id) {
         boolean isDeleted = userService.deleteUserById(id);
         if (isDeleted) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    //TODO: finish endpoint
+    @PatchMapping("/api/v1/user/{id}/role")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> changeUserRole(
+            @PathVariable Long id,
+            @RequestBody Role role) {
+        System.out.println("Requested id: " + id);
+        System.out.println("Requested role: " + role);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    private ResponseEntity<?> createModifyResponse(boolean isModified) {
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isModified", isModified);
+        return  new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/api/v1/admins")
@@ -99,8 +114,10 @@ public class UserController {
 
     @GetMapping("/api/v1/users")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public List<UserInfoDTO> getUserList() {
-        List<UserInfoDTO> userList = userService.getAllUsers();
+    public List<UserInfoDTO> getUserList(
+            @PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        List<UserInfoDTO> userList = userService.getAllUsers(pageable);
         return userList;
     }
 

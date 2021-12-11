@@ -19,7 +19,7 @@ public class ApiError {
     private String dateTime;
     private String message;
     private String debugMessage;
-    private List<? extends ApiSubError> subErrors;
+    private List<ApiSubError> subErrors;
 
     private ApiError() {
         dateTime = createDateTimeString();
