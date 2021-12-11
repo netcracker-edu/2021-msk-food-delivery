@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ncedu.fooddelivery.api.v1.entities.Product;
 import com.ncedu.fooddelivery.api.v1.entities.Warehouse;
 import lombok.Data;
@@ -15,10 +16,15 @@ public class ProductPositionInfoDTO {
     private String warehouseSection;
     private Integer supplyAmount;
     private Integer currentAmount;
+
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date supplyDate;
+
     private BigDecimal supplierInvoice;
     private String supplierName;
     private Boolean isInvoicePaid;
+
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date manufactureDate;
 
 

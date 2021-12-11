@@ -48,7 +48,7 @@ public class ProductPositionController {
 
     @GetMapping(path = "/api/v1/productPosition/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public ResponseEntity<ProductPositionInfoDTO> getFullInfoById(@AuthenticationPrincipal User user, @PathVariable Long id){
+    public ResponseEntity<ProductPositionInfoDTO> getFullInfoById(@AuthenticationPrincipal User user, @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long id){
         ProductPositionInfoDTO productPositionInfoDTO = productPositionService.getProductPositionInfoDTOById(id);
         if(productPositionInfoDTO == null) throw new NotFoundEx(String.valueOf(id));
         if(Role.isMODERATOR(user.getRole().toString())){
@@ -90,7 +90,7 @@ public class ProductPositionController {
 
     @PatchMapping("/api/v1/productPosition/{id}/currentAmount")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public ResponseEntity<?> nullifyProductPosition(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    public ResponseEntity<?> nullifyProductPosition(@Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long id, @AuthenticationPrincipal User user) {
         ProductPosition productPositionToNullify = productPositionService.getProductPosition(id);
         if (productPositionToNullify == null)
             throw new NotFoundEx(String.valueOf(id));
@@ -141,7 +141,7 @@ public class ProductPositionController {
     @GetMapping("/api/v1/order/{id}/productPositions")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
     public ResponseEntity<ProductPositionsFromOrderDTO> getProductPositionsFromOrder(@AuthenticationPrincipal User user,
-                                                                                     @PathVariable Long id){
+                                                                                     @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long id){
         Order order = orderService.getOrder(id);
         if(order == null) throw new NotFoundEx(String.valueOf(id));
 
@@ -192,7 +192,7 @@ public class ProductPositionController {
 
     @PatchMapping("/api/v1/order/{id}/productPositions/currentAmount")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public ResponseEntity<?> shipProductPositionsFromOrder(@PathVariable(name = "id") Long id,
+    public ResponseEntity<?> shipProductPositionsFromOrder(@Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable(name = "id") Long id,
                                                            @Valid @RequestBody ProductPositionsShipmentDTO productPositionsShipmentDTO,
                                                            @AuthenticationPrincipal User user){
         Order order = orderService.getOrder(id);

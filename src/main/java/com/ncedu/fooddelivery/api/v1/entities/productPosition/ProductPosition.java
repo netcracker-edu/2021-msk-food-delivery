@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.entities.productPosition;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ncedu.fooddelivery.api.v1.entities.Product;
 import com.ncedu.fooddelivery.api.v1.entities.Warehouse;
 import lombok.Data;
@@ -36,6 +37,7 @@ public class ProductPosition {
     @Column(name = "current_amount")
     private Integer currentAmount;
 
+    @JsonFormat(pattern="yyyy-MM-dd")
     @Column(name = "supply_date")
     private Date supplyDate;
 
@@ -49,6 +51,7 @@ public class ProductPosition {
     private Boolean isInvoicePaid;
 
     @Column(name = "manufacture_date")
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date manufactureDate;
 
     public ProductPosition(Long id, Product product, Warehouse warehouse, String warehouseSection, Integer supplyAmount, Integer currentAmount, Date supplyDate, BigDecimal supplierInvoice, String supplierName, Boolean isInvoicePaid, Date manufactureDate) {

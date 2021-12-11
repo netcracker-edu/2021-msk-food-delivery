@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +49,18 @@ public class GlobalExceptionHandler {
         apiError.setSubErrors(validationErrors);
 
         return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex){
+        ConstraintViolation cv = ex.getConstraintViolations().iterator().next();
+        String fullParam = cv.getPropertyPath().toString();
+        String param = fullParam.substring(fullParam.lastIndexOf('.') + 1);
+        String value = cv.getInvalidValue().toString();
+
+        final String mainMessage = "Constraint violation! Param: {" + param + "}; Value: {" + value + "}.";
+        final String UUID = "2a7b40a2-faf8-4a6c-b6a5-84fb7162f8b7";
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID));
     }
 
     private List<ApiSubError> getValidationErrors(MethodArgumentNotValidException notValidEx) {
