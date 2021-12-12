@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -26,7 +27,8 @@ import java.util.UUID;
 public class User implements Serializable, UserDetails {
     //TODO: problems with sequences when add to DB. We populated DB from data.sql, but hibernate_sequence whatever start from 1
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user")
+    @SequenceGenerator(name = "user", sequenceName = "users_user_id_seq", allocationSize = 1)
     @Column(name = "user_id")
     private Long id;
 
@@ -53,6 +55,12 @@ public class User implements Serializable, UserDetails {
     @OneToOne(cascade=CascadeType.ALL, mappedBy = "user")
     @PrimaryKeyJoinColumn
     private Moderator moderator;
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "owner")
+    private File avatar;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
+    private List<File> files;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
