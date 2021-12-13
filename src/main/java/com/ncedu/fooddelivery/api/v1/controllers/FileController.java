@@ -42,9 +42,10 @@ public class FileController {
             @PathVariable File file,
             @AuthenticationPrincipal User authedUser) {
 
-        Resource resource = fileService.load(file.getId().toString());
+        Resource resource = fileService.load(file);
+        String mediaType = file.getType().getMediaType();
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG)
+                .contentType(MediaType.parseMediaType(mediaType))
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"" + file.getName() + "\"")
                 .body(resource);
