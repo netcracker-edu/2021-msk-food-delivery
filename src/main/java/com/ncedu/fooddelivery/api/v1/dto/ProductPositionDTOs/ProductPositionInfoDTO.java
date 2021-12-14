@@ -1,10 +1,12 @@
 package com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 import com.ncedu.fooddelivery.api.v1.entities.Product;
 import com.ncedu.fooddelivery.api.v1.entities.Warehouse;
 import lombok.Data;
 
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -17,17 +19,15 @@ public class ProductPositionInfoDTO {
     private Integer supplyAmount;
     private Integer currentAmount;
 
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
     private Date supplyDate;
 
     private BigDecimal supplierInvoice;
     private String supplierName;
     private Boolean isInvoicePaid;
 
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @Temporal(TemporalType.DATE)
     private Date manufactureDate;
-
-
 
     public ProductPositionInfoDTO(){}
 

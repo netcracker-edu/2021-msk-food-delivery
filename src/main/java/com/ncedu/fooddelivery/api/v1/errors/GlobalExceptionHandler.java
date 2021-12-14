@@ -18,6 +18,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -49,6 +50,13 @@ public class GlobalExceptionHandler {
         apiError.setSubErrors(validationErrors);
 
         return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    protected ResponseEntity<Object> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex){
+        final String mainMessage = "Type mismatch. Param: {" + ex.getName() + "}; Value: {" + ex.getValue().toString() + "}.";
+        final String UUID = "50b8b93f-86d1-48e3-b271-d7107a2a900f";
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

@@ -11,19 +11,21 @@ import java.util.Date;
 public class AcceptSupplyDTO {
 
     @NotNull
+    @Min(value = 1)
+    @Max(value = Integer.MAX_VALUE)
     private Long productId;
     @NotNull
+    @Min(value = 1)
+    @Max(value = Integer.MAX_VALUE)
     private Long warehouseId;
 
     @Min(value = 1)
     @Max(value = Integer.MAX_VALUE)
     private Integer supplyAmount;
 
-    @NotEmpty
     @Pattern(regexp = "[А-Я]-[0-9]-[0-9][0-9][0-9]-[А-Я]")
     private String warehouseSection;
 
-    @NotNull
     @DecimalMin(value = "0.0", inclusive = false)
     @Digits(integer=12, fraction=2)
     private BigDecimal supplierInvoice;

@@ -181,7 +181,7 @@ public class ProductPositionController {
 
         } else {
             Specification<ProductPositionNotHierarchical> spec = ProductPositionSpecifications.getFilterSpecification(
-                    productId, null, currentAmount, supplyAmount, manufactureDate, supplierInvoice,
+                    productId, warehouseId, currentAmount, supplyAmount, manufactureDate, supplierInvoice,
                     supplyDate, supplierName, warehouseSection, isInvoicePaid
             );
             filteredPositions = productPositionService.findFiltered(spec, pageable);

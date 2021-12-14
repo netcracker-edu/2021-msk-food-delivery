@@ -1,6 +1,5 @@
 package com.ncedu.fooddelivery.api.v1.entities.productPosition;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
@@ -33,9 +32,8 @@ public class ProductPositionNotHierarchical {
     @Column(name = "current_amount")
     private Integer currentAmount;
 
-    @JsonFormat(pattern="yyyy-MM-dd")
     @Column(name = "supply_date")
-    private java.sql.Date supplyDate;
+    private Date supplyDate;
 
     @Column(name = "supplier_invoice")
     private BigDecimal supplierInvoice;
@@ -47,10 +45,9 @@ public class ProductPositionNotHierarchical {
     private Boolean isInvoicePaid;
 
     @Column(name = "manufacture_date")
-    @JsonFormat(pattern="yyyy-MM-dd")
     private Date manufactureDate;
 
-    public ProductPositionNotHierarchical(Long id, Long productId, Long warehouseId, String warehouseSection, Integer supplyAmount, Integer currentAmount, java.sql.Date supplyDate, BigDecimal supplierInvoice, String supplierName, Boolean isInvoicePaid, Date manufactureDate) {
+    public ProductPositionNotHierarchical(Long id, Long productId, Long warehouseId, String warehouseSection, Integer supplyAmount, Integer currentAmount, Date supplyDate, BigDecimal supplierInvoice, String supplierName, Boolean isInvoicePaid, Date manufactureDate) {
         this.id = id;
         this.productId = productId;
         this.warehouseId = warehouseId;

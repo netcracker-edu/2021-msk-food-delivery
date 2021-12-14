@@ -12,10 +12,11 @@ import java.util.Date;
 
 public class ProductPositionSpecifications {
 
-    public static Specification<ProductPositionNotHierarchical> getFilterSpecification(Long productId, Long warehouseId, Integer currentAmount,
-                                                                                       Integer supplyAmount, Date manufactureDate, BigDecimal supplierInvoice,
-                                                                                       Date supplyDate, String supplierName, String warehouseSection,
-                                                                                       Boolean isInvoicePaid){
+    public static Specification<ProductPositionNotHierarchical> getFilterSpecification(
+            Long productId, Long warehouseId, Integer currentAmount,
+            Integer supplyAmount, Date manufactureDate, BigDecimal supplierInvoice,
+            Date supplyDate, String supplierName, String warehouseSection,
+            Boolean isInvoicePaid){
         return  hasProductId(productId).
                 and(hasWarehouseId(warehouseId)).
                 and(hasCurrentAmount(currentAmount)).
@@ -31,7 +32,8 @@ public class ProductPositionSpecifications {
     public static Specification<ProductPositionNotHierarchical> hasWarehouseId(Long id){
         return new Specification<ProductPositionNotHierarchical>() {
             @Override
-            public Predicate toPredicate(Root<ProductPositionNotHierarchical> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+            public Predicate toPredicate(Root<ProductPositionNotHierarchical> root, CriteriaQuery<?> query,
+                                         CriteriaBuilder criteriaBuilder) {
                 if(id == null) return criteriaBuilder.isTrue(criteriaBuilder.literal(true));
                 return criteriaBuilder.equal(root.get("warehouseId"), id);
             }
