@@ -25,7 +25,6 @@ import java.util.UUID;
         typeClass = PostgreSQLEnumType.class
 )
 public class User implements Serializable, UserDetails {
-    //TODO: problems with sequences when add to DB. We populated DB from data.sql, but hibernate_sequence whatever start from 1
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user")
     @SequenceGenerator(name = "user", sequenceName = "users_user_id_seq", allocationSize = 1)

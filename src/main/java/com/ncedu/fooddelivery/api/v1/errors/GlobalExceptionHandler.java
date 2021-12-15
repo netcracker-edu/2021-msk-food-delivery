@@ -121,6 +121,14 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
     }
 
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<Object> handleNullPointerException(
+            NullPointerException ex) {
+        final String UUID = "3aef8117-7459-4366-aece-3c20d57bbb25";
+        final String message = "Request data can't be null";
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, message, UUID));
+    }
+  
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
