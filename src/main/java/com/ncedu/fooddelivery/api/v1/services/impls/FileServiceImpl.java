@@ -4,6 +4,7 @@ import com.ncedu.fooddelivery.api.v1.entities.File;
 import com.ncedu.fooddelivery.api.v1.entities.FileType;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.BadFileExtensionException;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.FileDeleteException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.FileStorageException;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.repos.FileRepo;
@@ -15,6 +16,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -93,11 +95,19 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    private File findFileByUUID(UUID uuid) {
-        Optional<File> optional = fileRepo.findById(uuid);
-        if (!optional.isPresent()) {
-            throw new NotFoundEx(uuid.toString());
+    @Override
+    public void delete(File file) {
+        String fileUUIDString = file.getId().toString();
+        try {
+            fileRepo.delete(file);
+            Path uploadPath = Paths.get(uploadLocation).toAbsolutePath().normalize();
+            String fileParentDir = fileUUIDString.substring(0, 2); // extract 2 chars from file UUID
+            Path fullFilePath = uploadPath.resolve(fileParentDir).resolve(fileUUIDString);
+            Files.deleteIfExists(fullFilePath);
+            //TODO: delete parrent folder if empty
+        } catch (IOException e) {
+            throw new FileDeleteException();
         }
-        return optional.get();
     }
+
 }

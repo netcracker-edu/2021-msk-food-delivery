@@ -6,6 +6,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface FileService {
-    String save(MultipartFile file, User owner);
-    Resource load(File file);
+    public String save(MultipartFile file, User owner);
+    public Resource load(File file);
+    public void delete(File file);
 }

@@ -1,9 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.errors;
 
-import com.ncedu.fooddelivery.api.v1.errors.badrequest.AlreadyExistsException;
-import com.ncedu.fooddelivery.api.v1.errors.badrequest.BadFileExtensionException;
-import com.ncedu.fooddelivery.api.v1.errors.badrequest.FileStorageException;
-import com.ncedu.fooddelivery.api.v1.errors.badrequest.PasswordsMismatchException;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.*;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
 import com.ncedu.fooddelivery.api.v1.errors.wrappers.ApiError;
@@ -116,6 +113,12 @@ public class GlobalExceptionHandler {
         final String UUID = "e32be0ba-48e8-4b30-ad79-5723c9d5fa14";
         final String message = "File size exceeded";
         return buildResponseEntity(new ApiError(HttpStatus.EXPECTATION_FAILED, message, UUID));
+    }
+
+    @ExceptionHandler(FileDeleteException.class)
+    public ResponseEntity<Object> handleFileDeleteException(
+            FileDeleteException ex) {
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {

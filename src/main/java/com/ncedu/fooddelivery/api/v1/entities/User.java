@@ -56,9 +56,6 @@ public class User implements Serializable, UserDetails {
     @PrimaryKeyJoinColumn
     private Moderator moderator;
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "owner")
-    private File avatar;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
     private List<File> files;
 
