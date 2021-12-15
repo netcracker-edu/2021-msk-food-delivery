@@ -25,10 +25,10 @@ public class ClientUtils {
         User user = new User();
         user.setId(userId);
         user.setFullName(fullName);
-        user.setEmail("hofstadter@bigbang.theory");
+        user.setEmail(email);
         user.setRole(Role.CLIENT);
         Client client = new Client();
-        client.setPhoneNumber("+7 (800) 555 35-35");
+        client.setPhoneNumber(phoneNumber);
         client.setUser(user);
         return client;
     }
