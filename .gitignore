@@ -63,3 +63,5 @@ build/
 
 ### FILES STORAGE ###
 /files/
+### LOGS STORAGE ###
+/logs/
