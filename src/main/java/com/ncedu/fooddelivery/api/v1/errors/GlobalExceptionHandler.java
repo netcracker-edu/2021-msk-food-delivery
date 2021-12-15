@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.errors;
 
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.AlreadyExistsException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.PasswordsMismatchException;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
@@ -56,6 +57,13 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex){
         final String mainMessage = "Type mismatch. Param: {" + ex.getName() + "}; Value: {" + ex.getValue().toString() + "}.";
         final String UUID = "50b8b93f-86d1-48e3-b271-d7107a2a900f";
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID));
+    }
+
+    @ExceptionHandler(UnrecognizedPropertyException.class)
+    protected ResponseEntity<Object> handleUnrecognizedPropertyException(UnrecognizedPropertyException ex){
+        final String mainMessage = "Unknown fields aren't allowed. Field: {" + ex.getPropertyName() + "}.";
+        final String UUID = "1c8b3f40-ecd7-4822-a1f8-58212664a7fa";
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID));
     }
 
