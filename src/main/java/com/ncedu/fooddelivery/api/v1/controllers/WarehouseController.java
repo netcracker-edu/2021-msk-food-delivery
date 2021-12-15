@@ -35,7 +35,7 @@ public class WarehouseController {
     GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    @GetMapping(path = "/api/v1/warehouse/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/api/v1/warehouse/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<WarehouseInfoDTO> getById(@PathVariable Long id, @AuthenticationPrincipal User authedUser){
         if(Role.isMODERATOR(authedUser.getRole().toString())){
             if(!authedUser.getModerator().getWarehouseId().equals(id)){
