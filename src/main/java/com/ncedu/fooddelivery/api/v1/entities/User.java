@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -53,6 +54,9 @@ public class User implements Serializable, UserDetails {
     @OneToOne(cascade=CascadeType.ALL, mappedBy = "user")
     @PrimaryKeyJoinColumn
     private Moderator moderator;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
+    private List<File> files;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

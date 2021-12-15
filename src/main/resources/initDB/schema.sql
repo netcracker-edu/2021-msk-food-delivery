@@ -297,7 +297,8 @@ CREATE TABLE IF NOT EXISTS files
 	file_id UUID PRIMARY KEY,
 	owner_id BIGINT REFERENCES users (user_id) ON DELETE SET NULL,
 	type FILE_TYPE NOT NULL,
-	size FLOAT4 NOT NULL CHECK (size > 0),
+	name VARCHAR(100) NOT NULL,
+	size BIGINT NOT NULL CHECK (size > 0),
 	upload_date TIMESTAMP NOT NULL
 
 );
