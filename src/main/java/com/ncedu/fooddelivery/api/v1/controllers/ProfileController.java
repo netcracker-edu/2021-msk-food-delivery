@@ -6,16 +6,19 @@ import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.services.ClientService;
 import com.ncedu.fooddelivery.api.v1.services.ModeratorService;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestController
 public class ProfileController {
 
@@ -29,7 +32,7 @@ public class ProfileController {
     @GetMapping("/api/v1/profile")
     public UserInfoDTO getProfile(
             @AuthenticationPrincipal User authedUser) {
-
+        log.info("GET /api/v1/profile");
         String authedUserRole = authedUser.getRole().name();
         Long authedUserId = authedUser.getId();
         if (Role.isCLIENT(authedUserRole)) {
@@ -47,7 +50,7 @@ public class ProfileController {
     public ResponseEntity<?> changeUserInfo(
             @Valid @RequestBody UserChangeInfoDTO newUserInfo,
             @AuthenticationPrincipal User authedUser) {
-
+        log.info("PUT /api/v1/profile");
         String authedUserRole = authedUser.getRole().name();
         Long authedUserId = authedUser.getId();
         boolean isModified = false;
@@ -66,6 +69,7 @@ public class ProfileController {
     public ResponseEntity<?> changeUserEmail(
             @Valid @RequestBody EmailChangeDTO newEmailInfo,
             @AuthenticationPrincipal User authedUser) {
+        log.info("PATCH /api/v1/profile/email");
         boolean isModified = false;
         isModified = userService.changeEmail(authedUser, newEmailInfo);
         return createModifyResponse(isModified);
@@ -75,6 +79,7 @@ public class ProfileController {
     public ResponseEntity<?> changeUserPassword(
             @Valid @RequestBody PasswordChangeDTO passwordChangeDTO,
             @AuthenticationPrincipal User authedUser) {
+        log.info("PATCH /api/v1/profile/password");
         boolean isModified = false;
         isModified = userService.changePassword(authedUser, passwordChangeDTO);
         return  createModifyResponse(isModified);

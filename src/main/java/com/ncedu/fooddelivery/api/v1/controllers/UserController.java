@@ -8,6 +8,7 @@ import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.services.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,11 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 public class UserController {
-    //TODO: replace returned object in methods on ResponseEntity
     //TODO: add updating special fields with PATCH http verb
-    //TODO: add updating other fields with PUT http verb
 
     @Autowired UserService userService;
     @Autowired ClientService clientService;
@@ -38,7 +38,7 @@ public class UserController {
     public UserInfoDTO getUserById(
             @PathVariable Long id,
             @AuthenticationPrincipal User authedUser) {
-
+        log.info("GET /api/v1/user/"+id);
         UserInfoDTO userInfo = userService.getUserDTOById(id);
         if (userInfo == null) {
             throw new NotFoundEx(id.toString());
@@ -55,6 +55,7 @@ public class UserController {
             ModeratorInfoDTO moderatorInfo = moderatorService.getModeratorDTOById(userId);
             return moderatorInfo;
         }
+        log.info("Sending user with id: " + id);
         //if user role is ADMIN
         return userInfo;
     }
@@ -64,6 +65,7 @@ public class UserController {
     public ResponseEntity<?> changeUserInfo(
             @PathVariable Long id,
             @Valid @RequestBody UserChangeInfoDTO newUserInfo) {
+        log.info("PUT /api/v1/user/"+id);
         User user = userService.getUserById(id);
         String userRole = user.getRole().name();
         boolean isModified = false;
@@ -73,7 +75,7 @@ public class UserController {
         //for admin and moderator we can change only full name
         String newFullName = newUserInfo.getFullName();
         isModified = userService.changeFullName(id, newFullName);
-
+        log.info("User with id " + id +" modified " +isModified);
         return createModifyResponse(isModified);
     }
 
@@ -81,10 +83,13 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteUser(
             @PathVariable Long id) {
+        log.info("DELETE /api/v1/user/" + id);
         boolean isDeleted = userService.deleteUserById(id);
         if (isDeleted) {
+            log.info("Deleted user " + id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
+        log.warn("Problems with deleting user: " + id);
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
@@ -108,6 +113,7 @@ public class UserController {
     @GetMapping("/api/v1/admins")
     @PreAuthorize("hasAuthority('ADMIN')")
     public List<UserInfoDTO> getAdminList() {
+        log.info("GET /api/v1/admins");
         List<UserInfoDTO> userList = userService.getAllAdmins();
         return userList;
     }
@@ -117,6 +123,7 @@ public class UserController {
     public List<UserInfoDTO> getUserList(
             @PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable
     ) {
+        log.info("GET /api/v1/users PAGE=" + pageable.getPageSize() + " SIZE=" +pageable.getPageSize());
         List<UserInfoDTO> userList = userService.getAllUsers(pageable);
         return userList;
     }
