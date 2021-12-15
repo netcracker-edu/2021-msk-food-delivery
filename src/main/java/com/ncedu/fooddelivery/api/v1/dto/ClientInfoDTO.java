@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.dto;
 
+import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import lombok.Data;
 
 import java.sql.Timestamp;

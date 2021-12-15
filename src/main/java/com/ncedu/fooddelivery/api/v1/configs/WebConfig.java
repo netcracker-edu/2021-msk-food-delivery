@@ -30,13 +30,4 @@ public class WebConfig implements WebMvcConfigurer {
         builder.failOnUnknownProperties(true);
         converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
     }
-    /*
-    @Bean
-    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
-        ObjectMapper mapper = new ObjectMapper();
-
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter(mapper);
-        return converter;
-    }*/
 }

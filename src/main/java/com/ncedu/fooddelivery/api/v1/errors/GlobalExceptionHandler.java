@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.errors;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.*;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
@@ -35,6 +36,37 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<?> handleNotFoundExceptions(
             NotFoundEx ex) {
         return buildResponseEntity(new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), ex.getUuid()));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Object> handleAccessDeniedException(
+            Exception ex, WebRequest request) {
+        CustomAccessDeniedException accessEx = new CustomAccessDeniedException();
+        return buildResponseEntity(new ApiError(HttpStatus.FORBIDDEN, accessEx.getMessage(), accessEx.getUuid()));
+    }
+
+    // in case of invalid type of properties
+    @ExceptionHandler(InvalidFormatException.class)
+    protected ResponseEntity<?> handleInvalidFormatException(
+            InvalidFormatException invalidFormatException) {
+
+        final String UUID = "9ff6f740-3f66-42d9-b6c2-06e79691ef9e";
+        final String mainMessage = "Properties have incorrect type.";
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID);
+        return buildResponseEntity(apiError);
+    }
+
+    // in case of unknown fields
+    @ExceptionHandler(UnrecognizedPropertyException.class)
+    protected ResponseEntity<?> handleUnrecognizedPropertyException(
+            UnrecognizedPropertyException unrecognizedPropertyException) {
+
+        final String UUID = "ba4382b3-10e4-47ab-a8e7-ffd10579b553";
+        final String mainMessage = "Unknown properties are not allowed.";
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID);
+        return buildResponseEntity(apiError);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -80,6 +112,21 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID));
     }
 
+    @ExceptionHandler(IncorrectProductPositionWarehouseBindingException.class)
+    protected ResponseEntity<Object> handleIncorrectProductPositionWarehouseBindingException(IncorrectProductPositionWarehouseBindingException ex){
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), IncorrectProductPositionWarehouseBindingException.UUID));
+    }
+
+    @ExceptionHandler(NotUniqueIdException.class)
+    protected ResponseEntity<Object> handleNotUniqueIdException (NotUniqueIdException ex){
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, NotUniqueIdException.message, NotUniqueIdException.UUID));
+    }
+
+    @ExceptionHandler(ProductPositionNotEnoughException.class)
+    protected ResponseEntity<Object> handleProductPositionNotEnoughException (ProductPositionNotEnoughException ex){
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ProductPositionNotEnoughException.UUID));
+    }
+
     private List<ApiSubError> getValidationErrors(MethodArgumentNotValidException notValidEx) {
         List<ApiSubError> validationErrors = new ArrayList<>();
         List<ObjectError> objectErrors = notValidEx.getBindingResult().getAllErrors();
@@ -96,13 +143,6 @@ public class GlobalExceptionHandler {
         Object rejectedValue = fieldError.getRejectedValue();
         String errorMessage = fieldError.getDefaultMessage();
         return new ValidationSubError(objectName, fieldName, rejectedValue, errorMessage);
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Object> handleAccessDeniedException(
-            Exception ex, WebRequest request) {
-        CustomAccessDeniedException accessEx = new CustomAccessDeniedException();
-        return buildResponseEntity(new ApiError(HttpStatus.FORBIDDEN, accessEx.getMessage(), accessEx.getUuid()));
     }
 
     @ExceptionHandler(AlreadyExistsException.class)

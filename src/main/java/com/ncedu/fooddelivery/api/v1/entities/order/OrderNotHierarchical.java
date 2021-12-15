@@ -4,40 +4,30 @@ import com.bedatadriven.jackson.datatype.jts.serialization.GeometryDeserializer;
 import com.bedatadriven.jackson.datatype.jts.serialization.GeometrySerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.ncedu.fooddelivery.api.v1.entities.Client;
-import com.ncedu.fooddelivery.api.v1.entities.Courier;
 import com.ncedu.fooddelivery.api.v1.entities.OrderStatus;
-import com.ncedu.fooddelivery.api.v1.entities.Warehouse;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.Data;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 
-@TypeDef(
-        name = "order_status",
-        typeClass = PostgreSQLEnumType.class
-)
 
 @Data
 @Entity
 @Table(name = "orders")
-public class Order {
-
+public class OrderNotHierarchical {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
     private Long id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "client_id")
-    private Client client;
+    @Column(name = "client_id")
+    private Long clientId;
 
     @NotNull
     @Column(name = "address")
@@ -50,13 +40,11 @@ public class Order {
     private Geometry coordinates;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "warehouse_id")
-    private Warehouse warehouse;
+    @Column(name = "warehouse_id")
+    private Long warehouseId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "courier_id")
-    private Courier courier;
+    @Column(name = "courier_id")
+    private Long courierId;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -67,10 +55,10 @@ public class Order {
 
     @NotNull
     @Column(name = "date_start")
-    private LocalDateTime dateStart;
+    private Date dateStart;
 
     @Column(name = "date_end")
-    private LocalDateTime dateEnd;
+    private Date dateEnd;
 
     @NotNull
     @Column(name = "overall_cost")
@@ -93,15 +81,15 @@ public class Order {
     @Column(name = "delivery_rating")
     private BigDecimal deliveryRating;
 
-    public Order(){}
+    public OrderNotHierarchical(){}
 
-    public Order(Long id, Client client, String address, Geometry coordinates, Warehouse warehouse, Courier courier, OrderStatus status, LocalDateTime dateStart, LocalDateTime dateEnd, BigDecimal overallCost, BigDecimal highDemandCoeff, BigDecimal discount, Long promoCodeId, BigDecimal clientRating, BigDecimal deliveryRating) {
+    public OrderNotHierarchical(Long id, Long clientId, String address, Geometry coordinates, Long warehouseId, Long courierId, OrderStatus status, Date dateStart, Date dateEnd, BigDecimal overallCost, BigDecimal highDemandCoeff, BigDecimal discount, Long promoCodeId, BigDecimal clientRating, BigDecimal deliveryRating) {
         this.id = id;
-        this.client = client;
+        this.clientId = clientId;
         this.address = address;
         this.coordinates = coordinates;
-        this.warehouse = warehouse;
-        this.courier = courier;
+        this.warehouseId = warehouseId;
+        this.courierId = courierId;
         this.status = status;
         this.dateStart = dateStart;
         this.dateEnd = dateEnd;

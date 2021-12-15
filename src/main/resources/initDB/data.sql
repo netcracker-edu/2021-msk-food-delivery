@@ -166,7 +166,6 @@ BEGIN
                         (49, null, ''+7 (957) 555-35-35'', 4.64),
                         (50, null, ''+7 (958) 555-35-35'', 4.89),
                         (51, null, ''+7 (959) 555-35-35'', 4.95);
-
         END IF;
 END;
 ' language plpgsql;
@@ -564,6 +563,7 @@ BEGIN
                 null, 350, ''Вода, паста томатная, сахар, уксус, соль, специи.'', 365, TRUE, 85.90, 0);
 
         ALTER SEQUENCE IF EXISTS products_product_id_seq RESTART WITH 121;
+
         END IF;
 END;
 ' language plpgsql;
@@ -664,6 +664,7 @@ BEGIN
                 null, 0, 10.0, null, null, FALSE);
 
         ALTER SEQUENCE IF EXISTS promo_codes_promo_code_id_seq RESTART WITH 24;
+
         END IF;
 END;
 ' language plpgsql;
@@ -684,6 +685,7 @@ BEGIN
         			(11, 11, ''2021-11-07 21:26:22'');
 
         ALTER SEQUENCE IF EXISTS chats_chat_id_seq RESTART WITH 11;
+
         END IF;
 END;
 ' language plpgsql;

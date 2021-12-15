@@ -38,6 +38,10 @@ public class Courier {
     @Column(name = "rating")
     private Float rating;
 
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "courier_id")
+    private User user;
+
     public Courier(){}
 
     public Courier(Long id, Warehouse warehouse, String phoneNumber, String paymentData, String address, Float currentBalance, Float rating) {

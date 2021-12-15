@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS warehouses(warehouse_id BIGSERIAL PRIMARY KEY,
                                       is_deactivated BOOLEAN NOT NULL DEFAULT false);
 
 
+
 DO ' DECLARE
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ''role_enum'') THEN
