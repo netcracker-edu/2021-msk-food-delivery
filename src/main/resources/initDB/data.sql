@@ -102,6 +102,7 @@ BEGIN
                     (79, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов8 Модератор8 Модераторович8'', ''moderatorov8@mail.ru'', now(), null, null, null),
                     (80, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов9 Модератор9 Модераторович9'', ''moderatorov9@mail.ru'', now(), null, null, null),
                     (81, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов10 Модератор10 Модераторович10'', ''moderatorov10@mail.ru'', now(), null, null, null);
+
         ALTER SEQUENCE IF EXISTS users_user_id_seq RESTART WITH 81;
         END IF;
     END;
@@ -175,7 +176,6 @@ END;
     */
 DO ' DECLARE
 BEGIN
-
     IF NOT EXISTS (SELECT 1 FROM moderators WHERE moderator_id=72) THEN
         INSERT INTO moderators
             VALUES  (72, 1),
@@ -582,12 +582,12 @@ BEGIN
     END IF;
 END;
 ' language plpgsql;
+
     /*
             PROMOCODES
     */
 DO ' DECLARE
 BEGIN
-
     IF NOT EXISTS (SELECT 1 FROM promo_codes WHERE promo_code_id=1) THEN
        INSERT INTO promo_codes
         VALUES  (1, 1, ''2021-11-01 19:10:25'', ''Прекрасный промокод, только на 1 неделю ноября.'',
@@ -662,6 +662,7 @@ BEGIN
                 (24, 1, ''2021-10-28 20:01:51'', ''Нет подходящих промокодов? Встречайте, безлимитный промокод на 10 рублей всегда!'',
                 ''ДЕСЯТОЧКА'', TRUE, null, null,
                 null, 0, 10.0, null, null, FALSE);
+
         ALTER SEQUENCE IF EXISTS promo_codes_promo_code_id_seq RESTART WITH 24;
         END IF;
 END;
@@ -669,7 +670,6 @@ END;
 
 DO ' DECLARE
 BEGIN
-
     IF NOT EXISTS (SELECT 1 FROM chats WHERE chat_id=2) THEN
         INSERT INTO chats
         	VALUES 	(2, 2, ''2021-10-28 10:01:25''),
@@ -682,6 +682,7 @@ BEGIN
         			(9, 9, ''2021-11-04 11:17:51''),
         			(10, 10, ''2021-11-05 02:31:55''),
         			(11, 11, ''2021-11-07 21:26:22'');
+
         ALTER SEQUENCE IF EXISTS chats_chat_id_seq RESTART WITH 11;
         END IF;
 END;
@@ -2042,13 +2043,25 @@ BEGIN
         SELECT courier_id, date_start, date_end, 1, (date_end - date_start)::INTERVAL, ROUND(overall_cost / 10, 2) FROM orders WHERE (courier_id IS NOT NULL AND status = ''DELIVERED'') ORDER BY courier_id ASC;
         INSERT INTO delivery_sessions(courier_id, start_time, end_time, orders_completed, average_time_per_order, money_earned)
         SELECT courier_id, date_start, date_end, 1, (date_end - date_start)::INTERVAL, 0.0 FROM orders WHERE (courier_id IS NOT NULL AND status = ''CANCELLED'') ORDER BY courier_id ASC;
+
+    END IF;
+END;
+' language plpgsql;
+
+
+DO ' DECLARE
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM delivery_sessions WHERE delivery_session_id = 1) THEN
+        INSERT INTO delivery_sessions(courier_id, start_time, end_time, orders_completed, average_time_per_order, money_earned)
+        SELECT courier_id, date_start, date_end, 1, (date_end - date_start)::INTERVAL, ROUND(overall_cost / 10, 2) FROM orders WHERE (courier_id IS NOT NULL AND status = ''DELIVERED'') ORDER BY courier_id ASC;
+        INSERT INTO delivery_sessions(courier_id, start_time, end_time, orders_completed, average_time_per_order, money_earned)
+        SELECT courier_id, date_start, date_end, 1, (date_end - date_start)::INTERVAL, 0.0 FROM orders WHERE (courier_id IS NOT NULL AND status = ''CANCELLED'') ORDER BY courier_id ASC;
     END IF;
 END;
 ' language plpgsql;
 
 DO ' DECLARE
 BEGIN
-
     IF NOT EXISTS (SELECT 1 FROM messages WHERE message_id=1) THEN
             INSERT INTO messages
             	VALUES 	(1, null, 2, ''2021-10-28 10:01:25'',
