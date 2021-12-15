@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> <Configuration>
     <Appenders>
-        <!-- CONSOLE APPENDER -->
-        <Console name="OwnConsoleAppender"> </Console>
-
         <!-- ROLLING FILE APPENDER -->
         <RollingFile name = "OwnRollingFileAppender" fileName = "logs/File.log"
                      filePattern = "logs/$${date:MM-yyyy}/File_%d{dd.MM.yyyy}_%i.log">
@@ -19,10 +16,7 @@
     <Loggers>
         <!-- LOGGER -->
         <Logger name="com.ncedu.fooddelivery.api.v1" level="info">
-            <AppenderRef ref="OwnConsoleAppender" />
             <AppenderRef ref="OwnRollingFileAppender"/>
         </Logger>
-        <!-- PREVENT DEFAULT LOGGER (since no appenders are defined) -->
-        <Root level="info"></Root>
     </Loggers>
 </Configuration>
