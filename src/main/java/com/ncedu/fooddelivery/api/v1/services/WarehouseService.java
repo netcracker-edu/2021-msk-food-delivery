@@ -6,6 +6,7 @@ import com.vividsolutions.jts.geom.Point;
 import java.util.List;
 
 
+
 public interface WarehouseService {
     WarehouseInfoDTO getWarehouseInfoDTOById(Long id);
     WarehouseInfoDTO getNearestWarehouse(Point geo);

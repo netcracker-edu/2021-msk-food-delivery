@@ -10,13 +10,13 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories("com.ncedu.fooddelivery.api.v1.repos")
 public class FoodDeliveryApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(FoodDeliveryApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(FoodDeliveryApplication.class, args);
+	}
 
-    @Bean
-    public JtsModule jtsModule() {
-        return new JtsModule();
-    }
+	@Bean
+	public JtsModule jtsModule() {
+		return new JtsModule();
+	}
 
 }
