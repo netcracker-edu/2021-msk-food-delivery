@@ -1,15 +1,21 @@
 package com.ncedu.fooddelivery.api.v1.services;
 
+import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.ProductPositionsShipmentDTO;
+import com.ncedu.fooddelivery.api.v1.entities.Warehouse;
+import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPosition;
+import com.ncedu.fooddelivery.api.v1.errors.NotUniqueIdException;
+import com.ncedu.fooddelivery.api.v1.errors.ProductPositionNotEnoughException;
+import com.ncedu.fooddelivery.api.v1.repos.order.OrderRepo;
 import com.ncedu.fooddelivery.api.v1.repos.productPosition.ProductPositionRepo;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.*;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -21,8 +27,13 @@ public class ProductPositionServiceTest {
     @MockBean
     ProductPositionRepo productPositionRepo;
 
+    @MockBean
+    OrderRepo orderRepo;
+
     @Autowired
     ProductPositionService productPositionService;
+
+
 
     @Test
     public void getByIdReturnNullTest(){
@@ -71,4 +82,71 @@ public class ProductPositionServiceTest {
         verify(productPositionRepo, times(0)).save(mockProductPosition);
         assertFalse(res);
     }
+
+    @Test
+    public void shipProductPositionsNotUniqueTest(){
+        ProductPositionsShipmentDTO mockDTO = Mockito.mock(ProductPositionsShipmentDTO.class);
+        List<ProductPositionsShipmentDTO.ProductPositionAmountPair> mockPairs;
+        ProductPositionsShipmentDTO.ProductPositionAmountPair mockPair1 = new ProductPositionsShipmentDTO.ProductPositionAmountPair(),
+                mockPair2 = new ProductPositionsShipmentDTO.ProductPositionAmountPair();
+        mockPair1.setId(12L);
+        mockPair1.setAmount(10);
+        mockPair2.setId(13L);
+        mockPair2.setAmount(20);
+        mockPairs = new ArrayList<>(Arrays.asList(mockPair1, mockPair2, mockPair1));
+
+        Long mockOrderId = 110L;
+        Order mockOrder = new Order();
+        Warehouse mockWarehouse = Mockito.mock(Warehouse.class);
+        mockOrder.setWarehouse(mockWarehouse);
+
+        Mockito.when(mockWarehouse.getId()).thenReturn(1L);
+
+        Mockito.when(mockDTO.getPositionAmountPairs()).thenReturn(mockPairs);
+
+        Mockito.when(orderRepo.findById(Mockito.any(Long.class))).thenReturn(Optional.of(mockOrder));
+
+        assertThrows(NotUniqueIdException.class, new Executable() {
+            @Override
+            public void execute() {
+                productPositionService.shipProductPositions(mockOrderId, mockDTO);
+            }
+        });
+
+        Mockito.verify(orderRepo, times(1)).findById(110L);
+        Mockito.verify(mockDTO, times(1)).getPositionAmountPairs();
+    }
+
+    @Test
+    public void shipProductPositionsNotEnoughTest(){
+        Long mockOrderId = 110L;
+        Order mockOrder = Mockito.mock(Order.class);
+        ProductPositionsShipmentDTO mockDTO = Mockito.mock(ProductPositionsShipmentDTO.class);
+        ProductPositionsShipmentDTO.ProductPositionAmountPair mockPair = new ProductPositionsShipmentDTO.ProductPositionAmountPair();
+        mockPair.setId(10L);
+        mockPair.setAmount(1000);
+        ProductPosition mockPosition = Mockito.mock(ProductPosition.class);
+        mockPosition.setCurrentAmount(1);
+        Warehouse mockWarehouse = Mockito.mock(Warehouse.class);
+
+        Mockito.when(mockWarehouse.getId()).thenReturn(1L);
+        Mockito.when(mockOrder.getWarehouse()).thenReturn(mockWarehouse);
+        Mockito.when(mockDTO.getPositionAmountPairs()).thenReturn(new ArrayList<>(Arrays.asList(mockPair)));
+        Mockito.when(orderRepo.findById(Mockito.any(Long.class))).thenReturn(Optional.of(mockOrder));
+        Mockito.when(productPositionRepo.findById(Mockito.any(Long.class))).thenReturn(Optional.of(mockPosition));
+        Mockito.when(mockPosition.getWarehouse()).thenReturn(mockWarehouse);
+
+        assertThrows(ProductPositionNotEnoughException.class, new Executable() {
+            @Override
+            public void execute() {
+                productPositionService.shipProductPositions(mockOrderId, mockDTO);
+            }
+        });
+
+        verify(mockDTO, times(1)).getPositionAmountPairs();
+        verify(orderRepo, times(1)).findById(110L);
+        verify(productPositionRepo, times(2)).findById(10L);
+    }
+
+
 }
