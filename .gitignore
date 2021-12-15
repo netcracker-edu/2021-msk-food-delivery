@@ -60,3 +60,6 @@ build/
 
 ### MAC ###
 .DS_Store
+
+### FILES STORAGE ###
+/files/

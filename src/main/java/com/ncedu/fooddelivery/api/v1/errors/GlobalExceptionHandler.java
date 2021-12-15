@@ -2,8 +2,7 @@ package com.ncedu.fooddelivery.api.v1.errors;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
-import com.ncedu.fooddelivery.api.v1.errors.badrequest.AlreadyExistsException;
-import com.ncedu.fooddelivery.api.v1.errors.badrequest.PasswordsMismatchException;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.*;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
 import com.ncedu.fooddelivery.api.v1.errors.wrappers.ApiError;
@@ -17,10 +16,12 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -87,8 +88,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<Object> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex){
-        final String mainMessage = "Type mismatch for argument {" + ex.getName() + "}.";
-        final String UUID = "ff574a23-d676-4738-8785-1f8840df03f9";
+        final String mainMessage = "Type mismatch. Param: {" + ex.getName() + "}; Value: {" + ex.getValue().toString() + "}.";
+        final String UUID = "50b8b93f-86d1-48e3-b271-d7107a2a900f";
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID));
+    }
+
+    @ExceptionHandler(UnrecognizedPropertyException.class)
+    protected ResponseEntity<Object> handleUnrecognizedPropertyException(UnrecognizedPropertyException ex){
+        final String mainMessage = "Unknown fields aren't allowed. Field: {" + ex.getPropertyName() + "}.";
+        final String UUID = "1c8b3f40-ecd7-4822-a1f8-58212664a7fa";
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID));
     }
 
@@ -149,6 +157,48 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
     }
 
+    @ExceptionHandler(MissingPathVariableException.class)
+    public ResponseEntity<Object> handleMissingPathVariableException(
+            MissingPathVariableException ex) {
+        final String UUID = "e547f7c0-352e-4798-9def-c716f1288b02";
+        final String message = "Path var not presented or value of var is bad";
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, message, UUID));
+    }
+
+    @ExceptionHandler(BadFileExtensionException.class)
+    public ResponseEntity<Object> handleBadFileExtensionException(
+            BadFileExtensionException ex) {
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
+    }
+
+    @ExceptionHandler(FileStorageException.class)
+    public ResponseEntity<Object> handleFileStorageException(
+            FileStorageException ex) {
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Object> handleMaxUploadSizeException(
+            MaxUploadSizeExceededException ex) {
+        final String UUID = "e32be0ba-48e8-4b30-ad79-5723c9d5fa14";
+        final String message = "File size exceeded";
+        return buildResponseEntity(new ApiError(HttpStatus.EXPECTATION_FAILED, message, UUID));
+    }
+
+    @ExceptionHandler(FileDeleteException.class)
+    public ResponseEntity<Object> handleFileDeleteException(
+            FileDeleteException ex) {
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<Object> handleNullPointerException(
+            NullPointerException ex) {
+        final String UUID = "3aef8117-7459-4366-aece-3c20d57bbb25";
+        final String message = "Request data can't be null";
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, message, UUID));
+    }
+  
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }

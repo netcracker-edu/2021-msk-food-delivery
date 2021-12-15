@@ -8,6 +8,20 @@ CREATE TABLE IF NOT EXISTS warehouses(warehouse_id BIGSERIAL PRIMARY KEY,
                                       delivery_zone geometry NOT NULL,
                                       is_deactivated BOOLEAN NOT NULL DEFAULT false);
 
+
+
+DO ' DECLARE
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ''role_enum'') THEN
+        CREATE TYPE role_enum AS ENUM
+        (
+           ''CLIENT'', ''ADMIN'', ''MODERATOR'', ''COURIER''
+        );
+    END IF;
+END;
+' LANGUAGE PLPGSQL;
+
+
 DO ' DECLARE
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ''role_enum'') THEN
@@ -21,6 +35,7 @@ END;
 
 CREATE TABLE IF NOT EXISTS users
 (
+
 	user_id BIGSERIAL PRIMARY KEY,
 	role ROLE_ENUM NOT NULL,
 	password TEXT NOT NULL,
@@ -60,6 +75,54 @@ CREATE TABLE IF NOT EXISTS products
 	discount NUMERIC(7,2) NOT NULL DEFAULT 0 CHECK(discount >= 0)
 );
 
+CREATE TABLE IF NOT EXISTS products_search (
+	product_search_id BIGINT PRIMARY KEY REFERENCES products (product_id) ON DELETE CASCADE,
+	search_vector tsvector
+);
+
+/*
+    INSERT TO PRODUCTS_SEARCH if NEW PRODUCT ADDED
+*/
+CREATE OR REPLACE FUNCTION copy_products_to_search() RETURNS TRIGGER AS '
+BEGIN
+    INSERT INTO products_search
+        VALUES(new.product_id,
+			   setweight(to_tsvector(''russian'', new.name), ''A'') ||
+			   setweight(to_tsvector(''russian'', new.description), ''B'') ||
+			   setweight(to_tsvector(''russian'', new.composition), ''C''));
+    RETURN new;
+END;
+' language plpgsql;
+
+DROP TRIGGER IF EXISTS copy_products_to_search ON products;
+
+CREATE TRIGGER copy_products_to_search
+	 AFTER INSERT ON products
+     FOR EACH ROW
+     EXECUTE PROCEDURE copy_products_to_search();
+
+/*
+    UPDATE PRODUCTS_SEARCH if PRODUCTS UPDATED
+*/
+CREATE OR REPLACE FUNCTION update_products_in_search() RETURNS TRIGGER AS '
+BEGIN
+    UPDATE products_search
+        SET search_vector =
+			   setweight(to_tsvector(''russian'', new.name), ''A'') ||
+			   setweight(to_tsvector(''russian'', new.description), ''B'') ||
+			   setweight(to_tsvector(''russian'', new.composition), ''C'')
+		WHERE product_search_id = new.product_id;
+    RETURN new;
+END;
+'
+language plpgsql;
+
+DROP TRIGGER IF EXISTS update_products_in_search ON products;
+
+CREATE TRIGGER update_products_in_search
+	 AFTER UPDATE ON products
+     FOR EACH ROW
+     EXECUTE PROCEDURE update_products_in_search();
 
 CREATE TABLE IF NOT EXISTS promo_codes
 (
@@ -235,7 +298,8 @@ CREATE TABLE IF NOT EXISTS files
 	file_id UUID PRIMARY KEY,
 	owner_id BIGINT REFERENCES users (user_id) ON DELETE SET NULL,
 	type FILE_TYPE NOT NULL,
-	size FLOAT4 NOT NULL CHECK (size > 0),
+	name VARCHAR(100) NOT NULL,
+	size BIGINT NOT NULL CHECK (size > 0),
 	upload_date TIMESTAMP NOT NULL
 
 );

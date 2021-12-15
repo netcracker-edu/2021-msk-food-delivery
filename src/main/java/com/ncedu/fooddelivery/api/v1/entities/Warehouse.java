@@ -42,4 +42,14 @@ public class Warehouse {
     private Boolean isDeactivated;
 
     public Warehouse(){}
+
+
+    public Warehouse(Long id, Point geo, Geometry deliveryZone, String address, String name, Boolean isDeactivated) {
+        this.id = id;
+        this.geo = geo;
+        this.deliveryZone = deliveryZone;
+        this.address = address;
+        this.name = name;
+        this.isDeactivated = isDeactivated;
+    }
 }
