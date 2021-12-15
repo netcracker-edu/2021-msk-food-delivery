@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.errors;
 
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.*;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
@@ -18,8 +19,11 @@ import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +52,32 @@ public class GlobalExceptionHandler {
         apiError.setSubErrors(validationErrors);
 
         return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    protected ResponseEntity<Object> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex){
+        final String mainMessage = "Type mismatch. Param: {" + ex.getName() + "}; Value: {" + ex.getValue().toString() + "}.";
+        final String UUID = "50b8b93f-86d1-48e3-b271-d7107a2a900f";
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID));
+    }
+
+    @ExceptionHandler(UnrecognizedPropertyException.class)
+    protected ResponseEntity<Object> handleUnrecognizedPropertyException(UnrecognizedPropertyException ex){
+        final String mainMessage = "Unknown fields aren't allowed. Field: {" + ex.getPropertyName() + "}.";
+        final String UUID = "1c8b3f40-ecd7-4822-a1f8-58212664a7fa";
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex){
+        ConstraintViolation cv = ex.getConstraintViolations().iterator().next();
+        String fullParam = cv.getPropertyPath().toString();
+        String param = fullParam.substring(fullParam.lastIndexOf('.') + 1);
+        String value = cv.getInvalidValue().toString();
+
+        final String mainMessage = "Constraint violation! Param: {" + param + "}; Value: {" + value + "}.";
+        final String UUID = "2a7b40a2-faf8-4a6c-b6a5-84fb7162f8b7";
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID));
     }
 
     private List<ApiSubError> getValidationErrors(MethodArgumentNotValidException notValidEx) {
