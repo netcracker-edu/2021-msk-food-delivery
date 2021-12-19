@@ -5,10 +5,15 @@ import com.ncedu.fooddelivery.api.v1.entities.OrderStatus;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.entities.order.OrderNotHierarchical;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.IncorrectUserRoleRequestException;
+import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
+import com.ncedu.fooddelivery.api.v1.repos.UserRepo;
 import com.ncedu.fooddelivery.api.v1.services.OrderService;
+import com.ncedu.fooddelivery.api.v1.services.UserService;
 import com.ncedu.fooddelivery.api.v1.specifications.OrderSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,6 +23,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +31,7 @@ import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Validated
 @RestController
@@ -32,6 +39,9 @@ public class OrderController {
 
     @Autowired
     OrderService orderService;
+
+    @Autowired
+    UserService userService;
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
     @GetMapping("/api/v1/orders")
@@ -52,6 +62,8 @@ public class OrderController {
 
             @AuthenticationPrincipal User user,
             Pageable pageable){
+
+        userService.checkIsUserLocked(user);
 
         List<OrderInfoDTO> filteredOrders;
 
@@ -78,4 +90,34 @@ public class OrderController {
 
         return new ResponseEntity<>(filteredOrders, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
+    @GetMapping("/api/v1/user/{id}/orders")
+    public ResponseEntity<List<OrderInfoDTO>> getOrdersHistory(@AuthenticationPrincipal User user,
+                                                               @PathVariable @Min(value = 1) @Max(value = Long.MAX_VALUE) Long id,
+                                                               Pageable pageable){
+        userService.checkIsUserLocked(user);
+        User targetUser = userService.getUserById(id);
+        if(targetUser == null) throw new NotFoundEx(String.valueOf(id));
+        if(targetUser.getRole() == Role.ADMIN || targetUser.getRole() == Role.MODERATOR) throw new IncorrectUserRoleRequestException();
+        List<OrderInfoDTO> ordersHistory;
+        if(user.getRole() == Role.ADMIN){
+            ordersHistory = orderService.getOrdersHistory(targetUser, pageable);
+        } else {
+            Long moderatorWarehouseId = user.getModerator().getWarehouseId();
+            ordersHistory = orderService.getOrdersHistory(targetUser, pageable).stream().filter(order -> order.getWarehouse().getId().equals(moderatorWarehouseId)).collect(Collectors.toList());
+        }
+        return new ResponseEntity<>(ordersHistory, HttpStatus.OK);
+    }
+
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/api/v1/user/orders")
+    public ResponseEntity<List<OrderInfoDTO>> getMyOrdersHistory(@AuthenticationPrincipal User user,
+                                                                 Pageable pageable){
+        if(user.getRole() == Role.ADMIN || user.getRole() == Role.MODERATOR) throw new IncorrectUserRoleRequestException();
+        List<OrderInfoDTO> ordersHistory = orderService.getOrdersHistory(user, pageable);
+        return new ResponseEntity<>(ordersHistory, HttpStatus.OK);
+    }
+
 }

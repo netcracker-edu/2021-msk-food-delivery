@@ -1,13 +1,17 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
 import com.ncedu.fooddelivery.api.v1.dto.OrderInfoDTO;
+import com.ncedu.fooddelivery.api.v1.entities.Role;
+import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import com.ncedu.fooddelivery.api.v1.entities.order.OrderNotHierarchical;
 import com.ncedu.fooddelivery.api.v1.repos.order.OrderNotHierarchicalRepo;
 import com.ncedu.fooddelivery.api.v1.repos.order.OrderRepo;
+import com.ncedu.fooddelivery.api.v1.repos.orderProductPosition.OrderNotHierarchicalProductPositionRepo;
 import com.ncedu.fooddelivery.api.v1.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +28,9 @@ public class OrderServiceImpl1 implements OrderService {
     @Autowired
     OrderNotHierarchicalRepo orderNotHierarchicalRepo;
 
+    @Autowired
+    OrderNotHierarchicalProductPositionRepo orderNotHierarchicalProductPositionRepo;
+
     @Override
     public Order getOrder(Long id) {
         Optional<Order> optionalOrder = orderRepo.findById(id);
@@ -33,7 +40,15 @@ public class OrderServiceImpl1 implements OrderService {
 
     @Override
     public List<OrderInfoDTO> findFiltered(Specification<OrderNotHierarchical> spec, Pageable pageable) {
+
         return orderNotHierarchicalRepo.findAll(spec, pageable).stream().map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OrderInfoDTO> getOrdersHistory(User user, Pageable pageable) {
+        pageable.getSort().and(Sort.by(Sort.Direction.DESC, "date_start"));
+        if(user.getRole() == Role.CLIENT) return orderRepo.getClientOrdersHistory(user.getId(), pageable).stream().map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
+        return orderRepo.getCourierOrdersHistory(user.getId(), pageable).stream().map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
     }
 
     public OrderInfoDTO convertToOrderInfoDTO(OrderNotHierarchical orderNotHierarchical){
@@ -44,7 +59,7 @@ public class OrderServiceImpl1 implements OrderService {
                 order.getCourier(), order.getStatus(), order.getDateStart(),
                 order.getDateEnd(), order.getOverallCost(), order.getHighDemandCoeff(),
                 order.getDiscount(), order.getPromoCodeId(), order.getClientRating(),
-                order.getDeliveryRating()
+                order.getDeliveryRating(), orderNotHierarchicalProductPositionRepo.findAllByOrderId(order.getId())
         );
     }
 
@@ -55,7 +70,7 @@ public class OrderServiceImpl1 implements OrderService {
                 order.getCourier(), order.getStatus(), order.getDateStart(),
                 order.getDateEnd(), order.getOverallCost(), order.getHighDemandCoeff(),
                 order.getDiscount(), order.getPromoCodeId(), order.getClientRating(),
-                order.getDeliveryRating()
+                order.getDeliveryRating(), orderNotHierarchicalProductPositionRepo.findAllByOrderId(order.getId())
         );
     }
 }

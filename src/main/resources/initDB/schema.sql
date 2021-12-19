@@ -21,18 +21,6 @@ BEGIN
 END;
 ' LANGUAGE PLPGSQL;
 
-
-DO ' DECLARE
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ''role_enum'') THEN
-        CREATE TYPE role_enum AS ENUM
-        (
-           ''CLIENT'', ''ADMIN'', ''MODERATOR'', ''COURIER''
-        );
-    END IF;
-END;
-' LANGUAGE PLPGSQL;
-
 CREATE TABLE IF NOT EXISTS users
 (
 

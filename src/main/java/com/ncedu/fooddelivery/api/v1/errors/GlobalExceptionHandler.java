@@ -57,18 +57,6 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
-    // in case of unknown fields
-    @ExceptionHandler(UnrecognizedPropertyException.class)
-    protected ResponseEntity<?> handleUnrecognizedPropertyException(
-            UnrecognizedPropertyException unrecognizedPropertyException) {
-
-        final String UUID = "ba4382b3-10e4-47ab-a8e7-ffd10579b553";
-        final String mainMessage = "Unknown properties are not allowed.";
-
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID);
-        return buildResponseEntity(apiError);
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<?> handleNotValidJSONException(
             MethodArgumentNotValidException notValidEx) {
@@ -110,6 +98,11 @@ public class GlobalExceptionHandler {
         final String mainMessage = "Constraint violation! Param: {" + param + "}; Value: {" + value + "}.";
         final String UUID = "2a7b40a2-faf8-4a6c-b6a5-84fb7162f8b7";
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID));
+    }
+
+    @ExceptionHandler(IncorrectUserRoleRequestException.class)
+    protected ResponseEntity<Object> handleIncorrectUserRoleRequestException(IncorrectUserRoleRequestException ex){
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, IncorrectUserRoleRequestException.message, IncorrectUserRoleRequestException.UUID));
     }
 
     @ExceptionHandler(IncorrectProductPositionWarehouseBindingException.class)
@@ -191,13 +184,13 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
     }
 
-    @ExceptionHandler(NullPointerException.class)
+    /*@ExceptionHandler(NullPointerException.class)
     public ResponseEntity<Object> handleNullPointerException(
             NullPointerException ex) {
         final String UUID = "3aef8117-7459-4366-aece-3c20d57bbb25";
         final String message = "Request data can't be null";
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, message, UUID));
-    }
+    }*/
   
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());

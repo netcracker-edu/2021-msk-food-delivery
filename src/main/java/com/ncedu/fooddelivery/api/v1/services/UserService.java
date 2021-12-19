@@ -22,6 +22,6 @@ public interface UserService {
     public List<UserInfoDTO> getAllAdmins();
     public List<UserInfoDTO> getAllUsers(Pageable pageable);
 
-
+    void checkIsUserLocked(User user);
 
 }
