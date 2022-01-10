@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS warehouses(warehouse_id BIGSERIAL PRIMARY KEY,
                                       delivery_zone geometry NOT NULL,
                                       is_deactivated BOOLEAN NOT NULL DEFAULT false);
 
+
+
 DO ' DECLARE
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = ''role_enum'') THEN
@@ -290,7 +292,6 @@ CREATE TABLE IF NOT EXISTS orders_product_positions(order_product_position_id BI
                                                     price NUMERIC(7, 2) NOT NULL CHECK(price > 0),
                                                     FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
                                                     FOREIGN KEY (product_position_id) REFERENCES product_positions(product_position_id) ON DELETE CASCADE);
-
 
 CREATE TABLE IF NOT EXISTS files
 (
