@@ -25,12 +25,18 @@ import static org.springframework.http.ResponseEntity.ok;
 @Slf4j
 @RestController
 public class FileController {
+    //TODO: add replacing file feature
+    //TODO: add getting file list with sort and pageable
+    //TODO: add checks for client, courier uploaded photos (only jpeg + max size)
+    //TODO: add relations with other entities
+    //TODO: add trigger which deleting files without relations
+    //TODO: add unit tests
 
     @Autowired
     FileService fileService;
 
     @PostMapping("/api/v1/file")
-    public Map<String,String> uploadFile (
+    public Map<String,String> uploadFile(
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal User authedUser) {
         log.info("POST /api/v1/file");
@@ -65,17 +71,16 @@ public class FileController {
             @PathVariable File file,
             @AuthenticationPrincipal User authedUser) {
         log.info("DELETE /api/v1/file/" + file.getId().toString());
-
         Long fileOwnerId = file.getOwner().getId();
-        boolean isNotAdmin = !Role.isADMIN(authedUser.getRole());
-        boolean isNotOwner = !fileOwnerId.equals(authedUser.getId());
-        if (isNotAdmin && isNotOwner) {
-            log.error(authedUser.getEmail() + " not Admin and not Owner of the file " + file.getId().toString());
-            throw new CustomAccessDeniedException();
+        boolean isAdmin = Role.isADMIN(authedUser.getRole());
+        boolean isOwner = fileOwnerId.equals(authedUser.getId());
+        if (isAdmin || isOwner) {
+            fileService.delete(file);
+            log.info("File deleted: " + file.getId().toString());
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        fileService.delete(file);
-        log.info("File deleted: " + file.getId().toString());
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        log.error(authedUser.getEmail() + " not Admin and not Owner of the file " + file.getId().toString());
+        throw new CustomAccessDeniedException();
     }
 
 }

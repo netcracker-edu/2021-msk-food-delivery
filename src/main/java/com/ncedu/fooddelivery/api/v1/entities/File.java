@@ -24,7 +24,7 @@ public class File {
     @Column(name = "file_id")
     private UUID id;
     @Enumerated(EnumType.STRING)
-    @Type( type = "type_enum" )
+    @Type(type = "type_enum")
     private FileType type;
     private String name;
     private Long size;

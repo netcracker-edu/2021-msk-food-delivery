@@ -108,7 +108,7 @@ public class ProductServiceImpl implements ProductService {
         }
         return productsDTO;
     }
-
+    //TODO: refactor search funcs (eliminate duplicates)
     @Override
     public List<ProductDTO> searchProducts(String phrase, Pageable pageable) {
 

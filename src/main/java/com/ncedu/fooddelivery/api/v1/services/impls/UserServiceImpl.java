@@ -28,6 +28,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     PasswordEncoder encoder;
 
+    @Override
     public User getUserById(Long id) {
         Optional<User> user = userRepo.findById(id);
         if (!user.isPresent()) {
@@ -36,6 +37,7 @@ public class UserServiceImpl implements UserService {
         return user.get();
     }
 
+    @Override
     public UserInfoDTO getUserDTOById(Long id) {
         User user = getUserById(id);
         return createUserDTO(user);
@@ -47,6 +49,7 @@ public class UserServiceImpl implements UserService {
                 user.getLastSigninDate(), user.getAvatarId());
     }
 
+    @Override
     public boolean deleteUserById(Long id) {
         User userForDelete = getUserById(id);
         userRepo.delete(userForDelete);

@@ -27,7 +27,14 @@ import java.util.Map;
 @Slf4j
 @RestController
 public class UserController {
-    //TODO: add updating special fields with PATCH http verb
+    //TODO: develop JWT authentication (login, logout endpoints)
+    //TODO: finish PATCH role endpoint
+    //TODO: add changing warehouse for moderator and courier
+    //TODO: delete photo from user (only Admin)
+    //TODO: blocking user (only Admin)
+    //TODO: search for any field (incomplete text search)
+    //TODO: trigger on deleting non active users
+    //TODO: add unit tests
 
     @Autowired UserService userService;
     @Autowired ClientService clientService;
@@ -93,7 +100,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    //TODO: finish endpoint
+
     @PatchMapping("/api/v1/user/{id}/role")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> changeUserRole(

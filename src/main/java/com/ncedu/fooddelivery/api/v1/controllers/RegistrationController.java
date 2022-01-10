@@ -14,6 +14,7 @@ import javax.validation.Valid;
 @Slf4j
 @RestController
 public class RegistrationController {
+    //TODO: add unit tests
 
     @Autowired
     RegistrationService registrationService;

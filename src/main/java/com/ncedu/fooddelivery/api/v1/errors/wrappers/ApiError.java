@@ -1,6 +1,5 @@
 package com.ncedu.fooddelivery.api.v1.errors.wrappers;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 

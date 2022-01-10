@@ -27,6 +27,8 @@ import java.util.Map;
 @Slf4j
 @RestController
 public class ProductController {
+    //TODO: maybe add filters
+    //TODO: add unit tests
 
     @Autowired
     ProductService productService;
@@ -35,7 +37,7 @@ public class ProductController {
     public ProductDTO getProductById(
             @PathVariable Long id,
             @AuthenticationPrincipal User authedUser) {
-        log.info(authedUser.getEmail() + " GET /api/v1/product/"+id );
+        log.info(authedUser.getEmail() + " GET /api/v1/product/" + id);
         String authedUserRole = authedUser.getRole().name();
         if (Role.isCLIENT(authedUserRole)) {
             return productService.getProductDTOByIdInShowcase(id);
@@ -55,7 +57,7 @@ public class ProductController {
 
     @DeleteMapping("/api/v1/product/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> createProduct(
+    public ResponseEntity<?> deleteProduct(
             @PathVariable Long id) {
         log.info("DELETE /api/v1/product/" + id);
         productService.deleteProduct(id);
@@ -82,9 +84,9 @@ public class ProductController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> switchInShowcaseStatus(
             @PathVariable Long id) {
-        log.info("PATCH /api/v1/product/"+id+"/inShowcase");
+        log.info("PATCH /api/v1/product/" + id + "/inShowcase");
         boolean inShowcase = productService.switchInShowcaseStatus(id);
-        log.info("New value inShowcase: '" + inShowcase +"' for product: "+id);
+        log.info("New value inShowcase: '" + inShowcase + "' for product: " + id);
         return createModifyResponse("inShowcase", inShowcase);
     }
 
@@ -97,10 +99,10 @@ public class ProductController {
 
     //TODO: modify with warehouse and product positions limits
     @GetMapping("/api/v1/products")
-    public List<ProductDTO> getProductById(
+    public List<ProductDTO> getProducts(
             @PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable,
             @AuthenticationPrincipal User authedUser) {
-        log.info("GET /api/v1/products PAGE="+pageable.getPageNumber() + " SIZE=" + pageable.getPageSize());
+        log.info("GET /api/v1/products PAGE=" + pageable.getPageNumber() + " SIZE=" + pageable.getPageSize());
         String authedUserRole = authedUser.getRole().name();
         List<ProductDTO> productsDTO = null;
 
@@ -119,7 +121,7 @@ public class ProductController {
             @PageableDefault Pageable pageable,
             @AuthenticationPrincipal User authedUser) {
         String phrase = searchDTO.getPhrase();
-        log.info("GET /api/v1/products/search with phrase:'"+phrase+"' PAGE="+pageable.getPageNumber() + " SIZE=" + pageable.getPageSize());
+        log.info("GET /api/v1/products/search with phrase:'" + phrase + "' PAGE=" + pageable.getPageNumber() + " SIZE=" + pageable.getPageSize());
         List<ProductDTO> productsDTO;
         String authedUserRole = authedUser.getRole().name();
 
