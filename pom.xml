@@ -71,12 +71,6 @@
 			<artifactId>hibernate-types-55</artifactId>
 			<version>2.14.0</version>
 		</dependency>
-    
-    <!-- web -->
-    <dependency>
-       <groupId>org.springframework.boot</groupId>
-       <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
 
 		<!-- test -->
 		<dependency>
@@ -120,8 +114,6 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-
-
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
