@@ -21,11 +21,11 @@ public class RegistrationController {
 
     @PostMapping("/api/v1/registration")
     public isCreatedDTO registration(@Valid @RequestBody RegistrationDTO userInfo) {
-        log.info("POST /api/v1/registration");
+        log.debug("POST /api/v1/registration");
         Long userId = registrationService.addUser(userInfo);
         isCreatedDTO isCreated = new isCreatedDTO();
         isCreated.setId(userId);
-        log.info("Created user: " + userId);
+        log.debug("Created user: " + userId);
         return isCreated;
     }
 }

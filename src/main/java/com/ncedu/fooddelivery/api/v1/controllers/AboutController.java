@@ -17,7 +17,7 @@ public class AboutController {
 
     @GetMapping("/api/v1/about")
     public AboutDTO about() {
-        log.info("GET /api/v1/about calling.");
+        log.debug("GET /api/v1/about calling.");
         AboutDTO aboutDTO = new AboutDTO();
         aboutDTO.setDbName(testDbConnect.getDbName());
         return aboutDTO;

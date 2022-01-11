@@ -39,13 +39,13 @@ public class FileController {
     public Map<String,String> uploadFile(
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal User authedUser) {
-        log.info("POST /api/v1/file");
+        log.debug("POST /api/v1/file");
         String fileUUID = fileService.save(file, authedUser);
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/api/v1/file/")
                 .path(fileUUID)
                 .toUriString();
-        log.info("Created file link: " + fileDownloadUri);
+        log.debug("Created file link: " + fileDownloadUri);
         Map<String, String> response = new HashMap<>();
         response.put("file", fileDownloadUri);
         return response;
@@ -54,11 +54,11 @@ public class FileController {
     public ResponseEntity<Resource> download(
             @PathVariable File file,
             @AuthenticationPrincipal User authedUser) {
-        log.info("GET /api/v1/file/" + file.getId().toString());
+        log.debug("GET /api/v1/file/" + file.getId().toString());
         Resource resource = fileService.load(file);
         String mediaType = file.getType().getMediaType();
         String fileNameWithExt = file.getName() + "." + file.getType().name();
-        log.info("Sending file "+fileNameWithExt+"("+file.getId().toString() +")"+" to client");
+        log.debug("Sending file "+fileNameWithExt+"("+file.getId().toString() +")"+" to client");
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(mediaType))
                 .header(HttpHeaders.CONTENT_DISPOSITION,
@@ -70,13 +70,13 @@ public class FileController {
     public ResponseEntity<?> delete(
             @PathVariable File file,
             @AuthenticationPrincipal User authedUser) {
-        log.info("DELETE /api/v1/file/" + file.getId().toString());
+        log.debug("DELETE /api/v1/file/" + file.getId().toString());
         Long fileOwnerId = file.getOwner().getId();
         boolean isAdmin = Role.isADMIN(authedUser.getRole());
         boolean isOwner = fileOwnerId.equals(authedUser.getId());
         if (isAdmin || isOwner) {
             fileService.delete(file);
-            log.info("File deleted: " + file.getId().toString());
+            log.debug("File deleted: " + file.getId().toString());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         log.error(authedUser.getEmail() + " not Admin and not Owner of the file " + file.getId().toString());

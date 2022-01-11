@@ -586,6 +586,7 @@ END;
     /*
             PROMOCODES
     */
+
 DO ' DECLARE
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM promo_codes WHERE promo_code_id=1) THEN
