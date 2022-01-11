@@ -11,7 +11,6 @@ import com.ncedu.fooddelivery.api.v1.repos.orderProductPosition.OrderNotHierarch
 import com.ncedu.fooddelivery.api.v1.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +45,6 @@ public class OrderServiceImpl1 implements OrderService {
 
     @Override
     public List<OrderInfoDTO> getOrdersHistory(User user, Pageable pageable) {
-        pageable.getSort().and(Sort.by(Sort.Direction.DESC, "date_start"));
         if(user.getRole() == Role.CLIENT) return orderRepo.getClientOrdersHistory(user.getId(), pageable).stream().map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
         return orderRepo.getCourierOrdersHistory(user.getId(), pageable).stream().map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
     }

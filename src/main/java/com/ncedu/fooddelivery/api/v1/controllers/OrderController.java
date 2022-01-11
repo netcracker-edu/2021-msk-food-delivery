@@ -8,14 +8,14 @@ import com.ncedu.fooddelivery.api.v1.entities.order.OrderNotHierarchical;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.IncorrectUserRoleRequestException;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
-import com.ncedu.fooddelivery.api.v1.repos.UserRepo;
 import com.ncedu.fooddelivery.api.v1.services.OrderService;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
 import com.ncedu.fooddelivery.api.v1.specifications.OrderSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -95,7 +95,7 @@ public class OrderController {
     @GetMapping("/api/v1/user/{id}/orders")
     public ResponseEntity<List<OrderInfoDTO>> getOrdersHistory(@AuthenticationPrincipal User user,
                                                                @PathVariable @Min(value = 1) @Max(value = Long.MAX_VALUE) Long id,
-                                                               Pageable pageable){
+                                                               @PageableDefault(sort = { "date_start" }, direction = Sort.Direction.DESC) Pageable pageable){
         userService.checkIsUserLocked(user);
         User targetUser = userService.getUserById(id);
         if(targetUser == null) throw new NotFoundEx(String.valueOf(id));
@@ -114,7 +114,7 @@ public class OrderController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/api/v1/user/orders")
     public ResponseEntity<List<OrderInfoDTO>> getMyOrdersHistory(@AuthenticationPrincipal User user,
-                                                                 Pageable pageable){
+                                                                 @PageableDefault(sort = { "date_start" }, direction = Sort.Direction.DESC) Pageable pageable){
         if(user.getRole() == Role.ADMIN || user.getRole() == Role.MODERATOR) throw new IncorrectUserRoleRequestException();
         List<OrderInfoDTO> ordersHistory = orderService.getOrdersHistory(user, pageable);
         return new ResponseEntity<>(ordersHistory, HttpStatus.OK);

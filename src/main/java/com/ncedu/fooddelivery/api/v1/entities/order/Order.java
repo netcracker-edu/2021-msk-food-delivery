@@ -17,7 +17,7 @@ import org.hibernate.annotations.TypeDef;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @TypeDef(
         name = "order_status",
@@ -67,10 +67,10 @@ public class Order {
 
     @NotNull
     @Column(name = "date_start")
-    private LocalDateTime dateStart;
+    private Timestamp dateStart;
 
     @Column(name = "date_end")
-    private LocalDateTime dateEnd;
+    private Timestamp dateEnd;
 
     @NotNull
     @Column(name = "overall_cost")
@@ -95,7 +95,7 @@ public class Order {
 
     public Order(){}
 
-    public Order(Long id, Client client, String address, Geometry coordinates, Warehouse warehouse, Courier courier, OrderStatus status, LocalDateTime dateStart, LocalDateTime dateEnd, BigDecimal overallCost, BigDecimal highDemandCoeff, BigDecimal discount, Long promoCodeId, BigDecimal clientRating, BigDecimal deliveryRating) {
+    public Order(Long id, Client client, String address, Geometry coordinates, Warehouse warehouse, Courier courier, OrderStatus status, Timestamp dateStart, Timestamp dateEnd, BigDecimal overallCost, BigDecimal highDemandCoeff, BigDecimal discount, Long promoCodeId, BigDecimal clientRating, BigDecimal deliveryRating) {
         this.id = id;
         this.client = client;
         this.address = address;

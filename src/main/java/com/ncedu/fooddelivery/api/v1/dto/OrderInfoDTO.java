@@ -1,10 +1,8 @@
 package com.ncedu.fooddelivery.api.v1.dto;
 
 import com.bedatadriven.jackson.datatype.jts.serialization.GeometrySerializer;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.*;
 import com.ncedu.fooddelivery.api.v1.entities.orderProductPosition.OrderNotHierarchicalProductPosition;
@@ -18,8 +16,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.sql.Timestamp;
 import java.util.List;
 
 @TypeDef(
@@ -50,13 +47,9 @@ public class OrderInfoDTO {
     @Type(type = "order_status")
     private OrderStatus status;     /* TODO: don't forget to check if status is null - change it for "CREATED"
                                        then */
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime dateStart;
+    private Timestamp dateStart;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime dateEnd;
+    private Timestamp dateEnd;
 
     private BigDecimal overallCost;
 
@@ -73,8 +66,8 @@ public class OrderInfoDTO {
     private List<OrderNotHierarchicalProductPosition> productPositions;
 
     public OrderInfoDTO(Long id, Client client, String address, Geometry coordinates,
-                        Warehouse warehouse, Courier courier, OrderStatus status, LocalDateTime dateStart,
-                        LocalDateTime dateEnd, BigDecimal overallCost, BigDecimal highDemandCoeff,
+                        Warehouse warehouse, Courier courier, OrderStatus status, Timestamp dateStart,
+                        Timestamp dateEnd, BigDecimal overallCost, BigDecimal highDemandCoeff,
                         BigDecimal discount, Long promoCodeId, BigDecimal clientRating, BigDecimal deliveryRating, List<OrderNotHierarchicalProductPosition> productPositions) {
         this.id = id;
         User userClient = client.getUser();
@@ -95,8 +88,8 @@ public class OrderInfoDTO {
                     courier.getAddress(), courier.getCurrentBalance());
         }
         this.status = status;
-        this.dateStart = dateStart.atZone(ZoneOffset.ofHours(3)).toLocalDateTime();
-        this.dateEnd = dateEnd.atZone(ZoneOffset.ofHours(3)).toLocalDateTime();
+        this.dateStart = dateStart;
+        this.dateEnd = dateEnd;
         this.overallCost = overallCost;
         this.highDemandCoeff = highDemandCoeff;
         this.discount = discount;
