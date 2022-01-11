@@ -60,18 +60,6 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
-    // in case of unknown fields
-    @ExceptionHandler(UnrecognizedPropertyException.class)
-    protected ResponseEntity<?> handleUnrecognizedPropertyException(
-            UnrecognizedPropertyException unrecognizedPropertyException) {
-
-        final String UUID = "ba4382b3-10e4-47ab-a8e7-ffd10579b553";
-        final String mainMessage = "Unknown properties are not allowed.";
-
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID);
-        return buildResponseEntity(apiError);
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<?> handleNotValidJSONException(
             MethodArgumentNotValidException notValidEx) {
@@ -146,14 +134,6 @@ public class GlobalExceptionHandler {
         Object rejectedValue = fieldError.getRejectedValue();
         String errorMessage = fieldError.getDefaultMessage();
         return new ValidationSubError(objectName, fieldName, rejectedValue, errorMessage);
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Object> handleAccessDeniedException(
-            Exception ex, WebRequest request) {
-        log.error(ex.getMessage(), ex);
-        CustomAccessDeniedException accessEx = new CustomAccessDeniedException();
-        return buildResponseEntity(new ApiError(HttpStatus.FORBIDDEN, accessEx.getMessage(), accessEx.getUuid()));
     }
 
     @ExceptionHandler(AlreadyExistsException.class)
