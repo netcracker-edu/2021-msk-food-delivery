@@ -8,6 +8,7 @@ import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException
 import com.ncedu.fooddelivery.api.v1.errors.wrappers.ApiError;
 import com.ncedu.fooddelivery.api.v1.errors.wrappers.ApiSubError;
 import com.ncedu.fooddelivery.api.v1.errors.wrappers.ValidationSubError;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,7 @@ import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandler {
@@ -35,6 +37,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundEx.class)
     protected ResponseEntity<?> handleNotFoundExceptions(
             NotFoundEx ex) {
+        log.error(ex.getMessage(), ex);
         return buildResponseEntity(new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), ex.getUuid()));
     }
 
@@ -57,22 +60,10 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
-    // in case of unknown fields
-    @ExceptionHandler(UnrecognizedPropertyException.class)
-    protected ResponseEntity<?> handleUnrecognizedPropertyException(
-            UnrecognizedPropertyException unrecognizedPropertyException) {
-
-        final String UUID = "ba4382b3-10e4-47ab-a8e7-ffd10579b553";
-        final String mainMessage = "Unknown properties are not allowed.";
-
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID);
-        return buildResponseEntity(apiError);
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<?> handleNotValidJSONException(
             MethodArgumentNotValidException notValidEx) {
-
+        log.error(notValidEx.getMessage(), notValidEx);
         final String UUID = "6ecfc3db-e67c-41c0-a6fd-468d78c2fa26";
         final String mainMessage = "JSON not Valid";
         //create main error wrapper for validation error
@@ -148,18 +139,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<Object> handleAlreadyExistsException(
             AlreadyExistsException ex) {
+        log.error(ex.getMessage(), ex);
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
     }
 
     @ExceptionHandler(PasswordsMismatchException.class)
     public ResponseEntity<Object> handlePasswordsMismatchException(
             PasswordsMismatchException ex) {
+        log.error(ex.getMessage(), ex);
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
     }
 
     @ExceptionHandler(MissingPathVariableException.class)
     public ResponseEntity<Object> handleMissingPathVariableException(
             MissingPathVariableException ex) {
+        log.error(ex.getMessage(), ex);
         final String UUID = "e547f7c0-352e-4798-9def-c716f1288b02";
         final String message = "Path var not presented or value of var is bad";
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, message, UUID));
@@ -168,18 +162,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadFileExtensionException.class)
     public ResponseEntity<Object> handleBadFileExtensionException(
             BadFileExtensionException ex) {
+        log.error(ex.getMessage(), ex);
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
     }
 
     @ExceptionHandler(FileStorageException.class)
     public ResponseEntity<Object> handleFileStorageException(
             FileStorageException ex) {
+        log.error(ex.getMessage(), ex);
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<Object> handleMaxUploadSizeException(
             MaxUploadSizeExceededException ex) {
+        log.error(ex.getMessage(), ex);
         final String UUID = "e32be0ba-48e8-4b30-ad79-5723c9d5fa14";
         final String message = "File size exceeded";
         return buildResponseEntity(new ApiError(HttpStatus.EXPECTATION_FAILED, message, UUID));
@@ -188,12 +185,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FileDeleteException.class)
     public ResponseEntity<Object> handleFileDeleteException(
             FileDeleteException ex) {
+        log.error(ex.getMessage(), ex);
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
     }
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<Object> handleNullPointerException(
             NullPointerException ex) {
+        log.error(ex.getMessage(), ex);
         final String UUID = "3aef8117-7459-4366-aece-3c20d57bbb25";
         final String message = "Request data can't be null";
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, message, UUID));

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?> <Configuration>
+    <Appenders>
+        <!-- ROLLING FILE APPENDER -->
+        <RollingFile name = "OwnRollingFileAppender" fileName = "logs/File.log"
+                     filePattern = "logs/$${date:MM-yyyy}/File_%d{dd.MM.yyyy}_%i.log">
+            <!-- PATTERN LAYOUT -->
+            <PatternLayout pattern="%d %p %c{2} %m %n"/>
+            <!-- ROLLOVER POLICY (on startup, daily and when the file reaches 1MB) -->
+            <Policies>
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="2 GB" />
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <!-- LOGGER -->
+        <Logger name="com.ncedu.fooddelivery.api.v1" level="debug">
+            <AppenderRef ref="OwnRollingFileAppender"/>
+        </Logger>
+    </Loggers>
+</Configuration>

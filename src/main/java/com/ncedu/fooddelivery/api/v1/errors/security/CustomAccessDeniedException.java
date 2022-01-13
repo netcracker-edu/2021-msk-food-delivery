@@ -1,6 +1,5 @@
 package com.ncedu.fooddelivery.api.v1.errors.security;
 
-import lombok.Data;
 import org.springframework.security.access.AccessDeniedException;
 
 public class CustomAccessDeniedException extends AccessDeniedException {

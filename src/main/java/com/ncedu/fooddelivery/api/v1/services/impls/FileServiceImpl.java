@@ -104,7 +104,7 @@ public class FileServiceImpl implements FileService {
             String fileParentDir = fileUUIDString.substring(0, 2); // extract 2 chars from file UUID
             Path fullFilePath = uploadPath.resolve(fileParentDir).resolve(fileUUIDString);
             Files.deleteIfExists(fullFilePath);
-            //TODO: delete parrent folder if empty
+            //TODO: delete parent folder if empty
         } catch (IOException e) {
             throw new FileDeleteException();
         }
