@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenUtil {
@@ -16,24 +17,26 @@ public class JwtTokenUtil {
     @Value("${jwt.expiration.time}")
     public long JWT_EXPIRATION_TIME;
 
+    public final String PREFIX = "Bearer ";
+    public final String HEADER = "Authorization";
+
     @Value("${jwt.secret}")
     private String SECRET;
 
     public String createToken(UserDetails userDetails) {
+        final long now = System.currentTimeMillis();
+
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION_TIME))
+                .setIssuedAt(new Date(now))
+                .setExpiration(new Date(now + JWT_EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
     }
 
-    public Boolean isTokenValid(String token, UserDetails userDetails) {
-        final String usernameFromDetails = userDetails.getUsername();
-        final String usernameFromToken = getUsernameFromToken(token);
-        boolean usernameEquals = usernameFromToken != null && usernameFromToken.equals(usernameFromDetails);
+    public Boolean isTokenValid(String token) {
         boolean tokenNotExpired = !isTokenExpired(token);
-        return usernameEquals && tokenNotExpired;
+        return tokenNotExpired;
     }
 
     private Boolean isTokenExpired(String token) {

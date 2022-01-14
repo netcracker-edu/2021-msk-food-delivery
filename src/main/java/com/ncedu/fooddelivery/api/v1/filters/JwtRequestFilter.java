@@ -5,6 +5,8 @@ import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -16,6 +18,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -32,44 +37,36 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        final String requestTokenHeader = request.getHeader("Authorization");
+        final String header = request.getHeader(jwtTokenUtil.HEADER);
 
-        String username = null;
-        String jwtToken = null;
-        // JWT Token is in the form "Bearer token".
-        // Remove Bearer word and get only the Token
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7);
-            try {
-                username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-            //TODO: refactor erorrs and add special for global
-            } catch (IllegalArgumentException e) {
-                    System.out.println("Unable to get JWT Token");
-            } catch (ExpiredJwtException e) {
-                    System.out.println("JWT Token has expired");
-            }
-        } else {
-            logger.warn("JWT Token does not begin with Bearer String");
+        if (header == null || !header.startsWith(jwtTokenUtil.PREFIX)) {
+            filterChain.doFilter(request, response);  		// If not valid, go to the next filter.
+            return;
         }
 
-        // Once we get the token validate it.
-        //TODO: refactor
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        String jwtToken = header.replace(jwtTokenUtil.PREFIX,"");
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            // if token is valid configure Spring Security to manually setauthentication
-            if (jwtTokenUtil.isTokenValid(jwtToken, userDetails)) {
+        try {
+            if (jwtTokenUtil.isTokenValid(jwtToken)) {
+                String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities());
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 usernamePasswordAuthenticationToken
                         .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                // After setting the Authentication in the context, we specify
-                // that the current user is authenticated. So it passes the
-                // Spring Security Configurations successfully.
+                    // After setting the Authentication in the context, we specify
+                    // that the current user is authenticated. So it passes the
+                    // Spring Security Configurations successfully.
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
             }
+        //TODO: refactor erorrs and add special for global
+        } catch (IllegalArgumentException e) {
+            System.out.println("Unable to get JWT Token");
+        } catch (ExpiredJwtException e) {
+            System.out.println("JWT Token has expired");
         }
+
         filterChain.doFilter(request, response);
     }
 }
