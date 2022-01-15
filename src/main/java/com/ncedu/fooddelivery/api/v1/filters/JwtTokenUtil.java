@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenUtil {
+//TODO: refresh token
 
     @Value("${jwt.expiration.time}")
     public long JWT_EXPIRATION_TIME;

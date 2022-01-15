@@ -28,6 +28,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
         // create custom error wrapper for response
         ApiError apiError = new ApiError(httpStatus, msg, uuid);
+        apiError.setDebugMessage(e.getMessage());
         // setting the response HTTP status and content type
         response.setStatus(httpStatus.value());
         response.setContentType(APPLICATION_JSON_VALUE);
