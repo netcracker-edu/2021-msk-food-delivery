@@ -1,6 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
-import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
+import com.ncedu.fooddelivery.api.v1.dto.IsCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductCreateDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductUpdateDTO;
@@ -10,18 +10,14 @@ import com.ncedu.fooddelivery.api.v1.mappers.ProductMapper;
 import com.ncedu.fooddelivery.api.v1.repos.ProductRepo;
 import com.ncedu.fooddelivery.api.v1.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-
-import static org.springframework.data.domain.Sort.Order.desc;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -56,10 +52,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public isCreatedDTO createProduct(ProductCreateDTO newProduct) {
+    public IsCreatedDTO createProduct(ProductCreateDTO newProduct) {
         Product product = productMapper.mapToEntity(newProduct);
         product = productRepo.save(product);
-        isCreatedDTO createdDTO = new isCreatedDTO();
+        IsCreatedDTO createdDTO = new IsCreatedDTO();
         createdDTO.setId(product.getId());
         return createdDTO;
     }

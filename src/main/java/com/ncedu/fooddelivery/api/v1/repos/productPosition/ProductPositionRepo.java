@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 
 public interface ProductPositionRepo extends JpaRepository<ProductPosition, Long> {
     @Query(
@@ -42,4 +44,11 @@ public interface ProductPositionRepo extends JpaRepository<ProductPosition, Long
     Page<ProductPosition> findExpiredPositions(@Param(value = "id") Long id, Pageable pageable);
 
     Page<ProductPosition> findAll(Specification<ProductPosition> spec, Pageable pageable);
+
+    @Query(
+            value = "SELECT * FROM product_positions " +
+                    "WHERE product_id = :id AND warehouse_id = :warehouseId",
+            nativeQuery = true
+    )
+    List<ProductPosition> findByProductIdAndWarehouseId(@Param(value = "id") Long id, @Param(value = "warehouseId") Long warehouseId);
 }

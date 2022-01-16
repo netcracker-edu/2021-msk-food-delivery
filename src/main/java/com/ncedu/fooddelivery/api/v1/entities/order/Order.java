@@ -74,15 +74,15 @@ public class Order {
 
     @NotNull
     @Column(name = "overall_cost")
-    private BigDecimal overallCost;
+    private Double overallCost;
 
     @NotNull
     @Column(name = "high_demand_coeff")
-    private BigDecimal highDemandCoeff;      // TODO: similarly "1.0"
+    private Double highDemandCoeff;      // TODO: similarly "1.0"
 
     @NotNull
     @Column(name = "discount")
-    private BigDecimal discount;     // TODO: similarly "0.0"
+    private Double discount;     // TODO: similarly "0.0"
 
     @Column(name = "promo_code_id")
     private Long promoCodeId;
@@ -95,7 +95,7 @@ public class Order {
 
     public Order(){}
 
-    public Order(Long id, Client client, String address, Geometry coordinates, Warehouse warehouse, Courier courier, OrderStatus status, Timestamp dateStart, Timestamp dateEnd, BigDecimal overallCost, BigDecimal highDemandCoeff, BigDecimal discount, Long promoCodeId, BigDecimal clientRating, BigDecimal deliveryRating) {
+    public Order(Long id, Client client, String address, Geometry coordinates, Warehouse warehouse, Courier courier, OrderStatus status, Timestamp dateStart, Timestamp dateEnd, Double overallCost, Double highDemandCoeff, Double discount, Long promoCodeId, BigDecimal clientRating, BigDecimal deliveryRating) {
         this.id = id;
         this.client = client;
         this.address = address;

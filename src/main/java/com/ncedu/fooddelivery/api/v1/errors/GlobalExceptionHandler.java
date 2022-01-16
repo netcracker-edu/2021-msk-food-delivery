@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.*;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
+import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.CourierAvailabilityEx;
+import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.ProductAvailabilityEx;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
-import com.ncedu.fooddelivery.api.v1.errors.wrappers.ApiError;
-import com.ncedu.fooddelivery.api.v1.errors.wrappers.ApiSubError;
-import com.ncedu.fooddelivery.api.v1.errors.wrappers.ValidationSubError;
+import com.ncedu.fooddelivery.api.v1.errors.wrappers.*;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -27,6 +27,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -191,7 +192,31 @@ public class GlobalExceptionHandler {
         final String message = "Request data can't be null";
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, message, UUID));
     }*/
-  
+
+    @ExceptionHandler(ProductAvailabilityEx.class)
+    public ResponseEntity<Object> handleProductAvailabilityEx(ProductAvailabilityEx ex){
+        ApiError err = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), ex.uuid);
+        List<ApiSubError> subErrors = new ArrayList<>();
+        err.setSubErrors(subErrors);
+        if(ex.getNotFoundProductsIds().size() != 0){
+            for(Long notFoundId: ex.getNotFoundProductsIds()){
+                subErrors.add(new ProductNotFoundSubError(notFoundId));
+            }
+        }
+        if(ex.getProductsAvailableAmount().size() != 0){
+            for(Map.Entry<Long, Integer> entry: ex.getProductsAvailableAmount().entrySet()){
+                subErrors.add(new ProductNotEnoughSubError(entry.getKey(), entry.getValue()));
+            }
+        }
+        return buildResponseEntity(err);
+    }
+
+    @ExceptionHandler(CourierAvailabilityEx.class)
+    public ResponseEntity<Object> handleCourierAvailabilityEx(CourierAvailabilityEx ex){
+        ApiError err = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), ex.uuid);
+        return buildResponseEntity(err);
+    }
+
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }

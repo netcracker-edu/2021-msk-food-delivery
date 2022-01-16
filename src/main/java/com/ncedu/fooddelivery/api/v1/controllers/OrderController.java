@@ -1,6 +1,8 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
-import com.ncedu.fooddelivery.api.v1.dto.OrderInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.order.CountOrderCostRequestDTO;
+import com.ncedu.fooddelivery.api.v1.dto.order.CountOrderCostResponseDTO;
+import com.ncedu.fooddelivery.api.v1.dto.order.OrderInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.OrderStatus;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
@@ -22,11 +24,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -118,6 +118,14 @@ public class OrderController {
         if(user.getRole() == Role.ADMIN || user.getRole() == Role.MODERATOR) throw new IncorrectUserRoleRequestException();
         List<OrderInfoDTO> ordersHistory = orderService.getOrdersHistory(user, pageable);
         return new ResponseEntity<>(ordersHistory, HttpStatus.OK);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/api/v1/order/price")
+    public ResponseEntity<CountOrderCostResponseDTO> countOrderCost(@AuthenticationPrincipal User user,
+                                                                     @RequestBody CountOrderCostRequestDTO requstDTO){
+        CountOrderCostResponseDTO responseDTO = orderService.countOrderPrice(requstDTO);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
 }

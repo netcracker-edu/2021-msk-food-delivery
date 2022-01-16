@@ -1,7 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
 import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.*;
-import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
+import com.ncedu.fooddelivery.api.v1.dto.IsCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPosition;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
@@ -61,14 +61,14 @@ public class ProductPositionController {
 
     @PostMapping(path = "/api/v1/productPosition")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public isCreatedDTO acceptSupply(@AuthenticationPrincipal User user, @Valid @RequestBody AcceptSupplyDTO acceptSupplyDTO){
+    public IsCreatedDTO acceptSupply(@AuthenticationPrincipal User user, @Valid @RequestBody AcceptSupplyDTO acceptSupplyDTO){
         if(Role.isMODERATOR(user.getRole().toString())){
             if(!user.getModerator().getWarehouseId().equals(acceptSupplyDTO.getWarehouseId())){
                 throw new CustomAccessDeniedException();
             }
         }
         Long id = productPositionService.acceptSupply(acceptSupplyDTO);
-        isCreatedDTO isCreated = new isCreatedDTO();
+        IsCreatedDTO isCreated = new IsCreatedDTO();
         isCreated.setId(id);
         return isCreated;
     }

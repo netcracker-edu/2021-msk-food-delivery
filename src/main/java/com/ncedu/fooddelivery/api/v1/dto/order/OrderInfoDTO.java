@@ -1,8 +1,10 @@
-package com.ncedu.fooddelivery.api.v1.dto;
+package com.ncedu.fooddelivery.api.v1.dto.order;
 
 import com.bedatadriven.jackson.datatype.jts.serialization.GeometrySerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.ncedu.fooddelivery.api.v1.dto.ClientInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.CourierInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.*;
 import com.ncedu.fooddelivery.api.v1.entities.orderProductPosition.OrderNotHierarchicalProductPosition;
@@ -51,11 +53,11 @@ public class OrderInfoDTO {
 
     private Timestamp dateEnd;
 
-    private BigDecimal overallCost;
+    private Double overallCost;
 
-    private BigDecimal highDemandCoeff;      // TODO: similarly "1.0"
+    private Double highDemandCoeff;      // TODO: similarly "1.0"
 
-    private BigDecimal discount;     // TODO: similarly "0.0"
+    private Double discount;     // TODO: similarly "0.0"
 
     private Long promoCodeId;
 
@@ -67,8 +69,8 @@ public class OrderInfoDTO {
 
     public OrderInfoDTO(Long id, Client client, String address, Geometry coordinates,
                         Warehouse warehouse, Courier courier, OrderStatus status, Timestamp dateStart,
-                        Timestamp dateEnd, BigDecimal overallCost, BigDecimal highDemandCoeff,
-                        BigDecimal discount, Long promoCodeId, BigDecimal clientRating, BigDecimal deliveryRating, List<OrderNotHierarchicalProductPosition> productPositions) {
+                        Timestamp dateEnd, Double overallCost, Double highDemandCoeff,
+                        Double discount, Long promoCodeId, BigDecimal clientRating, BigDecimal deliveryRating, List<OrderNotHierarchicalProductPosition> productPositions) {
         this.id = id;
         User userClient = client.getUser();
         this.client = new ClientInfoDTO(
