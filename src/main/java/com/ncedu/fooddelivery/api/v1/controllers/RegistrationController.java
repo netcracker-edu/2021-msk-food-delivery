@@ -19,9 +19,9 @@ public class RegistrationController {
     @Autowired
     RegistrationService registrationService;
 
-    @PostMapping("/api/v1/registration")
+    @PostMapping("/api/v1/signup")
     public isCreatedDTO registration(@Valid @RequestBody RegistrationDTO userInfo) {
-        log.debug("POST /api/v1/registration");
+        log.debug("POST /api/v1/signup");
         Long userId = registrationService.addUser(userInfo);
         isCreatedDTO isCreated = new isCreatedDTO();
         isCreated.setId(userId);
