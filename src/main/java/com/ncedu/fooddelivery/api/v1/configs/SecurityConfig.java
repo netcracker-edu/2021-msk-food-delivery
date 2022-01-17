@@ -15,13 +15,15 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    public final static String[] permitAllPaths = {"/api/*/auth/**", "/api/*/about"};
+
     @Autowired
     private UserDetailsServiceImpl authService;
 
@@ -46,7 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-                .antMatchers("/api/*/registration", "/api/*/login", "/api/*/logout", "/api/*/about").permitAll()
+                .antMatchers(permitAllPaths).permitAll()
                 .anyRequest().authenticated()
             .and()
                 .exceptionHandling()
