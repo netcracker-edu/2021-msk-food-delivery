@@ -1,6 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ncedu.fooddelivery.api.v1.configs.SecurityConfig;
 import com.ncedu.fooddelivery.api.v1.errors.wrappers.ApiError;
 import com.ncedu.fooddelivery.api.v1.services.impls.UserDetailsServiceImpl;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -9,12 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -22,10 +22,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.http.HttpResponse;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -39,6 +35,20 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request)
+            throws ServletException {
+        String path = request.getRequestURI();
+        AntPathMatcher antPathMatcher = new AntPathMatcher();
+
+        for (String pattern : SecurityConfig.permitAllPaths) {
+            if (antPathMatcher.match(pattern, path)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     protected void doFilterInternal(
@@ -55,7 +65,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String jwtToken = header.replace(jwtTokenUtil.PREFIX,"");
 
         try {
-            if (jwtTokenUtil.isTokenValid(jwtToken)) {
+            if (jwtTokenUtil.isTokenValid(jwtToken) && jwtTokenUtil.isTokenNotExpired(jwtToken)) {
                 String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
@@ -69,7 +79,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
                 filterChain.doFilter(request, response);
             }
-        //
         } catch (ExpiredJwtException e) {
             ApiError apiError = createJwtExpiredError(e);
             sendErrorResponse(apiError, response);

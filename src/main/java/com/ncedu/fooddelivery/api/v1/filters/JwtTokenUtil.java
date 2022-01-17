@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenUtil {
@@ -36,13 +35,12 @@ public class JwtTokenUtil {
     }
 
     public Boolean isTokenValid(String token) {
-        boolean tokenNotExpired = !isTokenExpired(token);
-        return tokenNotExpired;
+        return Jwts.parser().setSigningKey(SECRET).isSigned(token);
     }
 
-    private Boolean isTokenExpired(String token) {
+    public Boolean isTokenNotExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
-        return expiration.before(new Date());
+        return expiration.after(new Date());
     }
 
     public String getUsernameFromToken(String token) {
