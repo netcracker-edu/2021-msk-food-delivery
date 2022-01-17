@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.*;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.CourierAvailabilityEx;
+import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.OrderCostChangedEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.ProductAvailabilityEx;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
 import com.ncedu.fooddelivery.api.v1.errors.wrappers.*;
@@ -213,7 +214,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(CourierAvailabilityEx.class)
     public ResponseEntity<Object> handleCourierAvailabilityEx(CourierAvailabilityEx ex){
-        ApiError err = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), ex.uuid);
+        ApiError err = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), CourierAvailabilityEx.uuid);
+        return buildResponseEntity(err);
+    }
+
+    @ExceptionHandler(OrderCostChangedEx.class)
+    public ResponseEntity<Object> handleOrderCostChangedEx(OrderCostChangedEx ex){
+        ApiError err = new ApiError(HttpStatus.NOT_ACCEPTABLE, ex.getMessage(), OrderCostChangedEx.uuid);
         return buildResponseEntity(err);
     }
 

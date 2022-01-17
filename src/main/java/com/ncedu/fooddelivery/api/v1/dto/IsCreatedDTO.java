@@ -7,4 +7,11 @@ public class IsCreatedDTO {
     // id > 0 create success
     // id < 0 create fail
     private Long id;
+
+    public IsCreatedDTO(Long id) {
+        this.id = id;
+    }
+
+    public IsCreatedDTO() {
+    }
 }

@@ -1,7 +1,9 @@
 package com.ncedu.fooddelivery.api.v1.services;
 
+import com.ncedu.fooddelivery.api.v1.dto.IsCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.CountOrderCostRequestDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.CountOrderCostResponseDTO;
+import com.ncedu.fooddelivery.api.v1.dto.order.CreateOrderDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.OrderInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
@@ -18,5 +20,9 @@ public interface OrderService {
 
     List<OrderInfoDTO> getOrdersHistory(User user, Pageable pageable);
 
-    CountOrderCostResponseDTO countOrderPrice(CountOrderCostRequestDTO dto);
+    CountOrderCostResponseDTO countOrderCost(CountOrderCostRequestDTO dto);
+
+    Double[] countOrderCost(CountOrderCostRequestDTO.Geo geo, List<CountOrderCostRequestDTO.ProductAmountPair> pairs);
+
+    IsCreatedDTO createOrder(CreateOrderDTO dto, User user);
 }

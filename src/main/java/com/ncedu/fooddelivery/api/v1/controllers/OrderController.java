@@ -1,7 +1,9 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
+import com.ncedu.fooddelivery.api.v1.dto.IsCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.CountOrderCostRequestDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.CountOrderCostResponseDTO;
+import com.ncedu.fooddelivery.api.v1.dto.order.CreateOrderDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.OrderInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.OrderStatus;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
@@ -23,7 +25,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -33,7 +34,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Validated
 @RestController
 public class OrderController {
 
@@ -123,9 +123,16 @@ public class OrderController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/api/v1/order/price")
     public ResponseEntity<CountOrderCostResponseDTO> countOrderCost(@AuthenticationPrincipal User user,
-                                                                     @RequestBody CountOrderCostRequestDTO requstDTO){
-        CountOrderCostResponseDTO responseDTO = orderService.countOrderPrice(requstDTO);
+                                                                    @Valid @RequestBody CountOrderCostRequestDTO requestDTO){
+        CountOrderCostResponseDTO responseDTO = orderService.countOrderCost(requestDTO);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('CLIENT')")
+    @PostMapping("/api/v1/order")
+    public ResponseEntity<IsCreatedDTO> createOrder(@AuthenticationPrincipal User user,
+                                                    @Valid @RequestBody CreateOrderDTO dto){
+        return new ResponseEntity<>(orderService.createOrder(dto, user), HttpStatus.OK);
     }
 
 }

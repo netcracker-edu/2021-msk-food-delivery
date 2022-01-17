@@ -2,6 +2,7 @@ package com.ncedu.fooddelivery.api.v1.services.impls;
 
 import com.ncedu.fooddelivery.api.v1.dto.warehouseDTOs.WarehouseInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Warehouse;
+import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.repos.WarehouseRepo;
 import com.ncedu.fooddelivery.api.v1.services.WarehouseService;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -71,6 +72,13 @@ public class WarehouseServiceImpl1 implements WarehouseService {
             }
         });
         return availableWarehouses.get(0);
+    }
+
+    @Override
+    public Warehouse findById(Long id) {
+        Optional<Warehouse> warehouse = warehouseRepo.findById(id);
+        if(warehouse.isEmpty()) throw new NotFoundEx(id.toString());
+        return warehouse.get();
     }
 
     public WarehouseInfoDTO convertToInfoDTO(Warehouse warehouse){

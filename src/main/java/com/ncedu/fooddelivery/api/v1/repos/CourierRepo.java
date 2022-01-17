@@ -18,4 +18,14 @@ public interface CourierRepo extends JpaRepository<Courier, Long> {
             "WHERE delivery_sessions.end_time IS NULL AND orders.warehouse_id = :id AND orders.status IN ('COURIER_APPOINTED', 'PACKING', 'DELIVERING')",
             nativeQuery = true)
     Short countDeliveringCouriersByWarehouse(@Param(value = "id") Long warehouseId);
+
+    @Query(value = "SELECT * FROM couriers " +
+            "WHERE courier_id NOT IN (" +
+            "SELECT courier_id FROM " +
+            "couriers INNER JOIN delivery_sessions USING (courier_id) " +
+                     "INNER JOIN orders USING (courier_id) " +
+            "WHERE delivery_sessions.end_time IS NULL AND orders.warehouse_id = :id AND orders.status IN ('COURIER_APPOINTED', 'PACKING', 'DELIVERING')) " +
+            "LIMIT 1",
+            nativeQuery = true)
+    Courier getWaitingCourierByWarehouse(@Param(value = "id") Long warehouseId);
 }

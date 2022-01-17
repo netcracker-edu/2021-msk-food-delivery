@@ -33,11 +33,18 @@ public class OrderProductPosition {
 
     @NotNull
     @Column(name = "price")
-    private Float price;
+    private Double price;
 
     public OrderProductPosition(){}
 
-    public OrderProductPosition(Long id, Order order, ProductPosition productPosition, Integer amount, Float price) {
+    public OrderProductPosition(Order order, ProductPosition productPosition, Integer amount, Double price) {
+        this.order = order;
+        this.productPosition = productPosition;
+        this.amount = amount;
+        this.price = price;
+    }
+
+    public OrderProductPosition(Long id, Order order, ProductPosition productPosition, Integer amount, Double price) {
         this.id = id;
         this.order = order;
         this.productPosition = productPosition;
