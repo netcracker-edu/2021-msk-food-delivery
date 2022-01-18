@@ -28,4 +28,6 @@ public interface OrderService {
     OrderInfoDTO getOrderInfo(Long id, User user);
 
     void cancelOrder(Long id, User user);
+
+    void changeOrderStatus(Long id, User user);
 }

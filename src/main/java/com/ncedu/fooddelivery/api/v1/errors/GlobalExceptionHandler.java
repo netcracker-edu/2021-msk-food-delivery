@@ -226,7 +226,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(OrderCancellationException.class)
     public ResponseEntity<Object> handleOrderCancellationEx(OrderCancellationException ex){
-        ApiError err = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), OrderCostChangedEx.uuid);
+        ApiError err = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), OrderCancellationException.uuid);
+        return buildResponseEntity(err);
+    }
+
+    @ExceptionHandler(OrderStatusChangeException.class)
+    public ResponseEntity<Object> handleOrderStatusChangeEx(OrderStatusChangeException ex){
+        ApiError err = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), OrderStatusChangeException.uuid);
         return buildResponseEntity(err);
     }
 

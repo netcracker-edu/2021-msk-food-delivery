@@ -12,6 +12,7 @@ import com.ncedu.fooddelivery.api.v1.entities.orderProductPosition.OrderProductP
 import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPosition;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.NotUniqueIdException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.OrderCancellationException;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.OrderStatusChangeException;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.CourierAvailabilityEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.OrderCostChangedEx;
@@ -394,6 +395,27 @@ public class OrderServiceImpl1 implements OrderService {
         if(order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.DELIVERED) throw new OrderCancellationException(id);
 
         order.setStatus(OrderStatus.CANCELLED);
+        orderRepo.save(order);
+    }
+
+    @Override
+    public void changeOrderStatus(Long id, User user) {
+        userService.checkIsUserLocked(user);
+        Optional<Order> orderOptional = orderRepo.findById(id);
+        if(orderOptional.isEmpty()) throw new NotFoundEx(id.toString());
+        Order order = orderOptional.get();
+
+        if(user.getRole() == Role.MODERATOR){
+            if(!order.getWarehouse().getId().equals(user.getModerator().getWarehouseId())) throw new CustomAccessDeniedException();
+        } else if(user.getRole() == Role.COURIER){
+            if(!order.getCourier().getId().equals(user.getCourier().getId())) throw new CustomAccessDeniedException();
+        } else if(user.getRole() == Role.CLIENT){
+            if(!order.getClient().getId().equals(user.getClient().getId())) throw new CustomAccessDeniedException();
+        }
+
+        if(order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.DELIVERED) throw new OrderStatusChangeException(id);
+
+        order.setStatus(OrderStatus.values()[order.getStatus().ordinal() + 1]);
         orderRepo.save(order);
     }
 

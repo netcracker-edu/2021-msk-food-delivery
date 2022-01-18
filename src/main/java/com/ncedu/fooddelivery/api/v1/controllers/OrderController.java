@@ -152,4 +152,12 @@ public class OrderController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping("/api/v1/order/{id}/status")
+    public ResponseEntity<?> changeOrderStatus(@AuthenticationPrincipal User user,
+                                               @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long id){
+        orderService.changeOrderStatus(id, user);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
