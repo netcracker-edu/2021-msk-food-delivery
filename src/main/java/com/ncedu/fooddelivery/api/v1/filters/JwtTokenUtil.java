@@ -62,4 +62,15 @@ public class JwtTokenUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+    public boolean isAuthHeaderNotValid(String header) {
+        if (header == null || !header.startsWith(PREFIX)) {
+            return true;
+        }
+        return false;
+    }
+
+    public String getJwt(String header) {
+        return header.replace(PREFIX,"");
+    }
 }

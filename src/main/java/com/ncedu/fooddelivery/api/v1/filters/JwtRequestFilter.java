@@ -57,12 +57,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         final String header = request.getHeader(jwtTokenUtil.HEADER);
 
-        if (header == null || !header.startsWith(jwtTokenUtil.PREFIX)) {
+        if (jwtTokenUtil.isAuthHeaderNotValid(header)) {
             filterChain.doFilter(request, response);  		// If not valid, go to the next filter.
             return;
         }
 
-        String jwtToken = header.replace(jwtTokenUtil.PREFIX,"");
+        String jwtToken = jwtTokenUtil.getJwt(header);
 
         try {
             if (jwtTokenUtil.isTokenValid(jwtToken) && jwtTokenUtil.isTokenNotExpired(jwtToken)) {

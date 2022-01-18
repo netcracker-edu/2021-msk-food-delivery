@@ -197,6 +197,13 @@ public class GlobalExceptionHandler {
         final String message = "Request data can't be null";
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, message, UUID));
     }
+
+    @ExceptionHandler(RefreshTokenException.class)
+    public ResponseEntity<Object> handleRefreshTokenException(
+            RefreshTokenException ex) {
+        log.error(ex.getMessage(), ex);
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
+    }
   
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());

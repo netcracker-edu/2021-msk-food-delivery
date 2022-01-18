@@ -4,28 +4,27 @@ import com.ncedu.fooddelivery.api.v1.dto.jwt.JwtRequestDTO;
 import com.ncedu.fooddelivery.api.v1.dto.jwt.JwtResponseDTO;
 import com.ncedu.fooddelivery.api.v1.dto.jwt.RefreshTokenDTO;
 import com.ncedu.fooddelivery.api.v1.entities.User;
+import com.ncedu.fooddelivery.api.v1.entities.UserRefreshToken;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.RefreshTokenException;
 import com.ncedu.fooddelivery.api.v1.filters.JwtTokenUtil;
 import com.ncedu.fooddelivery.api.v1.services.UserRefreshTokenService;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
 import com.ncedu.fooddelivery.api.v1.services.impls.UserDetailsServiceImpl;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.security.Principal;
 import java.util.UUID;
 
 @RestController
@@ -36,16 +35,12 @@ public class AuthController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
-
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
-
     @Autowired
     private UserService userService;
-
     @Autowired
     private UserRefreshTokenService userRefreshTokenService;
 
@@ -64,6 +59,11 @@ public class AuthController {
         return ResponseEntity.ok(new JwtResponseDTO(accessToken, refreshToken));
     }
 
+    private Authentication authenticate(String login, String password) {
+        return authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(login, password));
+    }
+
     @PostMapping("/api/v1/auth/signout")
     public ResponseEntity<?> signout(
             @Valid @RequestBody RefreshTokenDTO refreshTokenDTO) {
@@ -72,8 +72,34 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    private Authentication authenticate(String login, String password) {
-        return authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(login, password));
+    @PostMapping("/api/v1/auth/refresh")
+    public ResponseEntity<?> refresh(
+            @Valid @RequestBody RefreshTokenDTO refreshTokenDTO,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authHeader) {
+        UUID refreshToken = UUID.fromString(refreshTokenDTO.getRefreshToken());
+        UserRefreshToken urt = userRefreshTokenService.getTokenById(refreshToken);
+        if (jwtTokenUtil.isAuthHeaderNotValid(authHeader)) {
+            throw new RefreshTokenException();
+        }
+        /*check user name from expired JWT and from owner of refresh token*/
+        String jwtToken = jwtTokenUtil.getJwt(authHeader);
+        String usernameFromToken = getUsernameFromToken(jwtToken);
+        String usernameFromDB = urt.getOwner().getEmail();
+        if (!usernameFromDB.equals(usernameFromToken)) {
+            throw new RefreshTokenException();
+        }
+
+        final String accessToken = jwtTokenUtil.createToken(urt.getOwner());
+        return ResponseEntity.ok(new JwtResponseDTO(accessToken, refreshToken.toString()));
     }
+
+    private String getUsernameFromToken(String jwtToken) {
+        try {
+            return jwtTokenUtil.getUsernameFromToken(jwtToken);
+        } catch (ExpiredJwtException e) {
+            Claims claims = e.getClaims();
+            return claims.getSubject();
+        }
+    }
+
 }
