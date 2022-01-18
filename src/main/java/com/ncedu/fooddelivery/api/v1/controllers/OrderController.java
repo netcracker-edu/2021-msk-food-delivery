@@ -144,4 +144,12 @@ public class OrderController {
         return new ResponseEntity<>(orderService.getOrderInfo(id, user), HttpStatus.OK);
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @PatchMapping("/api/v1/order/{id}/cancellation")
+    public ResponseEntity<?> cancelOrder(@AuthenticationPrincipal User user,
+                                                     @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long id){
+        orderService.cancelOrder(id, user);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

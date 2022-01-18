@@ -224,6 +224,12 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(err);
     }
 
+    @ExceptionHandler(OrderCancellationException.class)
+    public ResponseEntity<Object> handleOrderCancellationEx(OrderCancellationException ex){
+        ApiError err = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), OrderCostChangedEx.uuid);
+        return buildResponseEntity(err);
+    }
+
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }

@@ -26,4 +26,6 @@ public interface OrderService {
     IsCreatedDTO createOrder(CreateOrderDTO dto, User user);
 
     OrderInfoDTO getOrderInfo(Long id, User user);
+
+    void cancelOrder(Long id, User user);
 }
