@@ -8,9 +8,6 @@ import com.ncedu.fooddelivery.api.v1.dto.order.OrderInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.warehouseDTOs.WarehouseInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.*;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
-/*
-import com.ncedu.fooddelivery.api.v1.entities.order.OrderNotHierarchical;
-*/
 import com.ncedu.fooddelivery.api.v1.entities.orderProductPosition.OrderProductPosition;
 import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPosition;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.NotUniqueIdException;
@@ -18,11 +15,9 @@ import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.CourierAvailabilityEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.OrderCostChangedEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.ProductAvailabilityEx;
+import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
 import com.ncedu.fooddelivery.api.v1.repos.CourierRepo;
 import com.ncedu.fooddelivery.api.v1.repos.ProductRepo;
-/*
-import com.ncedu.fooddelivery.api.v1.repos.order.OrderNotHierarchicalRepo;
-*/
 import com.ncedu.fooddelivery.api.v1.repos.order.OrderRepo;
 import com.ncedu.fooddelivery.api.v1.repos.orderProductPosition.OrderNotHierarchicalProductPositionRepo;
 import com.ncedu.fooddelivery.api.v1.repos.orderProductPosition.OrderProductPositionRepo;
@@ -49,9 +44,6 @@ public class OrderServiceImpl1 implements OrderService {
 
     @Autowired
     OrderRepo orderRepo;
-
-   /* @Autowired
-    OrderNotHierarchicalRepo orderNotHierarchicalRepo;*/
 
     @Autowired
     OrderNotHierarchicalProductPositionRepo orderNotHierarchicalProductPositionRepo;
@@ -82,12 +74,6 @@ public class OrderServiceImpl1 implements OrderService {
         if(optionalOrder.isEmpty()) return null;
         else return optionalOrder.get();
     }
-
-    /*@Override
-    public List<OrderInfoDTO> findFiltered(Specification<OrderNotHierarchical> spec, Pageable pageable) {
-
-        return orderNotHierarchicalRepo.findAll(spec, pageable).stream().map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
-    }*/
 
     @Override
     public List<OrderInfoDTO> findFiltered(Specification<Order> spec, Pageable pageable) {
@@ -372,23 +358,28 @@ public class OrderServiceImpl1 implements OrderService {
         return courier;
     }
 
+    @Override
+    public OrderInfoDTO getOrderInfo(Long id, User user) {
+        userService.checkIsUserLocked(user);
+        Optional<Order> orderOptional = orderRepo.findById(id);
+        if(orderOptional.isEmpty()) throw new NotFoundEx(id.toString());
+        Order order = orderOptional.get();
+
+        if(user.getRole() == Role.MODERATOR){
+            if(!order.getWarehouse().getId().equals(user.getModerator().getWarehouseId())) throw new CustomAccessDeniedException();
+        } else if(user.getRole() == Role.COURIER){
+            if(!order.getCourier().getId().equals(user.getCourier().getId())) throw new CustomAccessDeniedException();
+        } else if(user.getRole() == Role.CLIENT){
+            if(!order.getClient().getId().equals(user.getClient().getId())) throw new CustomAccessDeniedException();
+        }
+        return convertToOrderInfoDTO(order);
+    }
+
     public void checkIdsUnique(List<CountOrderCostRequestDTO.ProductAmountPair> pairs){
         List<Long> ids = pairs.stream().map(pair -> pair.getId()).collect(Collectors.toList());
         List<Long> uniqueIds = ids.stream().distinct().collect(Collectors.toList());
         if(ids.size() != uniqueIds.size()) throw new NotUniqueIdException();
     }
-
-    /*public OrderInfoDTO convertToOrderInfoDTO(OrderNotHierarchical orderNotHierarchical){
-        Order order = orderRepo.findById(orderNotHierarchical.getId()).get();
-        return new OrderInfoDTO(
-                order.getId(), order.getClient(), order.getAddress(),
-                order.getCoordinates(), order.getWarehouse(),
-                order.getCourier(), order.getStatus(), order.getDateStart(),
-                order.getDateEnd(), order.getOverallCost(), order.getHighDemandCoeff(),
-                order.getDiscount(), order.getPromoCodeId(), order.getClientRating(),
-                order.getDeliveryRating(), orderNotHierarchicalProductPositionRepo.findAllByOrderId(order.getId())
-        );
-    }*/
 
     public OrderInfoDTO convertToOrderInfoDTO(Order order){
         return new OrderInfoDTO(

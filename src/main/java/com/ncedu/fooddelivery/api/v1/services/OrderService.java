@@ -24,4 +24,6 @@ public interface OrderService {
     Double[] countOrderCost(CountOrderCostRequestDTO.Geo geo, List<CountOrderCostRequestDTO.ProductAmountPair> pairs);
 
     IsCreatedDTO createOrder(CreateOrderDTO dto, User user);
+
+    OrderInfoDTO getOrderInfo(Long id, User user);
 }

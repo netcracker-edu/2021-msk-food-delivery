@@ -53,6 +53,10 @@ public class User implements Serializable, UserDetails {
 
     @OneToOne(cascade=CascadeType.ALL, mappedBy = "user")
     @PrimaryKeyJoinColumn
+    private Courier courier;
+
+    @OneToOne(cascade=CascadeType.ALL, mappedBy = "user")
+    @PrimaryKeyJoinColumn
     private Moderator moderator;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")

@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -34,6 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Validated
 @RestController
 public class OrderController {
 
@@ -133,6 +135,13 @@ public class OrderController {
     public ResponseEntity<IsCreatedDTO> createOrder(@AuthenticationPrincipal User user,
                                                     @Valid @RequestBody CreateOrderDTO dto){
         return new ResponseEntity<>(orderService.createOrder(dto, user), HttpStatus.OK);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/api/v1/order/{id}")
+    public ResponseEntity<OrderInfoDTO> getOrderInfo(@AuthenticationPrincipal User user,
+                                                     @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long id){
+        return new ResponseEntity<>(orderService.getOrderInfo(id, user), HttpStatus.OK);
     }
 
 }
