@@ -8,7 +8,9 @@ import com.ncedu.fooddelivery.api.v1.dto.order.OrderInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.warehouseDTOs.WarehouseInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.*;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
+/*
 import com.ncedu.fooddelivery.api.v1.entities.order.OrderNotHierarchical;
+*/
 import com.ncedu.fooddelivery.api.v1.entities.orderProductPosition.OrderProductPosition;
 import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPosition;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.NotUniqueIdException;
@@ -18,7 +20,9 @@ import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.OrderCostChangedEx
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.ProductAvailabilityEx;
 import com.ncedu.fooddelivery.api.v1.repos.CourierRepo;
 import com.ncedu.fooddelivery.api.v1.repos.ProductRepo;
+/*
 import com.ncedu.fooddelivery.api.v1.repos.order.OrderNotHierarchicalRepo;
+*/
 import com.ncedu.fooddelivery.api.v1.repos.order.OrderRepo;
 import com.ncedu.fooddelivery.api.v1.repos.orderProductPosition.OrderNotHierarchicalProductPositionRepo;
 import com.ncedu.fooddelivery.api.v1.repos.orderProductPosition.OrderProductPositionRepo;
@@ -46,8 +50,8 @@ public class OrderServiceImpl1 implements OrderService {
     @Autowired
     OrderRepo orderRepo;
 
-    @Autowired
-    OrderNotHierarchicalRepo orderNotHierarchicalRepo;
+   /* @Autowired
+    OrderNotHierarchicalRepo orderNotHierarchicalRepo;*/
 
     @Autowired
     OrderNotHierarchicalProductPositionRepo orderNotHierarchicalProductPositionRepo;
@@ -79,10 +83,16 @@ public class OrderServiceImpl1 implements OrderService {
         else return optionalOrder.get();
     }
 
-    @Override
+    /*@Override
     public List<OrderInfoDTO> findFiltered(Specification<OrderNotHierarchical> spec, Pageable pageable) {
 
         return orderNotHierarchicalRepo.findAll(spec, pageable).stream().map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
+    }*/
+
+    @Override
+    public List<OrderInfoDTO> findFiltered(Specification<Order> spec, Pageable pageable) {
+
+        return orderRepo.findAll(spec, pageable).stream().map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
     }
 
     @Override
@@ -368,7 +378,7 @@ public class OrderServiceImpl1 implements OrderService {
         if(ids.size() != uniqueIds.size()) throw new NotUniqueIdException();
     }
 
-    public OrderInfoDTO convertToOrderInfoDTO(OrderNotHierarchical orderNotHierarchical){
+    /*public OrderInfoDTO convertToOrderInfoDTO(OrderNotHierarchical orderNotHierarchical){
         Order order = orderRepo.findById(orderNotHierarchical.getId()).get();
         return new OrderInfoDTO(
                 order.getId(), order.getClient(), order.getAddress(),
@@ -378,7 +388,7 @@ public class OrderServiceImpl1 implements OrderService {
                 order.getDiscount(), order.getPromoCodeId(), order.getClientRating(),
                 order.getDeliveryRating(), orderNotHierarchicalProductPositionRepo.findAllByOrderId(order.getId())
         );
-    }
+    }*/
 
     public OrderInfoDTO convertToOrderInfoDTO(Order order){
         return new OrderInfoDTO(

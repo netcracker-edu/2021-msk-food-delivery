@@ -8,7 +8,7 @@ import com.ncedu.fooddelivery.api.v1.dto.order.OrderInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.OrderStatus;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
-import com.ncedu.fooddelivery.api.v1.entities.order.OrderNotHierarchical;
+import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.IncorrectUserRoleRequestException;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
@@ -51,8 +51,8 @@ public class OrderController {
             @RequestParam(name = "courierId", required = false) @Min(value = 1) @Max(value = Long.MAX_VALUE) Long courierId,
             @RequestParam(name = "address", required = false) String address,
             @RequestParam(name = "status", required = false) OrderStatus status,
-            @RequestParam(name = "dateStart", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date dateStart,
-            @RequestParam(name = "dateEnd", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date dateEnd,
+            @RequestParam(name = "dateStart", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date dateStart,
+            @RequestParam(name = "dateEnd", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date dateEnd,
             @RequestParam(name = "overallCost", required = false) @Digits(integer = 5, fraction = 2) @DecimalMin(value = "0.0", inclusive = false) BigDecimal overallCost,
             @RequestParam(name = "highDemandCoeff", required = false) @Digits (integer = 1, fraction = 2) @DecimalMin("1.0") @DecimalMax("3.0") BigDecimal highDemandCoeff,
             @RequestParam(name = "discount", required = false)  @Digits(integer = 5, fraction = 2) @DecimalMin(value = "0.0") BigDecimal discount,
@@ -72,7 +72,7 @@ public class OrderController {
             if(warehouseId != null){
                 if(!warehouseId.equals(moderatorWarehouseId)) throw new CustomAccessDeniedException();
             }
-            Specification<OrderNotHierarchical> spec = OrderSpecifications.getFilterSpecification(
+            Specification<Order> spec = OrderSpecifications.getFilterSpecification(
                     clientId, moderatorWarehouseId, courierId, address, status, dateStart, dateEnd,
                     overallCost, highDemandCoeff, discount, promoCodeId, clientRating,
                     deliveryRating
@@ -80,7 +80,7 @@ public class OrderController {
             filteredOrders = orderService.findFiltered(spec, pageable);
 
         } else {
-            Specification<OrderNotHierarchical> spec = OrderSpecifications.getFilterSpecification(
+            Specification<Order> spec = OrderSpecifications.getFilterSpecification(
                     clientId, null, courierId, address, status, dateStart, dateEnd,
                     overallCost, highDemandCoeff, discount, promoCodeId, clientRating,
                     deliveryRating
