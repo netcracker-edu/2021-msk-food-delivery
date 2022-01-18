@@ -416,7 +416,14 @@ public class OrderServiceImpl1 implements OrderService {
         if(order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.DELIVERED) throw new OrderStatusChangeException(id);
 
         order.setStatus(OrderStatus.values()[order.getStatus().ordinal() + 1]);
-        orderRepo.save(order);
+        order = orderRepo.save(order);
+        Courier courier = order.getCourier();
+        if(order.getStatus() == OrderStatus.DELIVERED && courier != null){
+            Double overallCost = order.getOverallCost();
+            Double income = Math.round(overallCost * 10.0) / 100.0;
+            courier.setCurrentBalance(courier.getCurrentBalance() + income.floatValue());
+            courierRepo.save(courier);
+        }
     }
 
     public void checkIdsUnique(List<CountOrderCostRequestDTO.ProductAmountPair> pairs){
