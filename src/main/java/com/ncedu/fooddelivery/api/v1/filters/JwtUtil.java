@@ -11,8 +11,7 @@ import java.util.Date;
 import java.util.function.Function;
 
 @Component
-public class JwtTokenUtil {
-//TODO: refresh token
+public class JwtUtil {
 
     @Value("${jwt.expiration.time}")
     private long JWT_EXPIRATION_TIME;
@@ -23,9 +22,16 @@ public class JwtTokenUtil {
     public final String PREFIX = "Bearer ";
     public final String HEADER = "Authorization";
 
+    public boolean isAuthHeaderNotValid(String header) {
+        return header == null || !header.startsWith(PREFIX);
+    }
+
+    public String getJwt(String header) {
+        return header.replace(PREFIX,"");
+    }
+
     public String createToken(UserDetails userDetails) {
         final long now = System.currentTimeMillis();
-
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(now))
@@ -36,8 +42,7 @@ public class JwtTokenUtil {
 
     public Boolean isTokenValid(String token) {
         getAllClaimsFromToken(token);
-        //if success parsing of JWT claims
-        return true;
+        return true; //if success parsing JWT claims
     }
 
     public Boolean isTokenNotExpired(String token) {
@@ -63,16 +68,5 @@ public class JwtTokenUtil {
                 .setSigningKey(SECRET)
                 .parseClaimsJws(token)
                 .getBody();
-    }
-
-    public boolean isAuthHeaderNotValid(String header) {
-        if (header == null || !header.startsWith(PREFIX)) {
-            return true;
-        }
-        return false;
-    }
-
-    public String getJwt(String header) {
-        return header.replace(PREFIX,"");
     }
 }

@@ -9,6 +9,6 @@ public interface UserRefreshTokenService {
 
     public String createRefreshToken(User owner, String userAgent);
     public UserRefreshToken getTokenById(UUID token_id);
-    public void deleteTokenById(UUID token_id);
+    public void deleteToken(UserRefreshToken userRefreshToken);
     public long deleteTokensByOwner(User owner);
 }

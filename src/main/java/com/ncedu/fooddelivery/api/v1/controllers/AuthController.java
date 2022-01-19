@@ -6,7 +6,7 @@ import com.ncedu.fooddelivery.api.v1.dto.jwt.RefreshTokenDTO;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.entities.UserRefreshToken;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.RefreshTokenException;
-import com.ncedu.fooddelivery.api.v1.filters.JwtTokenUtil;
+import com.ncedu.fooddelivery.api.v1.filters.JwtUtil;
 import com.ncedu.fooddelivery.api.v1.services.UserRefreshTokenService;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
 import com.ncedu.fooddelivery.api.v1.services.impls.UserDetailsServiceImpl;
@@ -30,13 +30,11 @@ import java.util.UUID;
 @RestController
 @Slf4j
 public class AuthController {
-//TODO: logout controller
-//TODO: refresh token controller
 
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private JwtUtil jwtUtil;
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
     @Autowired
@@ -48,14 +46,12 @@ public class AuthController {
     public ResponseEntity<?> signin(
             @Valid @RequestBody JwtRequestDTO authInfo,
             @RequestHeader(value = HttpHeaders.USER_AGENT) String userAgent) {
-        String login = authInfo.getLogin();
-        Authentication auth = authenticate(login, authInfo.getPassword());
-        //User implements UserDetails
-        User user = (User) auth.getPrincipal();
+        Authentication auth = authenticate(authInfo.getLogin(), authInfo.getPassword());
+        User user = (User) auth.getPrincipal(); //User implements UserDetails
         userService.setLastSigninFromNow(user);
         log.debug("USER: " + user.getUsername() + user.getLastSigninDate());
-        final String accessToken = jwtTokenUtil.createToken(user);
-        String refreshToken = userRefreshTokenService.createRefreshToken(user, userAgent);
+        final String accessToken = jwtUtil.createToken(user);
+        final String refreshToken = userRefreshTokenService.createRefreshToken(user, userAgent);
         return ResponseEntity.ok(new JwtResponseDTO(accessToken, refreshToken));
     }
 
@@ -68,7 +64,9 @@ public class AuthController {
     public ResponseEntity<?> signout(
             @Valid @RequestBody RefreshTokenDTO refreshTokenDTO) {
         UUID refreshToken = UUID.fromString(refreshTokenDTO.getRefreshToken());
-        userRefreshTokenService.deleteTokenById(refreshToken);
+        UserRefreshToken urt = userRefreshTokenService.getTokenById(refreshToken);
+        userService.setLastSigninFromNow(urt.getOwner());
+        userRefreshTokenService.deleteToken(urt);
         return ResponseEntity.noContent().build();
     }
 
@@ -78,24 +76,25 @@ public class AuthController {
             @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authHeader) {
         UUID refreshToken = UUID.fromString(refreshTokenDTO.getRefreshToken());
         UserRefreshToken urt = userRefreshTokenService.getTokenById(refreshToken);
-        if (jwtTokenUtil.isAuthHeaderNotValid(authHeader)) {
+        if (jwtUtil.isAuthHeaderNotValid(authHeader)) {
             throw new RefreshTokenException();
         }
-        /*check user name from expired JWT and from owner of refresh token*/
-        String jwtToken = jwtTokenUtil.getJwt(authHeader);
+        //check user name from expired JWT and from owner of refresh token
+        String jwtToken = jwtUtil.getJwt(authHeader);
         String usernameFromToken = getUsernameFromToken(jwtToken);
         String usernameFromDB = urt.getOwner().getEmail();
         if (!usernameFromDB.equals(usernameFromToken)) {
             throw new RefreshTokenException();
         }
-
-        final String accessToken = jwtTokenUtil.createToken(urt.getOwner());
+        //change lastSignin on owner of token
+        userService.setLastSigninFromNow(urt.getOwner());
+        final String accessToken = jwtUtil.createToken(urt.getOwner());
         return ResponseEntity.ok(new JwtResponseDTO(accessToken, refreshToken.toString()));
     }
 
     private String getUsernameFromToken(String jwtToken) {
         try {
-            return jwtTokenUtil.getUsernameFromToken(jwtToken);
+            return jwtUtil.getUsernameFromToken(jwtToken);
         } catch (ExpiredJwtException e) {
             Claims claims = e.getClaims();
             return claims.getSubject();

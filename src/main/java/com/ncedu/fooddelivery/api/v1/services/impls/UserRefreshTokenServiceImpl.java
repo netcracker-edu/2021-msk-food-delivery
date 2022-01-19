@@ -40,8 +40,7 @@ public class UserRefreshTokenServiceImpl implements UserRefreshTokenService {
     }
 
     @Override
-    public void deleteTokenById(UUID token_id) {
-       UserRefreshToken userRefreshToken = getTokenById(token_id);
+    public void deleteToken(UserRefreshToken userRefreshToken) {
        userRefreshTokenRepo.delete(userRefreshToken);
     }
 

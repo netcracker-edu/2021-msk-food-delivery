@@ -5,6 +5,7 @@ import com.ncedu.fooddelivery.api.v1.configs.SecurityConfig;
 import com.ncedu.fooddelivery.api.v1.errors.wrappers.ApiError;
 import com.ncedu.fooddelivery.api.v1.services.impls.UserDetailsServiceImpl;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,20 +29,16 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
-//TODO: refresh token
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
-
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private JwtUtil jwtUtil;
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request)
-            throws ServletException {
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
         AntPathMatcher antPathMatcher = new AntPathMatcher();
-
         for (String pattern : SecurityConfig.permitAllPaths) {
             if (antPathMatcher.match(pattern, path)) {
                 return true;
@@ -55,54 +52,45 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        final String header = request.getHeader(jwtTokenUtil.HEADER);
-
-        if (jwtTokenUtil.isAuthHeaderNotValid(header)) {
+        //check validity of Authorization header from request
+        final String authHeader = request.getHeader(jwtUtil.HEADER);
+        if (jwtUtil.isAuthHeaderNotValid(authHeader)) {
             filterChain.doFilter(request, response);  		// If not valid, go to the next filter.
             return;
         }
 
-        String jwtToken = jwtTokenUtil.getJwt(header);
-
+        String token = jwtUtil.getJwt(authHeader);
         try {
-            if (jwtTokenUtil.isTokenValid(jwtToken) && jwtTokenUtil.isTokenNotExpired(jwtToken)) {
-                String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken
-                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    // After setting the Authentication in the context, we specify
-                    // that the current user is authenticated. So it passes the
-                    // Spring Security Configurations successfully.
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            if (jwtUtil.isTokenValid(token) && jwtUtil.isTokenNotExpired(token)) {
+                UsernamePasswordAuthenticationToken upaToken  = createUpaToken(token, request);
+                SecurityContextHolder.getContext().setAuthentication(upaToken);
                 filterChain.doFilter(request, response);
             }
         } catch (ExpiredJwtException e) {
-            ApiError apiError = createJwtExpiredError(e);
+            final String uuid = "421de66a-1529-4124-b363-a92d85f0e8a2";
+            final String msg = "JWT expired";
+            ApiError apiError = createApiError(uuid, msg, e);
             sendErrorResponse(apiError, response);
         } catch (SignatureException e) {
-            ApiError apiError = createJwtSignatureError(e);
+            final String uuid = "8eb93a63-6fa3-4143-af39-74b64cdd7135";
+            final String msg = "JWT not valid";
+            ApiError apiError = createApiError(uuid, msg, e);
             sendErrorResponse(apiError, response);
         }
     }
 
-    private ApiError createJwtExpiredError(Exception e) {
-        final String uuid = "421de66a-1529-4124-b363-a92d85f0e8a2";
-        final String msg = "JWT expired";
-        HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
-        // create custom error wrapper for response
-        ApiError apiError = new ApiError(httpStatus, msg, uuid);
-        apiError.setDebugMessage(e.getMessage());
-        return apiError;
+    private UsernamePasswordAuthenticationToken createUpaToken(String token, HttpServletRequest request) {
+        String username = jwtUtil.getUsernameFromToken(token);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        UsernamePasswordAuthenticationToken upaToken =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        upaToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        return upaToken;
     }
 
-    private ApiError createJwtSignatureError(SignatureException e) {
-        final String uuid = "8eb93a63-6fa3-4143-af39-74b64cdd7135";
-        final String msg = "JWT not valid";
+    private ApiError createApiError(String uuid, String msg, JwtException e) {
+        log.error(e.getMessage(), e);
         HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
-        // create custom error wrapper for response
         ApiError apiError = new ApiError(httpStatus, msg, uuid);
         apiError.setDebugMessage(e.getMessage());
         return apiError;
