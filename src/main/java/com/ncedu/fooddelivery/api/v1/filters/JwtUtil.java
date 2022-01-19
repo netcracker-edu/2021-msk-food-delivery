@@ -15,13 +15,13 @@ public class JwtTokenUtil {
 //TODO: refresh token
 
     @Value("${jwt.expiration.time}")
-    public long JWT_EXPIRATION_TIME;
-
-    public final String PREFIX = "Bearer ";
-    public final String HEADER = "Authorization";
+    private long JWT_EXPIRATION_TIME;
 
     @Value("${jwt.secret}")
     private String SECRET;
+
+    public final String PREFIX = "Bearer ";
+    public final String HEADER = "Authorization";
 
     public String createToken(UserDetails userDetails) {
         final long now = System.currentTimeMillis();
@@ -35,7 +35,9 @@ public class JwtTokenUtil {
     }
 
     public Boolean isTokenValid(String token) {
-        return Jwts.parser().setSigningKey(SECRET).isSigned(token);
+        getAllClaimsFromToken(token);
+        //if success parsing of JWT claims
+        return true;
     }
 
     public Boolean isTokenNotExpired(String token) {
