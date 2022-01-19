@@ -7,7 +7,7 @@ import javax.validation.constraints.*;
 import java.util.UUID;
 
 @Data
-public class RegistrationDTO {
+public class NewUserDTO {
     //TODO: Class for converting phoneNumber in required format
 
     //common user info

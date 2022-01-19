@@ -27,7 +27,6 @@ import java.util.Map;
 @Slf4j
 @RestController
 public class UserController {
-    //TODO: develop JWT authentication (login, logout endpoints)
     //TODO: finish PATCH role endpoint
     //TODO: add changing warehouse for moderator and courier
     //TODO: delete photo from user (only Admin)
