@@ -197,6 +197,15 @@ public class GlobalExceptionHandler {
         final String message = "Request data can't be null";
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, message, UUID));
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleNotProcessedException(
+            Exception ex) {
+        log.error(ex.getMessage(), ex);
+        final String UUID = "3155227c-2001-4878-b2e7-040c4d4d803c";
+        final String message = "Unknown exception. Internal server error";
+        return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, message, UUID));
+    }
   
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
