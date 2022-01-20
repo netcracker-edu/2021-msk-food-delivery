@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
+import com.ncedu.fooddelivery.api.v1.dto.file.FileLinkDTO;
 import com.ncedu.fooddelivery.api.v1.entities.File;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
@@ -36,22 +37,17 @@ public class FileController {
     FileService fileService;
 
     @PostMapping("/api/v1/file")
-    public Map<String,String> uploadFile(
+    public FileLinkDTO uploadFile(
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal User authedUser) {
         log.debug("POST /api/v1/file");
-        String fileUUID = fileService.save(file, authedUser);
-        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/api/v1/file/")
-                .path(fileUUID)
-                .toUriString();
-        log.debug("Created file link: " + fileDownloadUri);
-        Map<String, String> response = new HashMap<>();
-        response.put("file", fileDownloadUri);
-        return response;
+        FileLinkDTO fileLinkDTO = fileService.save(file, authedUser);
+        log.debug("Created file link: " + fileLinkDTO.getLink());
+        return fileLinkDTO;
     }
+
     @GetMapping("/api/v1/file/{file}")
-    public ResponseEntity<Resource> download(
+    public ResponseEntity<?> download(
             @PathVariable File file,
             @AuthenticationPrincipal User authedUser) {
         log.debug("GET /api/v1/file/" + file.getId().toString());
