@@ -3,11 +3,13 @@ package com.ncedu.fooddelivery.api.v1.services.impls;
 import com.ncedu.fooddelivery.api.v1.dto.file.FileLinkDTO;
 import com.ncedu.fooddelivery.api.v1.entities.File;
 import com.ncedu.fooddelivery.api.v1.entities.FileType;
+import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.BadFileExtensionException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.FileDeleteException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.FileStorageException;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
+import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
 import com.ncedu.fooddelivery.api.v1.repos.FileRepo;
 import com.ncedu.fooddelivery.api.v1.services.FileService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -123,18 +126,38 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void delete(File file) {
-        String fileUUIDString = file.getId().toString();
+    public void delete(File file, User authedUser) {
+
+        Long fileOwnerId = file.getOwner().getId();
+        boolean isNotAdmin = !Role.isADMIN(authedUser.getRole());
+        boolean isNotOwner = !fileOwnerId.equals(authedUser.getId());
+        if (isNotAdmin && isNotOwner) {
+            log.error(authedUser.getEmail() + " not Admin and not Owner of the file " + file.getId().toString());
+            throw new CustomAccessDeniedException();
+        }
+
         try {
             fileRepo.delete(file);
-            Path uploadPath = Paths.get(UPLOAD_LOCATION).toAbsolutePath().normalize();
-            String fileParentDir = fileUUIDString.substring(0, 2); // extract 2 chars from file UUID
-            Path fullFilePath = uploadPath.resolve(fileParentDir).resolve(fileUUIDString);
+            Path fullFilePath = createFullPathToFile(file.getId());
             Files.deleteIfExists(fullFilePath);
-            //TODO: delete parent folder if empty
+            Path fileParentDirPath = fullFilePath.getParent();
+            log.debug("PARENT DIR PATH: " + fileParentDirPath + "\n");
+            boolean isParentDirEmpty = checkParentDirEmpty(fileParentDirPath);
+            if (isParentDirEmpty) {
+                Files.delete(fileParentDirPath);
+            }
         } catch (IOException e) {
             throw new FileDeleteException();
         }
+    }
+
+    private boolean checkParentDirEmpty(Path fileParentDirPath) throws IOException {
+        if (Files.isDirectory(fileParentDirPath)) {
+            try(Stream<Path> entries = Files.list(fileParentDirPath)) {
+                return !entries.findFirst().isPresent();
+            }
+        }
+        return false;
     }
 
 }

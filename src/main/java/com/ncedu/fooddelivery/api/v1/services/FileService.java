@@ -9,5 +9,5 @@ import org.springframework.web.multipart.MultipartFile;
 public interface FileService {
     public FileLinkDTO save(MultipartFile file, User owner);
     public Resource load(File file);
-    public void delete(File file);
+    public void delete(File file, User authedUser);
 }

@@ -51,15 +51,19 @@ public class FileController {
             @PathVariable File file,
             @AuthenticationPrincipal User authedUser) {
         log.debug("GET /api/v1/file/" + file.getId().toString());
+        return buildDownloadResponseEntity(file);
+    }
+
+    private ResponseEntity<?> buildDownloadResponseEntity(File file) {
         Resource resource = fileService.load(file);
         String mediaType = file.getType().getMediaType();
         String fileNameWithExt = file.getName() + "." + file.getType().name();
         log.debug("Sending file "+fileNameWithExt+"("+file.getId().toString() +")"+" to client");
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(mediaType))
-                .header(HttpHeaders.CONTENT_DISPOSITION,
+                    .contentType(MediaType.parseMediaType(mediaType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"" + fileNameWithExt +"\"")
-                .body(resource);
+                    .body(resource);
     }
 
     @DeleteMapping("/api/v1/file/{file}")
@@ -67,16 +71,9 @@ public class FileController {
             @PathVariable File file,
             @AuthenticationPrincipal User authedUser) {
         log.debug("DELETE /api/v1/file/" + file.getId().toString());
-        Long fileOwnerId = file.getOwner().getId();
-        boolean isAdmin = Role.isADMIN(authedUser.getRole());
-        boolean isOwner = fileOwnerId.equals(authedUser.getId());
-        if (isAdmin || isOwner) {
-            fileService.delete(file);
-            log.debug("File deleted: " + file.getId().toString());
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        log.error(authedUser.getEmail() + " not Admin and not Owner of the file " + file.getId().toString());
-        throw new CustomAccessDeniedException();
+        fileService.delete(file, authedUser);
+        log.debug("File deleted: " + file.getId().toString());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }
