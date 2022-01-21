@@ -236,6 +236,18 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(err);
     }
 
+    @ExceptionHandler(CourierNotSetException.class)
+    public ResponseEntity<Object> handleCourierNotSetException(CourierNotSetException ex){
+        ApiError err = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), CourierNotSetException.uuid);
+        return buildResponseEntity(err);
+    }
+
+    @ExceptionHandler(CourierReplaceException.class)
+    public ResponseEntity<Object> handleCourierReplaceException(CourierReplaceException ex){
+        ApiError err = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), CourierReplaceException.uuid);
+        return buildResponseEntity(err);
+    }
+
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }

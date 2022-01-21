@@ -160,4 +160,11 @@ public class OrderController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN')")
+    @PatchMapping("/api/v1/order/{orderId}/courier")
+    public ResponseEntity<?> replaceCourier(@AuthenticationPrincipal User user,
+                                            @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long orderId){
+        orderService.replaceCourier(orderId, user);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

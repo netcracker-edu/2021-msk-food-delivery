@@ -30,4 +30,6 @@ public interface OrderService {
     void cancelOrder(Long id, User user);
 
     void changeOrderStatus(Long id, User user);
+
+    void replaceCourier(Long orderId, User user);
 }

@@ -10,9 +10,7 @@ import com.ncedu.fooddelivery.api.v1.entities.*;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import com.ncedu.fooddelivery.api.v1.entities.orderProductPosition.OrderProductPosition;
 import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPosition;
-import com.ncedu.fooddelivery.api.v1.errors.badrequest.NotUniqueIdException;
-import com.ncedu.fooddelivery.api.v1.errors.badrequest.OrderCancellationException;
-import com.ncedu.fooddelivery.api.v1.errors.badrequest.OrderStatusChangeException;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.*;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.CourierAvailabilityEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.OrderCostChangedEx;
@@ -24,6 +22,7 @@ import com.ncedu.fooddelivery.api.v1.repos.order.OrderRepo;
 import com.ncedu.fooddelivery.api.v1.repos.orderProductPosition.OrderNotHierarchicalProductPositionRepo;
 import com.ncedu.fooddelivery.api.v1.repos.orderProductPosition.OrderProductPositionRepo;
 import com.ncedu.fooddelivery.api.v1.repos.productPosition.ProductPositionRepo;
+import com.ncedu.fooddelivery.api.v1.services.CourierService;
 import com.ncedu.fooddelivery.api.v1.services.OrderService;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
 import com.ncedu.fooddelivery.api.v1.services.WarehouseService;
@@ -61,6 +60,9 @@ public class OrderServiceImpl1 implements OrderService {
 
     @Autowired
     ProductRepo productRepo;
+
+    @Autowired
+    CourierService courierService;
 
     @Autowired
     CourierRepo courierRepo;
@@ -424,6 +426,25 @@ public class OrderServiceImpl1 implements OrderService {
             courier.setCurrentBalance(courier.getCurrentBalance() + income.floatValue());
             courierRepo.save(courier);
         }
+    }
+
+    @Override
+    public void replaceCourier(Long orderId, User user) {
+        userService.checkIsUserLocked(user);
+        Order order = getOrder(orderId);
+        if(order == null) throw new NotFoundEx(orderId.toString());
+
+        if(user.getRole() == Role.MODERATOR){
+            if(!order.getWarehouse().getId().equals(user.getModerator().getWarehouseId())) throw new CustomAccessDeniedException();
+        }
+
+        if(order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.DELIVERED) throw new CourierReplaceException();
+
+        Courier currentCourier = order.getCourier();
+        if(currentCourier == null) throw new CourierNotSetException();
+        Courier newCourier = courierService.getAnotherAvailableCourier(currentCourier.getId(), order.getWarehouse().getId());
+        order.setCourier(newCourier);
+        orderRepo.save(order);
     }
 
     public void checkIdsUnique(List<CountOrderCostRequestDTO.ProductAmountPair> pairs){
