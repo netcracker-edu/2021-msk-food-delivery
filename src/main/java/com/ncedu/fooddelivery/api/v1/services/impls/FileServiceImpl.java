@@ -1,6 +1,8 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
+import com.ncedu.fooddelivery.api.v1.dto.file.FileInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.file.FileLinkDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.File;
 import com.ncedu.fooddelivery.api.v1.entities.FileType;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
@@ -17,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -29,8 +33,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Service
@@ -190,5 +193,29 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    @Override
+    public List<FileInfoDTO> getAllFiles(Pageable pageable) {
+        Iterable<File> files = fileRepo.findAll(pageable);
+        Iterator<File> iterator = files.iterator();
+        List<FileInfoDTO> filesDTO= new ArrayList<>();
+        while (iterator.hasNext()) {
+            filesDTO.add(createFileDTO(iterator.next()));
+        }
+        return filesDTO;
+    }
+
+    private FileInfoDTO createFileDTO(File file) {
+        String fileLink = createFileLink(file.getId());
+        return new FileInfoDTO(file.getId().toString(), file.getType().getMediaType(),
+                                file.getName(), file.getSize(),
+                                file.getUploadDate(), fileLink,
+                                createUserDTO(file.getOwner()));
+    }
+
+    private UserInfoDTO createUserDTO(User user) {
+        return new UserInfoDTO(user.getId(), user.getRole().name(),
+                user.getFullName(), user.getEmail(),
+                user.getLastSigninDate(), user.getAvatarId());
+    }
 
 }

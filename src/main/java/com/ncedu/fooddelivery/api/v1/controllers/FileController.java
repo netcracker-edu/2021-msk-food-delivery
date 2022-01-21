@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
+import com.ncedu.fooddelivery.api.v1.dto.file.FileInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.file.FileLinkDTO;
 import com.ncedu.fooddelivery.api.v1.entities.File;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
@@ -9,16 +10,21 @@ import com.ncedu.fooddelivery.api.v1.services.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.http.ResponseEntity.ok;
@@ -26,7 +32,6 @@ import static org.springframework.http.ResponseEntity.ok;
 @Slf4j
 @RestController
 public class FileController {
-    //TODO: add replacing file feature
     //TODO: add getting file list with sort and pageable
     //TODO: add checks for client, courier uploaded photos (only jpeg + max size)
     //TODO: add relations with other entities
@@ -83,6 +88,15 @@ public class FileController {
         fileService.delete(file, authedUser);
         log.debug("File deleted: " + file.getId().toString());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/api/v1/files")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<FileInfoDTO> getAllFiles(
+            @PageableDefault(sort = {"uploadDate"}, direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        log.debug("GET /api/v1/files PAGE=" + pageable.getPageSize() + " SIZE=" +pageable.getPageSize());
+        return fileService.getAllFiles(pageable);
     }
 
 }
