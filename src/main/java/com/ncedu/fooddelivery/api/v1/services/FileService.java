@@ -10,4 +10,5 @@ public interface FileService {
     public FileLinkDTO save(MultipartFile file, User owner);
     public Resource load(File file);
     public void delete(File file, User authedUser);
+    public FileLinkDTO replace(MultipartFile newFile, File oldFile, User authedUser);
 }

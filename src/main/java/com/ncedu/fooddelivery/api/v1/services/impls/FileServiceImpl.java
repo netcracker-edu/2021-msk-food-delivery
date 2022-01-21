@@ -64,8 +64,7 @@ public class FileServiceImpl implements FileService {
 
         } catch (BadFileExtensionException e) {
             throw e;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new FileStorageException();
         }
@@ -110,31 +109,23 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public Resource load(File file) {
-        String fileUUIDString = file.getId().toString();
         try {
-            String fileParentDir = fileUUIDString.substring(0, 2); // extract 2 chars from file UUID
-            Path uploadPath = Paths.get(UPLOAD_LOCATION).toAbsolutePath().normalize();
-            Path fullFilePath = uploadPath.resolve(fileParentDir).resolve(fileUUIDString);
+            Path fullFilePath = createFullPathToFile(file.getId());
             Resource resource = new UrlResource(fullFilePath.toUri());
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             }
-            throw new NotFoundEx(fileUUIDString);
-        } catch (MalformedURLException e) {
-            throw new NotFoundEx(fileUUIDString);
+            throw new NotFoundEx(file.getId().toString());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new NotFoundEx(file.getId().toString());
         }
     }
 
     @Override
     public void delete(File file, User authedUser) {
 
-        Long fileOwnerId = file.getOwner().getId();
-        boolean isNotAdmin = !Role.isADMIN(authedUser.getRole());
-        boolean isNotOwner = !fileOwnerId.equals(authedUser.getId());
-        if (isNotAdmin && isNotOwner) {
-            log.error(authedUser.getEmail() + " not Admin and not Owner of the file " + file.getId().toString());
-            throw new CustomAccessDeniedException();
-        }
+        checkAdminOrOwner(file, authedUser);
 
         try {
             fileRepo.delete(file);
@@ -151,6 +142,16 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    private void checkAdminOrOwner(File file, User authedUser) {
+        Long fileOwnerId = file.getOwner().getId();
+        boolean isNotAdmin = !Role.isADMIN(authedUser.getRole());
+        boolean isNotOwner = !fileOwnerId.equals(authedUser.getId());
+        if (isNotAdmin && isNotOwner) {
+            log.error(authedUser.getEmail() + " not Admin and not Owner of the file " + file.getId().toString());
+            throw new CustomAccessDeniedException();
+        }
+    }
+
     private boolean checkParentDirEmpty(Path fileParentDirPath) throws IOException {
         if (Files.isDirectory(fileParentDirPath)) {
             try(Stream<Path> entries = Files.list(fileParentDirPath)) {
@@ -159,5 +160,35 @@ public class FileServiceImpl implements FileService {
         }
         return false;
     }
+
+    @Override
+    public FileLinkDTO replace(MultipartFile newFile, File oldFile, User authedUser) {
+
+        checkAdminOrOwner(oldFile, authedUser);
+
+        try {
+            String originalFileName = newFile.getOriginalFilename();
+            String newFileName = getFileNameWithoutExt(originalFileName);
+            FileType fileType = getFileType(originalFileName);
+            Long fileSize = newFile.getSize();
+
+            Path fullPathToFile = createFullPathToFile(oldFile.getId());
+            Files.copy(newFile.getInputStream(), fullPathToFile, StandardCopyOption.REPLACE_EXISTING);
+
+            oldFile.setName(newFileName);
+            oldFile.setType(fileType);
+            oldFile.setSize(fileSize);
+            oldFile.setUploadDate(Timestamp.valueOf(LocalDateTime.now()));
+            fileRepo.save(oldFile);
+            String fileLink = createFileLink(oldFile.getId());
+            return new FileLinkDTO(fileLink, oldFile.getId().toString());
+        } catch (BadFileExtensionException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new FileStorageException();
+        }
+    }
+
 
 }

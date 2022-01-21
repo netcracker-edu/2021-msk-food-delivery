@@ -66,6 +66,15 @@ public class FileController {
                     .body(resource);
     }
 
+    @PutMapping("/api/v1/file/{file}")
+    public FileLinkDTO replace(
+            @PathVariable File file,
+            @RequestParam("newFile") MultipartFile newFile,
+            @AuthenticationPrincipal User authedUser) {
+        FileLinkDTO fileLinkDTO = fileService.replace(newFile, file, authedUser);
+        return fileLinkDTO;
+    }
+
     @DeleteMapping("/api/v1/file/{file}")
     public ResponseEntity<?> delete(
             @PathVariable File file,
