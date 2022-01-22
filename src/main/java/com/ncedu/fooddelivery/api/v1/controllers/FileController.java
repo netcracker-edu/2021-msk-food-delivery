@@ -39,7 +39,6 @@ public class FileController {
     public Map<String,String> uploadFile(
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal User authedUser) {
-        log.debug("POST /api/v1/file");
         String fileUUID = fileService.save(file, authedUser);
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/api/v1/file/")
@@ -54,7 +53,6 @@ public class FileController {
     public ResponseEntity<Resource> download(
             @PathVariable File file,
             @AuthenticationPrincipal User authedUser) {
-        log.debug("GET /api/v1/file/" + file.getId().toString());
         Resource resource = fileService.load(file);
         String mediaType = file.getType().getMediaType();
         String fileNameWithExt = file.getName() + "." + file.getType().name();
@@ -70,7 +68,6 @@ public class FileController {
     public ResponseEntity<?> delete(
             @PathVariable File file,
             @AuthenticationPrincipal User authedUser) {
-        log.debug("DELETE /api/v1/file/" + file.getId().toString());
         Long fileOwnerId = file.getOwner().getId();
         boolean isAdmin = Role.isADMIN(authedUser.getRole());
         boolean isOwner = fileOwnerId.equals(authedUser.getId());

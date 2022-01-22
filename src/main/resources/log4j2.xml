@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?> <Configuration>
     <Appenders>
+        <!-- CONSOLE APPENDER -->
+        <Console name="OwnConsoleAppender"></Console>
         <!-- ROLLING FILE APPENDER -->
         <RollingFile name = "OwnRollingFileAppender" fileName = "logs/File.log"
                      filePattern = "logs/$${date:MM-yyyy}/File_%d{dd.MM.yyyy}_%i.log">
@@ -17,6 +19,9 @@
         <!-- LOGGER -->
         <Logger name="com.ncedu.fooddelivery.api.v1" level="debug">
             <AppenderRef ref="OwnRollingFileAppender"/>
+            <AppenderRef ref="OwnConsoleAppender"></AppenderRef>
         </Logger>
+
+        <Root level="info"></Root>
     </Loggers>
 </Configuration>

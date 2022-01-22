@@ -26,7 +26,6 @@ public class AuthController {
 
     @PostMapping("/api/v1/auth/signup")
     public isCreatedDTO signUp(@Valid @RequestBody NewUserDTO userInfo) {
-        log.debug("POST /api/v1/auth/signup");
         return authService.signUp(userInfo);
     }
 
