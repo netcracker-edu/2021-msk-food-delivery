@@ -46,7 +46,7 @@ public class ProductPositionController {
 
     ProductPositionController(){}
 
-    @GetMapping(path = "/api/v1/productPosition/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/api/v1/productPosition/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
     public ResponseEntity<ProductPositionInfoDTO> getFullInfoById(@AuthenticationPrincipal User user, @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long id){
         ProductPositionInfoDTO productPositionInfoDTO = productPositionService.getProductPositionInfoDTOById(id);
@@ -154,36 +154,23 @@ public class ProductPositionController {
     @GetMapping("/api/v1/productPositions")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
     public ResponseEntity<List<ProductPositionInfoDTO>> findFiltered(@AuthenticationPrincipal User user,
-                           @RequestParam(name = "warehouseId", required = false) @Min(value = 1) @Max(value = Long.MAX_VALUE) Long warehouseId,
-                           @RequestParam(name = "productId", required = false) @Min(value = 1) @Max(value = Long.MAX_VALUE) Long productId,
-                           @RequestParam(name = "warehouseSection", required = false) String warehouseSection,
-                           @RequestParam(name = "supplyAmount", required = false) @Min(value = 1) @Max(value = Integer.MAX_VALUE) Integer supplyAmount,
-                           @RequestParam(name = "currentAmount", required = false) @Min(value = 1) @Max(value = Integer.MAX_VALUE) Integer currentAmount,
-                           @RequestParam(name = "supplierInvoice", required = false) @Digits(integer = 10, fraction = 2) @DecimalMin(value = "0.0", inclusive = false) BigDecimal supplierInvoice,
-                           @RequestParam(name = "supplierName", required = false) String supplierName,
-                           @RequestParam(name = "isInvoicePaid", required = false) Boolean isInvoicePaid,
-                           @RequestParam(name = "supplyDate", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date supplyDate,
-                           @RequestParam(name = "manufactureDate", required = false)  @DateTimeFormat(pattern="yyyy-MM-dd") Date manufactureDate,
+                           @Valid ProductPositionFilterDTO filterDTO,
                            Pageable pageable){
 
         List<ProductPositionInfoDTO> filteredPositions;
-        if(user.getRole() == Role.MODERATOR){
+        if (user.getRole() == Role.MODERATOR) {
             Long moderatorWarehouseId = user.getModerator().getWarehouseId();
-            if(warehouseId != null){
-                if(!warehouseId.equals(moderatorWarehouseId)) throw new CustomAccessDeniedException();
+            if (filterDTO.getWarehouseId() != null) {
+                if (!filterDTO.getWarehouseId().equals(moderatorWarehouseId)) throw new CustomAccessDeniedException();
             }
-
-            Specification<ProductPositionNotHierarchical> spec = ProductPositionSpecifications.getFilterSpecification(
-                    productId, moderatorWarehouseId, currentAmount, supplyAmount, manufactureDate, supplierInvoice,
-                    supplyDate, supplierName, warehouseSection, isInvoicePaid
-            );
+            filterDTO.setWarehouseId(moderatorWarehouseId);
+            Specification<ProductPositionNotHierarchical> spec = ProductPositionSpecifications
+                    .getFilterSpecification(filterDTO);
             filteredPositions = productPositionService.findFiltered(spec, pageable);
 
         } else {
-            Specification<ProductPositionNotHierarchical> spec = ProductPositionSpecifications.getFilterSpecification(
-                    productId, warehouseId, currentAmount, supplyAmount, manufactureDate, supplierInvoice,
-                    supplyDate, supplierName, warehouseSection, isInvoicePaid
-            );
+            Specification<ProductPositionNotHierarchical> spec = ProductPositionSpecifications
+                    .getFilterSpecification(filterDTO);
             filteredPositions = productPositionService.findFiltered(spec, pageable);
         }
         return ResponseEntity.status(HttpStatus.OK).body(filteredPositions);

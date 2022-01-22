@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.specifications;
 
+import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.ProductPositionFilterDTO;
 import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPositionNotHierarchical;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -12,21 +13,17 @@ import java.util.Date;
 
 public class ProductPositionSpecifications {
 
-    public static Specification<ProductPositionNotHierarchical> getFilterSpecification(
-            Long productId, Long warehouseId, Integer currentAmount,
-            Integer supplyAmount, Date manufactureDate, BigDecimal supplierInvoice,
-            Date supplyDate, String supplierName, String warehouseSection,
-            Boolean isInvoicePaid){
-        return  hasProductId(productId).
-                and(hasWarehouseId(warehouseId)).
-                and(hasCurrentAmount(currentAmount)).
-                and(hasSupplyAmount(supplyAmount)).
-                and(hasManufactureDate(manufactureDate)).
-                and(hasSupplierInvoice(supplierInvoice)).
-                and(hasSupplyDate(supplyDate)).
-                and(hasSupplierName(supplierName)).
-                and(hasWarehouseSection(warehouseSection)).
-                and(hasInvoicePaid(isInvoicePaid));
+    public static Specification<ProductPositionNotHierarchical> getFilterSpecification(ProductPositionFilterDTO filterDTO){
+        return  hasProductId(filterDTO.getProductId()).
+                and(hasWarehouseId(filterDTO.getWarehouseId())).
+                and(hasCurrentAmount(filterDTO.getCurrentAmount())).
+                and(hasSupplyAmount(filterDTO.getSupplyAmount())).
+                and(hasManufactureDate(filterDTO.getManufactureDate())).
+                and(hasSupplierInvoice(filterDTO.getSupplierInvoice())).
+                and(hasSupplyDate(filterDTO.getSupplyDate())).
+                and(hasSupplierName(filterDTO.getSupplierName())).
+                and(hasWarehouseSection(filterDTO.getWarehouseSection())).
+                and(hasInvoicePaid(filterDTO.getIsInvoicePaid()));
     }
 
     public static Specification<ProductPositionNotHierarchical> hasWarehouseId(Long id){
