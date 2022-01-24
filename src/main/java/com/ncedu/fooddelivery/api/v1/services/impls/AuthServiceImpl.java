@@ -64,21 +64,17 @@ public class AuthServiceImpl implements AuthService {
         User user = regMapper.dtoToUser(userInfo);
         user.setRegDate(Timestamp.valueOf(LocalDateTime.now()));
 
-        Long userId = -1L;
         if (Role.isCLIENT(userInfo.getRole())) {
             Client client = regMapper.dtoToClient(userInfo);
-            client.setUser(user);
-            client = clientRepo.save(client);
-            userId = client.getId();
-        } else if (Role.isMODERATOR(userInfo.getRole())) {
-            Moderator moderator = regMapper.dtoToModerator(userInfo);
-            moderator.setUser(user);
-            moderator = moderatorRepo.save(moderator);
-            userId = moderator.getId();
-        } else {
-            user = userRepo.save(user);
-            userId = user.getId();
+            user.setClient(client);
         }
+        if (Role.isMODERATOR(userInfo.getRole())) {
+            Moderator moderator = regMapper.dtoToModerator(userInfo);
+            user.setModerator(moderator);
+        }
+        user = userRepo.save(user);
+        Long userId = user.getId();
+
         return new isCreatedDTO(userId);
     }
 
