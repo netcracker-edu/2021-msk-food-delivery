@@ -167,4 +167,26 @@ public class OrderController {
         orderService.replaceCourier(orderId, user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PreAuthorize("hasAuthority('CLIENT')")
+    @PatchMapping("/api/v1/order/{orderId}/courierRating")
+    public ResponseEntity<?> changeCourierRating(@AuthenticationPrincipal User user,
+                                                 @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long orderId,
+                                                 @RequestParam @Digits(integer = 1, fraction = 2) @DecimalMin(value = "0.0") @DecimalMax(value = "5.0") BigDecimal newRating
+                                                 ){
+
+        orderService.changeDeliveryRating(orderId, newRating, user);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('COURIER')")
+    @PatchMapping("/api/v1/order/{orderId}/clientRating")
+    public ResponseEntity<?> changeClientRating(@AuthenticationPrincipal User user,
+                                                 @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long orderId,
+                                                 @RequestParam @Digits(integer = 1, fraction = 2) @DecimalMin(value = "0.0") @DecimalMax(value = "5.0") BigDecimal newRating
+    ){
+
+        orderService.changeClientRating(orderId, newRating, user);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

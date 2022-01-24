@@ -10,6 +10,7 @@ import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface OrderService {
@@ -32,4 +33,8 @@ public interface OrderService {
     void changeOrderStatus(Long id, User user);
 
     void replaceCourier(Long orderId, User user);
+
+    void changeDeliveryRating(Long orderId, BigDecimal newRating, User user);
+
+    void changeClientRating(Long orderId, BigDecimal newRating, User user);
 }

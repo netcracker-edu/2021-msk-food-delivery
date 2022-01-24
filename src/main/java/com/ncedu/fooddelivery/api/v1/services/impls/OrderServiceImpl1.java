@@ -35,6 +35,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Predicate;
@@ -313,7 +314,7 @@ public class OrderServiceImpl1 implements OrderService {
                 } else {
                     ship += currentPos.getCurrentAmount();
                     productPosAmountMap.put(currentPos.getId(), currentPos.getCurrentAmount());
-                    productPosPriceMap.put(currentPos.getId(), productCost * (currentPos.getCurrentAmount()));
+                    productPosPriceMap.put(currentPos.getId(), productCost * (currentPos.getCurrentAmount())); // what if currentAmount == 0 ?
                     currentPos.setCurrentAmount(0);
                     productPositionRepo.save(currentPos);
                 }
@@ -444,6 +445,31 @@ public class OrderServiceImpl1 implements OrderService {
         if(currentCourier == null) throw new CourierNotSetException();
         Courier newCourier = courierService.getAnotherAvailableCourier(currentCourier.getId(), order.getWarehouse().getId());
         order.setCourier(newCourier);
+        orderRepo.save(order);
+    }
+
+    @Override
+    public void changeDeliveryRating(Long orderId, BigDecimal newRating, User user) {
+        userService.checkIsUserLocked(user);
+        Order order = getOrder(orderId);
+
+        if(order == null) throw new NotFoundEx(orderId.toString());
+        if(order.getCourier() == null) throw new CourierNotSetException();
+        if(!user.getId().equals(order.getClient().getId())) throw new CustomAccessDeniedException();
+
+        order.setDeliveryRating(newRating);
+        orderRepo.save(order);
+    }
+
+    @Override
+    public void changeClientRating(Long orderId, BigDecimal newRating, User user) {
+        userService.checkIsUserLocked(user);
+        Order order = getOrder(orderId);
+
+        if(order == null) throw new NotFoundEx(orderId.toString());
+        if(order.getCourier() == null || !user.getId().equals(order.getCourier().getId())) throw new CustomAccessDeniedException();
+
+        order.setClientRating(newRating);
         orderRepo.save(order);
     }
 

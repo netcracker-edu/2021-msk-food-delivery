@@ -2,9 +2,12 @@ package com.ncedu.fooddelivery.api.v1.repos;
 
 import com.ncedu.fooddelivery.api.v1.entities.Courier;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface CourierRepo extends JpaRepository<Courier, Long> {
     @Query(value = "SELECT COUNT(*) FROM " +
             "couriers INNER JOIN delivery_sessions USING (courier_id) " +
@@ -40,4 +43,9 @@ public interface CourierRepo extends JpaRepository<Courier, Long> {
             ") LIMIT 1",
             nativeQuery = true)
     Courier findAnotherAvailableCourier(@Param(value = "courierId") Long courierId, @Param(value = "warehouseId") Long warehouseId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = "call update_courier_rating()", nativeQuery = true)
+    Integer updateCourierRatingNightProcedure();
+
 }

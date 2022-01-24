@@ -331,3 +331,67 @@ CREATE TABLE IF NOT EXISTS messages
 		(picture_id IS NOT NULL)
 	)
 );
+
+CREATE OR REPLACE PROCEDURE update_courier_rating()
+AS '
+BEGIN
+UPDATE couriers c SET rating = (
+	SELECT ROUND(AVG(orders.delivery_rating), 2)
+	FROM orders
+	WHERE orders.courier_id = c.courier_id AND ((current_timestamp - orders.date_end)::interval < interval ''1 month''))
+WHERE courier_id IN (SELECT user_id FROM users WHERE lock_date IS NULL);
+END;
+' LANGUAGE plpgsql ;
+
+CREATE OR REPLACE PROCEDURE update_client_rating()
+AS '
+BEGIN
+UPDATE clients c SET rating = (
+	SELECT ROUND(AVG(orders.client_rating), 2)
+	FROM orders
+	WHERE orders.client_id = c.client_id AND ((current_timestamp - orders.date_end)::interval < interval ''1 month''))
+WHERE client_id IN (SELECT user_id FROM users WHERE lock_date IS NULL);
+END;
+' LANGUAGE plpgsql ;
+
+DROP FUNCTION IF EXISTS update_orders_client_rating() CASCADE;
+CREATE OR REPLACE FUNCTION update_orders_client_rating() RETURNS TRIGGER
+AS '
+    BEGIN
+        UPDATE clients c SET rating = (
+			SELECT ROUND(AVG(orders.client_rating), 2)
+			FROM orders
+			WHERE orders.client_id = NEW.client_id AND ((current_timestamp - orders.date_end)::interval < interval ''1 month''))
+		WHERE client_id = NEW.client_id;
+		RETURN NEW;
+    END;
+' LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS update_orders_client_rating ON orders;
+
+CREATE TRIGGER update_orders_client_rating
+    AFTER UPDATE OF client_rating
+    ON orders
+    FOR EACH ROW
+EXECUTE FUNCTION update_orders_client_rating();
+
+DROP FUNCTION IF EXISTS update_orders_courier_rating() CASCADE;
+CREATE OR REPLACE FUNCTION update_orders_courier_rating() RETURNS TRIGGER
+AS '
+    BEGIN
+        UPDATE couriers c SET rating = (
+			SELECT ROUND(AVG(orders.delivery_rating), 2)
+			FROM orders
+			WHERE orders.courier_id = NEW.courier_id AND ((current_timestamp - orders.date_end)::interval < interval ''1 month''))
+		WHERE courier_id = NEW.courier_id;
+		RETURN NEW;
+    END;
+' LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS update_orders_courier_rating ON orders;
+
+CREATE TRIGGER update_orders_courier_rating
+    AFTER UPDATE OF delivery_rating
+    ON orders
+    FOR EACH ROW
+EXECUTE FUNCTION update_orders_courier_rating();
