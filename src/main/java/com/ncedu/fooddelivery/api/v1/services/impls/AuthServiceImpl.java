@@ -5,6 +5,7 @@ import com.ncedu.fooddelivery.api.v1.dto.jwt.JwtRequestDTO;
 import com.ncedu.fooddelivery.api.v1.dto.jwt.JwtResponseDTO;
 import com.ncedu.fooddelivery.api.v1.dto.jwt.RefreshTokenDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.NewUserDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.*;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.RefreshTokenException;
 import com.ncedu.fooddelivery.api.v1.filters.JwtUtil;
@@ -89,7 +90,7 @@ public class AuthServiceImpl implements AuthService {
         log.debug("USER: " + user.getUsername() + user.getLastSigninDate());
         final String accessToken = jwtUtil.createToken(user);
         final String refreshToken = userRefreshTokenService.createRefreshToken(user, userAgent);
-        return new JwtResponseDTO(accessToken, refreshToken);
+        return new JwtResponseDTO(accessToken, refreshToken, createUserDTO(user));
     }
 
     private Authentication authenticate(String login, String password) {
@@ -116,7 +117,7 @@ public class AuthServiceImpl implements AuthService {
         //change lastSignin on owner of token
         userService.setLastSigninFromNow(urt.getOwner());
         final String accessToken = jwtUtil.createToken(urt.getOwner());
-        return new JwtResponseDTO(accessToken, refreshToken.toString());
+        return new JwtResponseDTO(accessToken, refreshToken.toString(), createUserDTO(urt.getOwner()));
     }
 
     //check user name from expired JWT and from owner of refresh token
@@ -140,5 +141,11 @@ public class AuthServiceImpl implements AuthService {
             Claims claims = e.getClaims();
             return claims.getSubject();
         }
+    }
+
+    private UserInfoDTO createUserDTO(User user) {
+        return new UserInfoDTO(user.getId(), user.getRole().name(),
+                user.getFullName(), user.getEmail(),
+                user.getLastSigninDate(), user.getAvatarId());
     }
 }
