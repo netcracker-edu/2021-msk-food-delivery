@@ -14,7 +14,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.util.List;
-
+/*
 @EnableWebMvc
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -30,4 +30,4 @@ public class WebConfig implements WebMvcConfigurer {
         builder.failOnUnknownProperties(true);
         converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
     }
-}
+}*/

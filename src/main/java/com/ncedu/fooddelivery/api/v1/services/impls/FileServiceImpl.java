@@ -63,10 +63,39 @@ public class FileServiceImpl implements FileService {
             UUID fileUuid = UUID.randomUUID();
 
             Path fullPathToFile = createFullPathToFile(fileUuid);
-            if (owner.getRole() == Role.CLIENT && fileType == FileType.PNG) {
-                fileType = FileType.JPEG;
-                convertPNGtoJPG(file, fullPathToFile);
-                fileSize = Files.size(fullPathToFile);
+            if (owner.getRole() == Role.CLIENT) {
+
+                InputStream is = file.getInputStream();
+                BufferedImage bufferedImage = ImageIO.read(is);
+                long imgWidth = bufferedImage.getWidth();
+                long imgHeigth = bufferedImage.getHeight();
+                if (imgWidth > 1024 || imgHeigth > 1024) {
+                    int targetWidth = 1024;
+                    int targetHeight = 1024;
+                    float ratio;
+                    if (imgWidth > imgHeigth) {
+                        ratio = imgWidth / 1024;
+                        targetWidth = 1024;
+                        targetHeight = Math.round(imgHeigth / ratio);
+                        log.debug("REALY WIDTH AND HEIGHT: " + imgWidth +"x"+imgHeigth);
+                        log.debug("TARGET WIDTH AND HEIGHT: " + targetWidth +"x"+targetHeight);
+                        //resize by width
+                    } else {
+                        //resize by height
+                        ratio = imgHeigth / 1024;
+                        targetHeight = 1024;
+                        targetWidth = Math.round(imgWidth / ratio);
+                    }
+                    Image resultingImage = bufferedImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
+                    BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+                    outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
+                    ImageIO.write(outputImage, "jpg", fullPathToFile.toFile());
+                }
+                if (fileType == FileType.PNG) {
+                    fileType = FileType.JPEG;
+                    convertPNGtoJPG(file, fullPathToFile);
+                    fileSize = Files.size(fullPathToFile);
+                }
             } else {
                 Files.copy(file.getInputStream(), fullPathToFile, StandardCopyOption.REPLACE_EXISTING);
             }
