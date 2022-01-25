@@ -25,7 +25,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,6 +40,7 @@ import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Stream;
 
 @Service
@@ -56,8 +63,14 @@ public class FileServiceImpl implements FileService {
             UUID fileUuid = UUID.randomUUID();
 
             Path fullPathToFile = createFullPathToFile(fileUuid);
-            Files.copy(file.getInputStream(), fullPathToFile, StandardCopyOption.REPLACE_EXISTING);
-
+            if (owner.getRole() == Role.CLIENT && fileType == FileType.PNG) {
+                fileType = FileType.JPEG;
+                convertPNGtoJPG(file, fullPathToFile);
+                fileSize = Files.size(fullPathToFile);
+            } else {
+                Files.copy(file.getInputStream(), fullPathToFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+            log.debug("FILE TYPE: " + fileType.getMediaType());
             File fileEntity = new File(fileUuid, fileType, fileName, fileSize,
                                         Timestamp.valueOf(LocalDateTime.now()), owner);
             fileRepo.save(fileEntity);
@@ -71,6 +84,15 @@ public class FileServiceImpl implements FileService {
             log.error(e.getMessage(), e);
             throw new FileStorageException();
         }
+    }
+
+    private void convertPNGtoJPG(MultipartFile file, Path fullPathToFile) throws IOException {
+        InputStream is = file.getInputStream();
+        BufferedImage bufferedImage = ImageIO.read(is);
+        BufferedImage newBufferedImage = new BufferedImage(bufferedImage.getWidth(),
+                bufferedImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+        newBufferedImage.createGraphics().drawImage(bufferedImage, 0, 0, Color.WHITE, null);
+        ImageIO.write(newBufferedImage, "jpg", fullPathToFile.toFile());
     }
 
     private String getFileNameWithoutExt(String originalFileName) {

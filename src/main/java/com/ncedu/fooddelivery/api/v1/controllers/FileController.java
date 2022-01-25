@@ -32,7 +32,6 @@ import static org.springframework.http.ResponseEntity.ok;
 @Slf4j
 @RestController
 public class FileController {
-    //TODO: add getting file list with sort and pageable
     //TODO: add checks for client, courier uploaded photos (only jpeg + max size)
     //TODO: add relations with other entities
     //TODO: add trigger which deleting files without relations
