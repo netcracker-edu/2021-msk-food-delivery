@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -125,5 +126,12 @@ public class UserServiceImpl implements UserService {
             usersDTO.add(createUserDTO(iterator.next()));
         }
         return usersDTO;
+    }
+
+    @Override
+    public void setLastSigninFromNow(User user) {
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        user.setLastSigninDate(now);
+        userRepo.save(user);
     }
 }

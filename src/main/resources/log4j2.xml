@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?> <Configuration>
     <Appenders>
+
         <!-- ROLLING FILE APPENDER -->
         <RollingFile name = "OwnRollingFileAppender" fileName = "logs/File.log"
                      filePattern = "logs/$${date:MM-yyyy}/File_%d{dd.MM.yyyy}_%i.log">
