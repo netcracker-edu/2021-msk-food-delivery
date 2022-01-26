@@ -65,3 +65,5 @@ build/
 /files/
 ### LOGS STORAGE ###
 /logs/
+### FILES STORAGE FOR TESTS ###
+/testfiles/
