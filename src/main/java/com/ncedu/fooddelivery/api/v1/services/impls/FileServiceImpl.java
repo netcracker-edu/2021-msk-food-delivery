@@ -50,6 +50,12 @@ public class FileServiceImpl implements FileService {
     @Value("${file.upload.location}")
     private String UPLOAD_LOCATION;
 
+    @Value("${file.client.image.width}")
+    private int CLIENT_IMAGE_WIDTH;
+
+    @Value("${file.client.image.height}")
+    private int CLIENT_IMAGE_HEIGHT;
+
     @Autowired
     FileRepo fileRepo;
 
@@ -63,65 +69,36 @@ public class FileServiceImpl implements FileService {
             UUID fileUuid = UUID.randomUUID();
 
             Path fullPathToFile = createFullPathToFile(fileUuid);
-            if (owner.getRole() == Role.CLIENT) {
+            if (owner.getRole() == Role.CLIENT || owner.getRole() == Role.COURIER) {
 
                 InputStream is = file.getInputStream();
                 BufferedImage bufferedImage = ImageIO.read(is);
-                long imgWidth = bufferedImage.getWidth();
-                long imgHeigth = bufferedImage.getHeight();
-                if (imgWidth > 1024 || imgHeigth > 1024) {
-                    int targetWidth = 1024;
-                    int targetHeight = 1024;
-                    float ratio;
-                    if (imgWidth > imgHeigth) {
-                        ratio = imgWidth / 1024;
-                        targetWidth = 1024;
-                        targetHeight = Math.round(imgHeigth / ratio);
-                        log.debug("REALY WIDTH AND HEIGHT: " + imgWidth +"x"+imgHeigth);
-                        log.debug("TARGET WIDTH AND HEIGHT: " + targetWidth +"x"+targetHeight);
-                        //resize by width
-                    } else {
-                        //resize by height
-                        ratio = imgHeigth / 1024;
-                        targetHeight = 1024;
-                        targetWidth = Math.round(imgWidth / ratio);
-                    }
-                    Image resultingImage = bufferedImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
-                    BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-                    outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
-                    ImageIO.write(outputImage, "jpg", fullPathToFile.toFile());
+
+                boolean isExceedImageSize = checkExceedImageSize(bufferedImage);
+                if (isExceedImageSize) {
+                    bufferedImage = resizeImage(bufferedImage);
                 }
                 if (fileType == FileType.PNG) {
-                    fileType = FileType.JPEG;
-                    convertPNGtoJPG(file, fullPathToFile);
-                    fileSize = Files.size(fullPathToFile);
+                    bufferedImage = convertPNGtoJPG(bufferedImage);
                 }
+                ImageIO.write(bufferedImage, "jpg", fullPathToFile.toFile());
+                fileSize = Files.size(fullPathToFile);
+                fileType = FileType.JPEG;
             } else {
                 Files.copy(file.getInputStream(), fullPathToFile, StandardCopyOption.REPLACE_EXISTING);
             }
-            log.debug("FILE TYPE: " + fileType.getMediaType());
             File fileEntity = new File(fileUuid, fileType, fileName, fileSize,
                                         Timestamp.valueOf(LocalDateTime.now()), owner);
             fileRepo.save(fileEntity);
 
             String fileLink = createFileLink(fileUuid);
             return new FileLinkDTO(fileLink, fileUuid.toString());
-
         } catch (BadFileExtensionException e) {
             throw e;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new FileStorageException();
         }
-    }
-
-    private void convertPNGtoJPG(MultipartFile file, Path fullPathToFile) throws IOException {
-        InputStream is = file.getInputStream();
-        BufferedImage bufferedImage = ImageIO.read(is);
-        BufferedImage newBufferedImage = new BufferedImage(bufferedImage.getWidth(),
-                bufferedImage.getHeight(), BufferedImage.TYPE_INT_RGB);
-        newBufferedImage.createGraphics().drawImage(bufferedImage, 0, 0, Color.WHITE, null);
-        ImageIO.write(newBufferedImage, "jpg", fullPathToFile.toFile());
     }
 
     private String getFileNameWithoutExt(String originalFileName) {
@@ -151,6 +128,40 @@ public class FileServiceImpl implements FileService {
         Path fileParentDirPath = uploadPath.resolve(fileParentDir);
         Files.createDirectories(fileParentDirPath);
         return fileParentDirPath.resolve(fileUuidString);
+    }
+
+    private boolean checkExceedImageSize(BufferedImage bufferedImage) {
+        int imgWidth = bufferedImage.getWidth();
+        int imgHeigth = bufferedImage.getHeight();
+        return imgWidth > 1024 || imgHeigth > 1024;
+    }
+
+    private BufferedImage resizeImage(BufferedImage bufferedImage) {
+        int imgWidth = bufferedImage.getWidth();
+        int imgHeight = bufferedImage.getHeight();
+        int targetWidth = CLIENT_IMAGE_WIDTH;
+        int targetHeight = CLIENT_IMAGE_HEIGHT;
+        float ratio;
+        if (imgWidth > imgHeight) {
+            //resize by width
+            ratio = (float) imgWidth / CLIENT_IMAGE_WIDTH;
+            targetHeight = Math.round( imgHeight  / ratio);
+        } else {
+            //resize by height
+            ratio = (float) imgHeight / CLIENT_IMAGE_HEIGHT;
+            targetWidth = Math.round( imgWidth / ratio);
+        }
+        Image resultingImage = bufferedImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+        BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+        outputImage.getGraphics().drawImage(resultingImage, 0, 0, Color.WHITE, null);
+        return outputImage;
+    }
+
+    private BufferedImage convertPNGtoJPG(BufferedImage bufferedImage) throws IOException {
+        BufferedImage newBufferedImage = new BufferedImage(bufferedImage.getWidth(),
+                bufferedImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+        newBufferedImage.createGraphics().drawImage(bufferedImage, 0, 0, Color.WHITE, null);
+        return newBufferedImage;
     }
 
     private String createFileLink(UUID fileUuid) {
@@ -227,7 +238,25 @@ public class FileServiceImpl implements FileService {
             Long fileSize = newFile.getSize();
 
             Path fullPathToFile = createFullPathToFile(oldFile.getId());
-            Files.copy(newFile.getInputStream(), fullPathToFile, StandardCopyOption.REPLACE_EXISTING);
+
+            if (authedUser.getRole() == Role.CLIENT || authedUser.getRole() == Role.COURIER) {
+
+                InputStream is = newFile.getInputStream();
+                BufferedImage bufferedImage = ImageIO.read(is);
+
+                boolean isExceedImageSize = checkExceedImageSize(bufferedImage);
+                if (isExceedImageSize) {
+                    bufferedImage = resizeImage(bufferedImage);
+                }
+                if (fileType == FileType.PNG) {
+                    bufferedImage = convertPNGtoJPG(bufferedImage);
+                }
+                ImageIO.write(bufferedImage, "jpg", fullPathToFile.toFile());
+                fileSize = Files.size(fullPathToFile);
+                fileType = FileType.JPEG;
+            } else {
+                Files.copy(newFile.getInputStream(), fullPathToFile, StandardCopyOption.REPLACE_EXISTING);
+            }
 
             oldFile.setName(newFileName);
             oldFile.setType(fileType);
