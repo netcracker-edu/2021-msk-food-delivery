@@ -67,8 +67,9 @@ public class FileServiceTest {
                 }};
 
     @BeforeAll
-    public void createPictures() {
+    public void createPictures() throws IOException {
         UPLOAD_PATH = Paths.get(UPLOAD_LOCATION).toAbsolutePath().normalize();
+        Files.createDirectories(UPLOAD_PATH);
         pictureNamesAndSize.entrySet().forEach(this::createPngJpgBmp);
     }
 
