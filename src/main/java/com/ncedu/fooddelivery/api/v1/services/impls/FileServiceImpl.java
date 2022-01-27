@@ -190,8 +190,11 @@ public class FileServiceImpl implements FileService {
     @Override
     public void delete(File file, User authedUser) {
 
-        checkAdminOrOwner(file, authedUser);
-
+        boolean isAdminOrOwner = checkAdminOrOwner(file, authedUser);
+        if (!isAdminOrOwner) {
+            log.error(authedUser.getEmail() + " not Admin and not Owner of the file " + file.getId().toString());
+            throw new CustomAccessDeniedException();
+        }
         try {
             fileRepo.delete(file);
             Path fullFilePath = createFullPathToFile(file.getId());
@@ -207,14 +210,11 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    private void checkAdminOrOwner(File file, User authedUser) {
+    private boolean checkAdminOrOwner(File file, User authedUser) {
         Long fileOwnerId = file.getOwner().getId();
-        boolean isNotAdmin = !Role.isADMIN(authedUser.getRole());
-        boolean isNotOwner = !fileOwnerId.equals(authedUser.getId());
-        if (isNotAdmin && isNotOwner) {
-            log.error(authedUser.getEmail() + " not Admin and not Owner of the file " + file.getId().toString());
-            throw new CustomAccessDeniedException();
-        }
+        boolean isAdmin = Role.isADMIN(authedUser.getRole().name());
+        boolean isOwner = fileOwnerId.equals(authedUser.getId());
+        return isAdmin || isOwner;
     }
 
     private boolean checkParentDirEmpty(Path fileParentDirPath) throws IOException {
@@ -229,7 +229,11 @@ public class FileServiceImpl implements FileService {
     @Override
     public FileLinkDTO replace(MultipartFile newFile, File oldFile, User authedUser) {
 
-        checkAdminOrOwner(oldFile, authedUser);
+        boolean isAdminOrOwner = checkAdminOrOwner(oldFile, authedUser);
+        if (!isAdminOrOwner) {
+            log.error(authedUser.getEmail() + " not Admin and not Owner of the file " + oldFile.getId().toString());
+            throw new CustomAccessDeniedException();
+        }
 
         try {
             String originalFileName = newFile.getOriginalFilename();

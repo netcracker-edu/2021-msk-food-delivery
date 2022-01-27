@@ -4,7 +4,7 @@ public enum Role {
     ADMIN, CLIENT, COURIER, MODERATOR;
 
 
-    public static boolean isADMIN(Role role) {
+    public static boolean isADMIN(String role) {
         final String ADMIN_ROLE = Role.ADMIN.name();
         return ADMIN_ROLE.equals(role);
     }
