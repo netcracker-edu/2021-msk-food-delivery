@@ -42,7 +42,6 @@ public class FileController {
     public FileLinkDTO uploadFile(
             @RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal User authedUser) {
-        log.debug("POST /api/v1/file");
         FileLinkDTO fileLinkDTO = fileService.save(file, authedUser);
         log.debug("Created file link: " + fileLinkDTO.getLink());
         return fileLinkDTO;
@@ -52,7 +51,6 @@ public class FileController {
     public ResponseEntity<?> download(
             @PathVariable File file,
             @AuthenticationPrincipal User authedUser) {
-        log.debug("GET /api/v1/file/" + file.getId().toString());
         return buildDownloadResponseEntity(file);
     }
 
@@ -81,7 +79,6 @@ public class FileController {
     public ResponseEntity<?> delete(
             @PathVariable File file,
             @AuthenticationPrincipal User authedUser) {
-        log.debug("DELETE /api/v1/file/" + file.getId().toString());
         fileService.delete(file, authedUser);
         log.debug("File deleted: " + file.getId().toString());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -92,7 +89,6 @@ public class FileController {
     public List<FileInfoDTO> getAllFiles(
             @PageableDefault(sort = {"uploadDate"}, direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        log.debug("GET /api/v1/files PAGE=" + pageable.getPageSize() + " SIZE=" +pageable.getPageSize());
         return fileService.getAllFiles(pageable);
     }
 
