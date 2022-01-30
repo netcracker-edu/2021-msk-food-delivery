@@ -34,10 +34,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -72,6 +74,8 @@ public class OrderServiceImpl1 implements OrderService {
     UserService userService;
 
     GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+
+    private ReentrantLock mutex = new ReentrantLock();
 
     @Override
     public Order getOrder(Long id) {
@@ -111,7 +115,10 @@ public class OrderServiceImpl1 implements OrderService {
             Long productId = pair.getId();
             Integer requestedAmount = pair.getAmount();
 
+            // 'findByProductIdAndWarehouseId' sets lock on every product position in result set. So no one other thread
+            // will be able to interact with these positions before whole transaction will complete.
             List<ProductPosition> productPositions = productPositionRepo.findByProductIdAndWarehouseId(productId, warehouseId);
+
             if(productPositions.size() == 0){
                 notFoundProductsIds.add(productId);
                 continue;
@@ -122,9 +129,9 @@ public class OrderServiceImpl1 implements OrderService {
                 @Override
                 public boolean test(ProductPosition productPosition) {
                     Short expirationDays = productPosition.getProduct().getExpirationDays();
-                    Date supplyDate = productPosition.getSupplyDate();
+                    Date manufactureDate = productPosition.getManufactureDate();
                     Calendar c = Calendar.getInstance();
-                    c.setTime(supplyDate);
+                    c.setTime(manufactureDate);
                     c.add(Calendar.DATE , expirationDays);
                     if(c.before(Calendar.getInstance())) return false;
                     return true;
@@ -160,7 +167,8 @@ public class OrderServiceImpl1 implements OrderService {
     @Override
     public CountOrderCostResponseDTO countOrderCost(CountOrderCostRequestDTO dto) {
         WarehouseInfoDTO warehouse = warehouseService.getNearestWarehouse(dto.getGeo().getLat(), dto.getGeo().getLon());
-        if(warehouse == null) throw new NotFoundEx(String.format("{Lat: %s; lon: $s}", dto.getGeo().getLat().toString(), dto.getGeo().getLon().toString()));
+        if(warehouse == null) throw new NotFoundEx(String.format("{Lat: %s; lon: $s}", dto.getGeo().getLat().toString(),
+                                                   dto.getGeo().getLon().toString()));
         Long warehouseId = warehouse.getId();
 
         List<Long> notFoundProductsIds = new ArrayList<>();
@@ -187,9 +195,9 @@ public class OrderServiceImpl1 implements OrderService {
                 @Override
                 public boolean test(ProductPosition productPosition) {
                     Short expirationDays = productPosition.getProduct().getExpirationDays();
-                    Date supplyDate = productPosition.getSupplyDate();
+                    Date manufactureDate = productPosition.getManufactureDate();
                     Calendar c = Calendar.getInstance();
-                    c.setTime(supplyDate);
+                    c.setTime(manufactureDate);
                     c.add(Calendar.DATE , expirationDays);
                     if(c.before(Calendar.getInstance())) return false;
                     return true;
@@ -247,6 +255,7 @@ public class OrderServiceImpl1 implements OrderService {
     }
 
     @Override
+    @Transactional
     public IsCreatedDTO createOrder(CreateOrderDTO dto, User user) {
         userService.checkIsUserLocked(user);
 
@@ -254,14 +263,19 @@ public class OrderServiceImpl1 implements OrderService {
         Double clientDiscount = dto.getDiscount();
         Double clientHighDemandCoeff = dto.getHighDemandCoeff();
 
+        // checking that client data is still actual
         Double[] repeatedCalculation = countOrderCost(dto.getGeo(), dto.getProductAmountPairs());
+
         Double countedCost = repeatedCalculation[0];
         Double countedDiscount = repeatedCalculation[1];
         Double countedHighDemandCoeff = repeatedCalculation[2];
         Long warehouseId = repeatedCalculation[3].longValue();
 
-        if(!clientCost.equals(countedCost) || !clientHighDemandCoeff.equals(countedHighDemandCoeff) || !clientDiscount.equals(countedDiscount)) throw new OrderCostChangedEx(countedCost, countedDiscount, countedHighDemandCoeff);
+        if(!clientCost.equals(countedCost) || !clientHighDemandCoeff.equals(countedHighDemandCoeff) ||
+                !clientDiscount.equals(countedDiscount)) throw new OrderCostChangedEx(countedCost,
+                                                         countedDiscount, countedHighDemandCoeff);
 
+        // then we start to create order
         Order order = new Order();
         order.setDiscount(countedDiscount);
         order.setHighDemandCoeff(countedHighDemandCoeff);
@@ -271,8 +285,11 @@ public class OrderServiceImpl1 implements OrderService {
         order.setAddress(dto.getAddress());
 
         List<CountOrderCostRequestDTO.ProductAmountPair> pairs = dto.getProductAmountPairs();
+
+        // we will use later Maps below to reserve product positions from warehouse and put them in order
         Map<Long, Double> productPosPriceMap = new HashMap<>();     // productPositionId -> amount * (price - discount)
         Map<Long, Integer> productPosAmountMap = new HashMap<>();   // productPositionId -> amount
+
         for(CountOrderCostRequestDTO.ProductAmountPair pair: pairs){
             Long productId = pair.getId();
             Product product = productRepo.findById(productId).get();
@@ -280,14 +297,14 @@ public class OrderServiceImpl1 implements OrderService {
             Integer requestedAmount = pair.getAmount();
             List<ProductPosition> productPositions = productPositionRepo.findByProductIdAndWarehouseId(productId, warehouseId);
 
-            //filtering expired product positions and sorting by supply date
+            //filtering expired product positions and sorting by manufacture date
             productPositions = productPositions.stream().filter(new Predicate<ProductPosition>() {
                 @Override
                 public boolean test(ProductPosition productPosition) {
                     Short expirationDays = productPosition.getProduct().getExpirationDays();
-                    Date supplyDate = productPosition.getSupplyDate();
+                    Date manufactureDate = productPosition.getManufactureDate();
                     Calendar c = Calendar.getInstance();
-                    c.setTime(supplyDate);
+                    c.setTime(manufactureDate);
                     c.add(Calendar.DATE , expirationDays);
                     if(c.before(Calendar.getInstance())) return false;
                     return true;
@@ -295,8 +312,8 @@ public class OrderServiceImpl1 implements OrderService {
             }).sorted(new Comparator<ProductPosition>() {
                 @Override
                 public int compare(ProductPosition o1, ProductPosition o2) {
-                    if(o1.getSupplyDate().before(o2.getSupplyDate())) return -1;
-                    else if(o1.getSupplyDate().after(o2.getSupplyDate())) return 1;
+                    if(o1.getManufactureDate().before(o2.getManufactureDate())) return -1;
+                    else if(o1.getManufactureDate().after(o2.getManufactureDate())) return 1;
                     return 0;
                 }
             }).collect(Collectors.toList());
@@ -314,7 +331,7 @@ public class OrderServiceImpl1 implements OrderService {
                 } else {
                     ship += currentPos.getCurrentAmount();
                     productPosAmountMap.put(currentPos.getId(), currentPos.getCurrentAmount());
-                    productPosPriceMap.put(currentPos.getId(), productCost * (currentPos.getCurrentAmount())); // what if currentAmount == 0 ?
+                    productPosPriceMap.put(currentPos.getId(), productCost * (currentPos.getCurrentAmount()));
                     currentPos.setCurrentAmount(0);
                     productPositionRepo.save(currentPos);
                 }
@@ -322,7 +339,8 @@ public class OrderServiceImpl1 implements OrderService {
 
         }
 
-        Geometry coords = geometryFactory.createPoint(new Coordinate(dto.getGeo().getLon().doubleValue(), dto.getGeo().getLat().doubleValue()));
+        Geometry coords = geometryFactory.createPoint(new Coordinate(dto.getGeo().getLon().doubleValue(),
+                                                      dto.getGeo().getLat().doubleValue()));
         order.setCoordinates(coords);
 
         order.setStatus(OrderStatus.CREATED);
@@ -330,7 +348,10 @@ public class OrderServiceImpl1 implements OrderService {
         Long orderId = orderRepo.save(order).getId();
 
         for(Long productPositionId: productPosAmountMap.keySet()){
-            orderProductPositionRepo.save(new OrderProductPosition(order, productPositionRepo.findById(productPositionId).get(), productPosAmountMap.get(productPositionId), productPosPriceMap.get(productPositionId)));
+            orderProductPositionRepo.save(new OrderProductPosition(order,
+                                          productPositionRepo.findById(productPositionId).get(),
+                                          productPosAmountMap.get(productPositionId),
+                                          productPosPriceMap.get(productPositionId)));
         }
 
         // attaching courier and then order status = 'courier_appointed'
@@ -338,14 +359,14 @@ public class OrderServiceImpl1 implements OrderService {
         try{
             courier = findFreeCourier(warehouseId);
         } catch (CourierAvailabilityEx ex){
-            order.setStatus(OrderStatus.CANCELLED);
+            order.setStatus(OrderStatus.CANCELLED);   // DB trigger will return all reserved product positions back
+                                                      // to warehouse
             orderRepo.save(order);
             throw ex;
         }
         order.setCourier(courier);
         order.setStatus(OrderStatus.COURIER_APPOINTED);
         orderRepo.save(order);
-
         return new IsCreatedDTO(orderId);
     }
 
