@@ -46,6 +46,6 @@ public interface CourierRepo extends JpaRepository<Courier, Long> {
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(value = "call update_courier_rating()", nativeQuery = true)
-    Integer updateCourierRatingNightProcedure();
+    Integer ratingNightTrigger();
 
 }

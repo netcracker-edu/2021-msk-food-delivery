@@ -7,15 +7,15 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DatabaseScheduler {
+public class NightScheduler {
     @Autowired
     ClientRepo clientRepo;
     @Autowired
     CourierRepo courierRepo;
 
-    @Scheduled(cron = "0 0 0 * * *", zone = "Europe/Moscow")    // every midnight
-    public void updateCourierAndClientRatings(){
-        clientRepo.updateClientRatingNightProcedure();
-        courierRepo.updateCourierRatingNightProcedure();
+    @Scheduled(cron = "0 0 0 * * *", zone = "Europe/Moscow")
+    public void midnightUpdate(){
+        clientRepo.ratingNightTrigger();
+        courierRepo.ratingNightTrigger();
     }
 }

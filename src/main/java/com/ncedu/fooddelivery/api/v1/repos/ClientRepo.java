@@ -12,5 +12,5 @@ public interface ClientRepo extends CrudRepository<Client, Long> {
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(value = "call update_client_rating()", nativeQuery = true)
-    void updateClientRatingNightProcedure();
+    void ratingNightTrigger();
 }
