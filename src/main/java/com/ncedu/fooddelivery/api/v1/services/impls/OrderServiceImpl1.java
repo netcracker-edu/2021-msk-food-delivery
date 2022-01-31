@@ -498,7 +498,7 @@ public class OrderServiceImpl1 implements OrderService {
     }
 
     @Override
-    public void cancelOrder(Long id, User user) {
+    public void changeOrderStatus(Long id, User user, ChangeOrderStatusDTO dto) {
         userService.checkIsUserLocked(user);
         Optional<Order> orderOptional = orderRepo.findById(id);
         if(orderOptional.isEmpty()) throw new NotFoundEx(id.toString());
@@ -512,38 +512,13 @@ public class OrderServiceImpl1 implements OrderService {
             if(!order.getClient().getId().equals(user.getClient().getId())) throw new CustomAccessDeniedException();
         }
 
-        if(order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.DELIVERED) throw new OrderCancellationException(id);
+        OrderStatus oldStatus = order.getStatus();
+        OrderStatus newStatus = dto.getNewStatus();
+        if(oldStatus == OrderStatus.CANCELLED || oldStatus == OrderStatus.DELIVERED
+                || (oldStatus.ordinal() > newStatus.ordinal())) throw new OrderStatusChangeException(id);
 
-        order.setStatus(OrderStatus.CANCELLED);
+        order.setStatus(newStatus);
         orderRepo.save(order);
-    }
-
-    @Override
-    public void changeOrderStatus(Long id, User user) {
-        userService.checkIsUserLocked(user);
-        Optional<Order> orderOptional = orderRepo.findById(id);
-        if(orderOptional.isEmpty()) throw new NotFoundEx(id.toString());
-        Order order = orderOptional.get();
-
-        if(user.getRole() == Role.MODERATOR){
-            if(!order.getWarehouse().getId().equals(user.getModerator().getWarehouseId())) throw new CustomAccessDeniedException();
-        } else if(user.getRole() == Role.COURIER){
-            if(!order.getCourier().getId().equals(user.getCourier().getId())) throw new CustomAccessDeniedException();
-        } else if(user.getRole() == Role.CLIENT){
-            if(!order.getClient().getId().equals(user.getClient().getId())) throw new CustomAccessDeniedException();
-        }
-
-        if(order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.DELIVERED) throw new OrderStatusChangeException(id);
-
-        order.setStatus(OrderStatus.values()[order.getStatus().ordinal() + 1]);
-        order = orderRepo.save(order);
-        Courier courier = order.getCourier();
-        if(order.getStatus() == OrderStatus.DELIVERED && courier != null){
-            Double overallCost = order.getOverallCost();
-            Double income = Math.round(overallCost * 10.0) / 100.0;
-            courier.setCurrentBalance(courier.getCurrentBalance() + income.floatValue());
-            courierRepo.save(courier);
-        }
     }
 
     @Override

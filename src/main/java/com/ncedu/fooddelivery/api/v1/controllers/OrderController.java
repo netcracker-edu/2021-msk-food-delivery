@@ -141,18 +141,12 @@ public class OrderController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @PatchMapping("/api/v1/order/{id}/cancellation")
-    public ResponseEntity<?> cancelOrder(@AuthenticationPrincipal User user,
-                                                     @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long id){
-        orderService.cancelOrder(id, user);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/api/v1/order/{id}/status")
     public ResponseEntity<?> changeOrderStatus(@AuthenticationPrincipal User user,
-                                               @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long id){
-        orderService.changeOrderStatus(id, user);
+                                               @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long id,
+                                               @RequestBody ChangeOrderStatusDTO dto
+                                               ){
+        orderService.changeOrderStatus(id, user, dto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
