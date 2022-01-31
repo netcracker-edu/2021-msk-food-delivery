@@ -164,6 +164,7 @@ public class OrderServiceImpl1 implements OrderService {
     }
 
     @Override
+    @Transactional
     public CountOrderCostResponseDTO countOrderCost(CountOrderCostRequestDTO dto) {
         WarehouseInfoDTO warehouse = warehouseService.getNearestWarehouse(dto.getGeo().getLat(), dto.getGeo().getLon());
         if(warehouse == null) throw new NotFoundEx(String.format("{Lat: %s; lon: $s}", dto.getGeo().getLat().toString(),
