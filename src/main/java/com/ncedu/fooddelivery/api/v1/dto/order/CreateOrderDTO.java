@@ -26,6 +26,9 @@ public class CreateOrderDTO {
     private Double highDemandCoeff;
 
     @NotNull
+    private Long warehouseId;
+
+    @NotNull
     @JsonProperty(value = "geo")
     private CountOrderCostRequestDTO.Geo geo;
 

@@ -12,6 +12,7 @@ import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.CourierAvailabilityEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.OrderCostChangedEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.ProductAvailabilityEx;
+import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.WarehouseCoordsBindingEx;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
 import com.ncedu.fooddelivery.api.v1.repos.CourierRepo;
 import com.ncedu.fooddelivery.api.v1.repos.ProductRepo;
@@ -96,10 +97,12 @@ public class OrderServiceImpl1 implements OrderService {
     }
 
     @Override
-    public Double[] countOrderCost(CountOrderCostRequestDTO.Geo geo, List<CountOrderCostRequestDTO.ProductAmountPair> pairs) {
+    public Double[] countOrderCost(CountOrderCostRequestDTO.Geo geo,
+                                   List<CountOrderCostRequestDTO.ProductAmountPair> pairs, Long clientWarehouseId) {
         WarehouseInfoDTO warehouse = warehouseService.getNearestWarehouse(geo.getLat(), geo.getLon());
         if(warehouse == null) throw new NotFoundEx(String.format("{Lat: %s; lon: $s}", geo.getLat().toString(), geo.getLon().toString()));
         Long warehouseId = warehouse.getId();
+        if(!warehouseId.equals(clientWarehouseId)) throw new WarehouseCoordsBindingEx();
 
         List<Long> notFoundProductsIds = new ArrayList<>();
         Map<Long, Integer> productsAvailableAmounts = new HashMap<>();
@@ -170,6 +173,7 @@ public class OrderServiceImpl1 implements OrderService {
         if(warehouse == null) throw new NotFoundEx(String.format("{Lat: %s; lon: $s}", dto.getGeo().getLat().toString(),
                                                    dto.getGeo().getLon().toString()));
         Long warehouseId = warehouse.getId();
+        if(!warehouseId.equals(dto.getWarehouseId())) throw new WarehouseCoordsBindingEx();
 
         List<Long> notFoundProductsIds = new ArrayList<>();
         Map<Long, Integer> productsAvailableAmounts = new HashMap<>();
@@ -264,7 +268,7 @@ public class OrderServiceImpl1 implements OrderService {
         Double clientHighDemandCoeff = dto.getHighDemandCoeff();
 
         // checking that client data is still actual
-        Double[] repeatedCalculation = countOrderCost(dto.getGeo(), dto.getProductAmountPairs());
+        Double[] repeatedCalculation = countOrderCost(dto.getGeo(), dto.getProductAmountPairs(), dto.getWarehouseId());
 
         Double countedCost = repeatedCalculation[0];
         Double countedDiscount = repeatedCalculation[1];

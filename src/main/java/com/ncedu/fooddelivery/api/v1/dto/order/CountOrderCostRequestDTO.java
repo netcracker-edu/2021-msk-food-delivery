@@ -46,6 +46,9 @@ public class CountOrderCostRequestDTO {
     }
 
     @NotNull
+    private Long warehouseId;
+
+    @NotNull
     private Geo geo;
 
     @NotNull

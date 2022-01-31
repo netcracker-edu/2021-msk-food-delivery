@@ -18,7 +18,8 @@ public interface OrderService {
 
     CountOrderCostResponseDTO countOrderCost(CountOrderCostRequestDTO dto);
 
-    Double[] countOrderCost(CountOrderCostRequestDTO.Geo geo, List<CountOrderCostRequestDTO.ProductAmountPair> pairs);
+    Double[] countOrderCost(CountOrderCostRequestDTO.Geo geo, List<CountOrderCostRequestDTO.ProductAmountPair> pairs,
+                            Long warehouseId);
 
     CreatedOrdersIdDTO createOrder(CreateOrderDTO dto, User user);
 

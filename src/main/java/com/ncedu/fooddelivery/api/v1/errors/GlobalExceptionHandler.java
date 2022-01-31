@@ -7,6 +7,7 @@ import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.CourierAvailabilityEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.OrderCostChangedEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.ProductAvailabilityEx;
+import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.WarehouseCoordsBindingEx;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
 import com.ncedu.fooddelivery.api.v1.errors.wrappers.*;
 import org.springframework.core.Ordered;
@@ -245,6 +246,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CourierReplaceException.class)
     public ResponseEntity<Object> handleCourierReplaceException(CourierReplaceException ex){
         ApiError err = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), CourierReplaceException.uuid);
+        return buildResponseEntity(err);
+    }
+
+    @ExceptionHandler(WarehouseCoordsBindingEx.class)
+    public ResponseEntity<Object> handleWarehouseCoordsBindingEx(WarehouseCoordsBindingEx ex){
+        ApiError err = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), WarehouseCoordsBindingEx.uuid);
         return buildResponseEntity(err);
     }
 
