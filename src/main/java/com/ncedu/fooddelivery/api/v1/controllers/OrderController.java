@@ -1,10 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
-import com.ncedu.fooddelivery.api.v1.dto.IsCreatedDTO;
-import com.ncedu.fooddelivery.api.v1.dto.order.CountOrderCostRequestDTO;
-import com.ncedu.fooddelivery.api.v1.dto.order.CountOrderCostResponseDTO;
-import com.ncedu.fooddelivery.api.v1.dto.order.CreateOrderDTO;
-import com.ncedu.fooddelivery.api.v1.dto.order.OrderInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.order.*;
 import com.ncedu.fooddelivery.api.v1.entities.OrderStatus;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
@@ -132,8 +128,8 @@ public class OrderController {
 
     @PreAuthorize("hasAuthority('CLIENT')")
     @PostMapping("/api/v1/order")
-    public ResponseEntity<IsCreatedDTO> createOrder(@AuthenticationPrincipal User user,
-                                                    @Valid @RequestBody CreateOrderDTO dto){
+    public ResponseEntity<CreatedOrdersIdDTO> createOrder(@AuthenticationPrincipal User user,
+                                                          @Valid @RequestBody CreateOrderDTO dto){
         return new ResponseEntity<>(orderService.createOrder(dto, user), HttpStatus.OK);
     }
 

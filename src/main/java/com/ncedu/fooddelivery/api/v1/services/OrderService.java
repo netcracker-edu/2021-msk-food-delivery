@@ -1,10 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.services;
 
-import com.ncedu.fooddelivery.api.v1.dto.IsCreatedDTO;
-import com.ncedu.fooddelivery.api.v1.dto.order.CountOrderCostRequestDTO;
-import com.ncedu.fooddelivery.api.v1.dto.order.CountOrderCostResponseDTO;
-import com.ncedu.fooddelivery.api.v1.dto.order.CreateOrderDTO;
-import com.ncedu.fooddelivery.api.v1.dto.order.OrderInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.order.*;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +20,7 @@ public interface OrderService {
 
     Double[] countOrderCost(CountOrderCostRequestDTO.Geo geo, List<CountOrderCostRequestDTO.ProductAmountPair> pairs);
 
-    IsCreatedDTO createOrder(CreateOrderDTO dto, User user);
+    CreatedOrdersIdDTO createOrder(CreateOrderDTO dto, User user);
 
     OrderInfoDTO getOrderInfo(Long id, User user);
 
