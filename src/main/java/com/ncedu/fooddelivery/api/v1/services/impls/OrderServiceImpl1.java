@@ -33,7 +33,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Predicate;
@@ -564,7 +563,7 @@ public class OrderServiceImpl1 implements OrderService {
     }
 
     @Override
-    public void changeDeliveryRating(Long orderId, BigDecimal newRating, User user) {
+    public void changeDeliveryRating(Long orderId, ChangeRatingDTO dto, User user) {
         userService.checkIsUserLocked(user);
         Order order = getOrder(orderId);
 
@@ -572,19 +571,19 @@ public class OrderServiceImpl1 implements OrderService {
         if(order.getCourier() == null) throw new CourierNotSetException();
         if(!user.getId().equals(order.getClient().getId())) throw new CustomAccessDeniedException();
 
-        order.setDeliveryRating(newRating);
+        order.setDeliveryRating(dto.getRating());
         orderRepo.save(order);
     }
 
     @Override
-    public void changeClientRating(Long orderId, BigDecimal newRating, User user) {
+    public void changeClientRating(Long orderId, ChangeRatingDTO dto, User user) {
         userService.checkIsUserLocked(user);
         Order order = getOrder(orderId);
 
         if(order == null) throw new NotFoundEx(orderId.toString());
         if(order.getCourier() == null || !user.getId().equals(order.getCourier().getId())) throw new CustomAccessDeniedException();
 
-        order.setClientRating(newRating);
+        order.setClientRating(dto.getRating());
         orderRepo.save(order);
     }
 

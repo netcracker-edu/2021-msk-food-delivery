@@ -29,7 +29,7 @@ public interface OrderService {
 
     void replaceCourier(Long orderId, User user);
 
-    void changeDeliveryRating(Long orderId, BigDecimal newRating, User user);
+    void changeDeliveryRating(Long orderId, ChangeRatingDTO dto, User user);
 
-    void changeClientRating(Long orderId, BigDecimal newRating, User user);
+    void changeClientRating(Long orderId, ChangeRatingDTO dto, User user);
 }

@@ -144,7 +144,7 @@ public class OrderController {
     @PatchMapping("/api/v1/order/{id}/status")
     public ResponseEntity<?> changeOrderStatus(@AuthenticationPrincipal User user,
                                                @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long id,
-                                               @RequestBody ChangeOrderStatusDTO dto
+                                               @Valid @RequestBody ChangeOrderStatusDTO dto
                                                ){
         orderService.changeOrderStatus(id, user, dto);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -162,21 +162,19 @@ public class OrderController {
     @PatchMapping("/api/v1/order/{orderId}/courierRating")
     public ResponseEntity<?> changeCourierRating(@AuthenticationPrincipal User user,
                                                  @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long orderId,
-                                                 @RequestParam @Digits(integer = 1, fraction = 2) @DecimalMin(value = "0.0") @DecimalMax(value = "5.0") BigDecimal newRating
-                                                 ){
+                                                 @Valid @RequestBody ChangeRatingDTO dto){
 
-        orderService.changeDeliveryRating(orderId, newRating, user);
+        orderService.changeDeliveryRating(orderId, dto, user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PreAuthorize("hasAuthority('COURIER')")
     @PatchMapping("/api/v1/order/{orderId}/clientRating")
     public ResponseEntity<?> changeClientRating(@AuthenticationPrincipal User user,
-                                                 @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long orderId,
-                                                 @RequestParam @Digits(integer = 1, fraction = 2) @DecimalMin(value = "0.0") @DecimalMax(value = "5.0") BigDecimal newRating
-    ){
-
-        orderService.changeClientRating(orderId, newRating, user);
+                                                @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long orderId,
+                                                @Valid @RequestBody ChangeRatingDTO dto
+                                                ){
+        orderService.changeClientRating(orderId, dto, user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
