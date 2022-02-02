@@ -1,6 +1,5 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
-import com.ncedu.fooddelivery.api.v1.dto.IsCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.*;
 import com.ncedu.fooddelivery.api.v1.dto.warehouseDTOs.WarehouseInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.*;
@@ -37,9 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -75,8 +71,6 @@ public class OrderServiceImpl1 implements OrderService {
 
     GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
-    private ReentrantLock mutex = new ReentrantLock();
-
     @Override
     public Order getOrder(Long id) {
         Optional<Order> optionalOrder = orderRepo.findById(id);
@@ -100,7 +94,8 @@ public class OrderServiceImpl1 implements OrderService {
     public Double[] countOrderCost(CountOrderCostRequestDTO.Geo geo,
                                    List<CountOrderCostRequestDTO.ProductAmountPair> pairs, Long clientWarehouseId) {
         WarehouseInfoDTO warehouse = warehouseService.getNearestWarehouse(geo.getLat(), geo.getLon());
-        if(warehouse == null) throw new NotFoundEx(String.format("{Lat: %s; lon: $s}", geo.getLat().toString(), geo.getLon().toString()));
+        if(warehouse == null) throw new NotFoundEx(String.format("{Lat: %s; lon: %s}", geo.getLat().toString(),
+                geo.getLon().toString()));
         Long warehouseId = warehouse.getId();
         if(!warehouseId.equals(clientWarehouseId)) throw new WarehouseCoordsBindingEx();
 
@@ -163,14 +158,14 @@ public class OrderServiceImpl1 implements OrderService {
 
         orderHighDemandCoeff = countHighDemandCoeff(warehouseId);
         overallOrderCost = Math.round(overallOrderCost * orderHighDemandCoeff * 100.0) / 100.0;
-        return new Double[]{overallOrderCost, overallOrderDiscount, orderHighDemandCoeff, warehouseId.doubleValue()};
+        return new Double[]{overallOrderCost, overallOrderDiscount, orderHighDemandCoeff};
     }
 
     @Override
     @Transactional
     public CountOrderCostResponseDTO countOrderCost(CountOrderCostRequestDTO dto) {
         WarehouseInfoDTO warehouse = warehouseService.getNearestWarehouse(dto.getGeo().getLat(), dto.getGeo().getLon());
-        if(warehouse == null) throw new NotFoundEx(String.format("{Lat: %s; lon: $s}", dto.getGeo().getLat().toString(),
+        if(warehouse == null) throw new NotFoundEx(String.format("{Lat: %s; lon: %s}", dto.getGeo().getLat().toString(),
                                                    dto.getGeo().getLon().toString()));
         Long warehouseId = warehouse.getId();
         if(!warehouseId.equals(dto.getWarehouseId())) throw new WarehouseCoordsBindingEx();
@@ -262,36 +257,162 @@ public class OrderServiceImpl1 implements OrderService {
     @Transactional
     public CreatedOrdersIdDTO createOrder(CreateOrderDTO dto, User user) {
         userService.checkIsUserLocked(user);
+        checkOrderDataActuality(dto);
 
-        Double clientCost = dto.getOverallCost();
-        Double clientDiscount = dto.getDiscount();
-        Double clientHighDemandCoeff = dto.getHighDemandCoeff();
-
-        // checking that client data is still actual
-        Double[] repeatedCalculation = countOrderCost(dto.getGeo(), dto.getProductAmountPairs(), dto.getWarehouseId());
-
-        Double countedCost = repeatedCalculation[0];
-        Double countedDiscount = repeatedCalculation[1];
-        Double countedHighDemandCoeff = repeatedCalculation[2];
-        Long warehouseId = repeatedCalculation[3].longValue();
-
-        if(!clientCost.equals(countedCost) || !clientHighDemandCoeff.equals(countedHighDemandCoeff) ||
-                !clientDiscount.equals(countedDiscount)) throw new OrderCostChangedEx(countedCost,
-                                                         countedDiscount, countedHighDemandCoeff);
-
+        Long warehouseId = dto.getWarehouseId();
         Geometry coords = geometryFactory.createPoint(new Coordinate(dto.getGeo().getLon().doubleValue(),
                 dto.getGeo().getLat().doubleValue()));
 
         List<CountOrderCostRequestDTO.ProductAmountPair> pairs = dto.getProductAmountPairs();
+        Object[] productPosMaps = getProductPositionsData(pairs, warehouseId);
 
-        // we will use later Maps below to reserve product positions from warehouse and put them in order
-        Map<Long, Double> productPosPriceMap = new HashMap<>();     // productPositionId -> amount * (price - discount)
+        // we will use later Maps below to reserve product positions from warehouse and put them in order(s)
+        HashMap<Long, Double> productPosPriceMap = (HashMap<Long, Double>) productPosMaps[0];
+        HashMap<Long, Integer> productPosAmountMap = (HashMap<Long, Integer>) productPosMaps[1];
+
+        Double orderWeight = countOrderWeight(pairs);
+        if(orderWeight > 15000d){
+            int neededCouriersAmount = (int) Math.ceil(orderWeight / 15000d);
+            List<ProductPosition> productPositions = getSortedProductPositions(productPosAmountMap);
+            // we've got sorted by weight sequence of product positions, so we can put them into different orders
+
+            List<Order> orders = new ArrayList<>();
+            for(int i = 0; i < neededCouriersAmount; i++){
+                Order order = buildOrder(user, coords, dto, productPositions);
+
+                // attaching courier and then order status = 'courier_appointed'
+                Courier courier;
+                try{
+                    courier = findFreeCourier(warehouseId);
+                } catch (CourierAvailabilityEx ex){
+                    for(Order o: orders){
+                        o.setStatus(OrderStatus.CANCELLED);   // DB trigger will return all reserved product
+                                                                  // positions back to warehouse
+                        orderRepo.save(o);
+                    }
+                    throw ex;
+                }
+                order.setCourier(courier);
+                order.setStatus(OrderStatus.COURIER_APPOINTED);
+                orders.add(orderRepo.save(order));
+            }
+
+            return new CreatedOrdersIdDTO(orders.stream().map(order -> order.getId()).collect(Collectors.toList()));
+
+        } else {
+            Order order = buildOrder(user, coords, dto, productPosPriceMap, productPosAmountMap);
+
+            // attaching courier and then order status = 'courier_appointed'
+            Courier courier;
+            try{
+                courier = findFreeCourier(warehouseId);
+            } catch (CourierAvailabilityEx ex){
+                order.setStatus(OrderStatus.CANCELLED);   // DB trigger will return all reserved product positions back
+                // to warehouse
+                orderRepo.save(order);
+                throw ex;
+            }
+            order.setCourier(courier);
+            order.setStatus(OrderStatus.COURIER_APPOINTED);
+            orderRepo.save(order);
+            return new CreatedOrdersIdDTO(List.of(order.getId()));
+        }
+    }
+
+    private Order buildOrder(User user, Geometry coords, CreateOrderDTO dto, Map<Long, Double> productPosPriceMap,
+                             Map<Long, Integer> productPosAmountMap){
+        Order order = new Order();
+        order.setDiscount(dto.getDiscount());
+        order.setHighDemandCoeff(dto.getHighDemandCoeff());
+        order.setOverallCost(dto.getOverallCost());
+        order.setClient(user.getClient());
+        order.setWarehouse(warehouseService.findById(dto.getWarehouseId()));
+        order.setAddress(dto.getAddress());
+        order.setCoordinates(coords);
+        order.setStatus(OrderStatus.CREATED);
+        order.setDateStart(new Timestamp(System.currentTimeMillis()));
+
+        // adding records in DB table 'orders_product_positions'
+        for(Long productPositionId: productPosAmountMap.keySet()){
+            orderProductPositionRepo.save(new OrderProductPosition(order,
+                    productPositionRepo.findById(productPositionId).get(),
+                    productPosAmountMap.get(productPositionId),
+                    productPosPriceMap.get(productPositionId)));
+        }
+        return orderRepo.save(order);
+
+    }
+
+    private Order buildOrder(User user, Geometry coords, CreateOrderDTO dto, List<ProductPosition> productPositions){
+        Order order = new Order();
+        final int weightLimit = 15000;
+        int currentWeight = 0;
+
+        Map<Long, Integer> currOrderPositions = new HashMap<>();
+        // adding records in DB table 'orders_product_positions'
+        for(int j = 0; j < productPositions.size() && weightLimit != currentWeight; j++){
+            ProductPosition currPos = productPositions.get(j);
+            int currPosWeight = currPos.getProduct().getWeight();
+            if((weightLimit - currentWeight) >= currPosWeight){
+                currentWeight += currPosWeight;
+                currOrderPositions.merge(currPos.getId(), 1, Integer::sum);
+                productPositions.remove(j);
+                j--;
+            }
+        }
+
+        Double orderCost = 0d;
+        Double orderDiscount = 0d;
+        for(Long psId: currOrderPositions.keySet()){
+            int amount = currOrderPositions.get(psId);
+            ProductPosition ps = productPositionRepo.findById(psId).get();
+            Double price = (ps.getProduct().getPrice() - ps.getProduct().getDiscount()) * amount;
+            Double discount = amount * ps.getProduct().getDiscount();
+            orderCost += price;
+            orderDiscount += discount;
+        }
+        order.setDiscount(orderDiscount);
+        order.setHighDemandCoeff(dto.getHighDemandCoeff());
+        order.setOverallCost(orderCost);
+        order.setClient(user.getClient());
+        order.setWarehouse(warehouseService.findById(dto.getWarehouseId()));
+        order.setAddress(dto.getAddress());
+        order.setCoordinates(coords);
+        order.setStatus(OrderStatus.CREATED);
+        order.setDateStart(new Timestamp(System.currentTimeMillis()));
+        order = orderRepo.save(order);
+        for(Long psId: currOrderPositions.keySet()) {
+            int amount = currOrderPositions.get(psId);
+            ProductPosition ps = productPositionRepo.findById(psId).get();
+            orderProductPositionRepo.save(new OrderProductPosition(order, ps, amount,
+                    (ps.getProduct().getPrice() - ps.getProduct().getDiscount()) * amount));
+        }
+        return order;
+    }
+
+    private List<ProductPosition> getSortedProductPositions(Map<Long, Integer> productPosAmountMap){
+        List<ProductPosition> productPositions = new ArrayList<>();   // every product position in order
+        for(Map.Entry<Long, Integer> prodPos: productPosAmountMap.entrySet()){
+            productPositions.addAll(Collections.nCopies(prodPos.getValue(),
+                    productPositionRepo.findById(prodPos.getKey()).get()));
+        }
+        productPositions = productPositions.stream().sorted(new Comparator<ProductPosition>() {
+            @Override
+            public int compare(ProductPosition ps1, ProductPosition ps2) {
+                int weight1 = ps1.getProduct().getWeight(), weight2 = ps2.getProduct().getWeight();
+                return weight1 > weight2 ? -1 : weight1 == weight2 ? 0 : 1;
+            }
+        }).collect(Collectors.toList());
+        return productPositions;
+    }
+
+    private Object[] getProductPositionsData(List<CountOrderCostRequestDTO.ProductAmountPair> pairs, Long warehouseId){
+        Map<Long, Double> productPosPriceMap = new HashMap<>();     // productPositionId -> amount * (price -
+        // discount)
         Map<Long, Integer> productPosAmountMap = new HashMap<>();   // productPositionId -> amount
 
         for(CountOrderCostRequestDTO.ProductAmountPair pair: pairs){
             Long productId = pair.getId();
-            Product product = productRepo.findById(productId).get();
-            Double productCost = product.getPrice() - product.getDiscount();
             Integer requestedAmount = pair.getAmount();
             List<ProductPosition> productPositions = productPositionRepo.findByProductIdAndWarehouseId(productId, warehouseId);
 
@@ -316,147 +437,49 @@ public class OrderServiceImpl1 implements OrderService {
                 }
             }).collect(Collectors.toList());
 
-            // reserving product positions
-            Integer ship = 0;
-            for(int i = 0; i < productPositions.size() && !ship.equals(requestedAmount); i++){
-                ProductPosition currentPos = productPositions.get(i);
-                if( (requestedAmount - ship) <= currentPos.getCurrentAmount()){
-                    currentPos.setCurrentAmount(currentPos.getCurrentAmount() - (requestedAmount - ship));
-                    productPositionRepo.save(currentPos);
-                    productPosAmountMap.put(currentPos.getId(), requestedAmount - ship);
-                    productPosPriceMap.put(currentPos.getId(), (requestedAmount - ship) * productCost);
-                    break;
-                } else {
-                    ship += currentPos.getCurrentAmount();
-                    productPosAmountMap.put(currentPos.getId(), currentPos.getCurrentAmount());
-                    productPosPriceMap.put(currentPos.getId(), productCost * (currentPos.getCurrentAmount()));
-                    currentPos.setCurrentAmount(0);
-                    productPositionRepo.save(currentPos);
-                }
-            }
-
+            reserveProductPositions(productPositions, requestedAmount, productPosPriceMap, productPosAmountMap);
         }
+        return new Object[]{productPosPriceMap, productPosAmountMap};
+    }
 
-        Double orderWeight = countOrderWeight(pairs);
-        if(orderWeight > 15000d){
-            int neededCouriersAmount = (int) Math.ceil(orderWeight / 15000d);
-            List<ProductPosition> productPositions = new ArrayList<>();   // every product position in order
-            for(Map.Entry<Long, Integer> prodPos: productPosAmountMap.entrySet()){
-                productPositions.addAll(Collections.nCopies(prodPos.getValue(),
-                                      productPositionRepo.findById(prodPos.getKey()).get()));
+    private void reserveProductPositions(List<ProductPosition> productPositions, Integer requestedAmount,
+                                         Map<Long, Double> productPosPriceMap, Map<Long, Integer> productPosAmountMap){
+        Product product = productPositions.get(0).getProduct();
+        Double productCost = product.getPrice() - product.getDiscount();
+        Integer ship = 0;
+        for(int i = 0; i < productPositions.size() && !ship.equals(requestedAmount); i++){
+            ProductPosition currentPos = productPositions.get(i);
+            if( (requestedAmount - ship) <= currentPos.getCurrentAmount()){
+                currentPos.setCurrentAmount(currentPos.getCurrentAmount() - (requestedAmount - ship));
+                productPositionRepo.save(currentPos);
+                productPosAmountMap.put(currentPos.getId(), requestedAmount - ship);
+                productPosPriceMap.put(currentPos.getId(), (requestedAmount - ship) * productCost);
+                break;
+            } else {
+                ship += currentPos.getCurrentAmount();
+                productPosAmountMap.put(currentPos.getId(), currentPos.getCurrentAmount());
+                productPosPriceMap.put(currentPos.getId(), productCost * (currentPos.getCurrentAmount()));
+                currentPos.setCurrentAmount(0);
+                productPositionRepo.save(currentPos);
             }
-            productPositions = productPositions.stream().sorted(new Comparator<ProductPosition>() {
-                @Override
-                public int compare(ProductPosition ps1, ProductPosition ps2) {
-                    int weight1 = ps1.getProduct().getWeight(), weight2 = ps2.getProduct().getWeight();
-                    return weight1 > weight2 ? -1 : weight1 == weight2 ? 0 : 1;
-                }
-            }).collect(Collectors.toList());
-
-            // we've got sorted sequence of product positions, so we can put them into different orders for different
-            // couriers
-
-            List<Order> orders = new ArrayList<>();
-            for(int i = 0; i < neededCouriersAmount; i++){
-                Order order = new Order();
-                int weightLimit = 15000;
-                int currentWeight = 0;
-
-                Map<Long, Integer> currOrderPositions = new HashMap<>();
-                // adding records in DB table 'orders_product_positions'
-                for(int j = 0; j < productPositions.size() && weightLimit != currentWeight; j++){
-                    ProductPosition currPos = productPositions.get(j);
-                    int currPosWeight = currPos.getProduct().getWeight();
-                    if((weightLimit - currentWeight) >= currPosWeight){
-                        currentWeight += currPosWeight;
-                        currOrderPositions.merge(currPos.getId(), 1, Integer::sum);
-                        productPositions.remove(j);
-                        j--;
-                    }
-                }
-
-                Double orderCost = 0d;
-                Double orderDiscount = 0d;
-                for(Long psId: currOrderPositions.keySet()){
-                    int amount = currOrderPositions.get(psId);
-                    ProductPosition ps = productPositionRepo.findById(psId).get();
-                    Double price = (ps.getProduct().getPrice() - ps.getProduct().getDiscount()) * amount;
-                    Double discount = amount * ps.getProduct().getDiscount();
-                    orderCost += price;
-                    orderDiscount += discount;
-                }
-                order.setDiscount(orderDiscount);
-                order.setHighDemandCoeff(countedHighDemandCoeff);
-                order.setOverallCost(orderCost);
-                order.setClient(user.getClient());
-                order.setWarehouse(warehouseService.findById(warehouseId));
-                order.setAddress(dto.getAddress());
-                order.setCoordinates(coords);
-                order.setStatus(OrderStatus.CREATED);
-                order.setDateStart(new Timestamp(System.currentTimeMillis()));
-                orderRepo.save(order);
-                orders.add(order);
-                for(Long psId: currOrderPositions.keySet()) {
-                    int amount = currOrderPositions.get(psId);
-                    ProductPosition ps = productPositionRepo.findById(psId).get();
-                    orderProductPositionRepo.save(new OrderProductPosition(order, ps, amount,
-                                        (ps.getProduct().getPrice() - ps.getProduct().getDiscount()) * amount));
-                }
-
-                // attaching courier and then order status = 'courier_appointed'
-                Courier courier = new Courier();
-                try{
-                    courier = findFreeCourier(warehouseId);
-                } catch (CourierAvailabilityEx ex){
-                    for(Order o: orders){
-                        order.setStatus(OrderStatus.CANCELLED);   // DB trigger will return all reserved product
-                                                                  // positions back to warehouse
-                        orderRepo.save(order);
-                    }
-                    throw ex;
-                }
-                order.setCourier(courier);
-                order.setStatus(OrderStatus.COURIER_APPOINTED);
-                orderRepo.save(order);
-            }
-
-            return new CreatedOrdersIdDTO(orders.stream().map(order -> order.getId()).collect(Collectors.toList()));
-
-        } else {
-            Order order = new Order();
-            order.setDiscount(countedDiscount);
-            order.setHighDemandCoeff(countedHighDemandCoeff);
-            order.setOverallCost(countedCost);
-            order.setClient(user.getClient());
-            order.setWarehouse(warehouseService.findById(warehouseId));
-            order.setAddress(dto.getAddress());
-            order.setCoordinates(coords);
-            order.setStatus(OrderStatus.CREATED);
-            order.setDateStart(new Timestamp(System.currentTimeMillis()));
-            Long orderId = orderRepo.save(order).getId();
-
-            // adding records in DB table 'orders_product_positions'
-            for(Long productPositionId: productPosAmountMap.keySet()){
-                orderProductPositionRepo.save(new OrderProductPosition(order,
-                        productPositionRepo.findById(productPositionId).get(),
-                        productPosAmountMap.get(productPositionId),
-                        productPosPriceMap.get(productPositionId)));
-            }
-
-            // attaching courier and then order status = 'courier_appointed'
-            Courier courier = new Courier();
-            try{
-                courier = findFreeCourier(warehouseId);
-            } catch (CourierAvailabilityEx ex){
-                order.setStatus(OrderStatus.CANCELLED);   // DB trigger will return all reserved product positions back
-                // to warehouse
-                orderRepo.save(order);
-                throw ex;
-            }
-            order.setCourier(courier);
-            order.setStatus(OrderStatus.COURIER_APPOINTED);
-            return new CreatedOrdersIdDTO(Arrays.asList(orderId));
         }
+    }
+
+    private void checkOrderDataActuality(CreateOrderDTO dto){
+        Double clientCost = dto.getOverallCost();
+        Double clientDiscount = dto.getDiscount();
+        Double clientHighDemandCoeff = dto.getHighDemandCoeff();
+
+        // checking that client data is still actual
+        Double[] repeatedCalculation = countOrderCost(dto.getGeo(), dto.getProductAmountPairs(), dto.getWarehouseId());
+
+        Double countedCost = repeatedCalculation[0];
+        Double countedDiscount = repeatedCalculation[1];
+        Double countedHighDemandCoeff = repeatedCalculation[2];
+
+        if(!clientCost.equals(countedCost) || !clientHighDemandCoeff.equals(countedHighDemandCoeff) ||
+                !clientDiscount.equals(countedDiscount)) throw new OrderCostChangedEx(countedCost,
+                countedDiscount, countedHighDemandCoeff);
     }
 
     public Double countOrderWeight(List<CountOrderCostRequestDTO.ProductAmountPair> products){
