@@ -12,7 +12,7 @@ import java.util.List;
 public interface OrderService {
     Order getOrder(Long id);
 
-    List<OrderInfoDTO> findFiltered(Specification<Order> spec, Pageable pageable);
+    List<OrderInfoDTO> findFiltered(User user, OrderFilterDTO dto, Pageable pageable);
 
     List<OrderInfoDTO> getOrdersHistory(User user, Pageable pageable);
 

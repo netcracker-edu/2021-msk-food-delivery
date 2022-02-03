@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.specifications;
 
+import com.ncedu.fooddelivery.api.v1.dto.order.OrderFilterDTO;
 import com.ncedu.fooddelivery.api.v1.entities.OrderStatus;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,25 +19,21 @@ public class OrderSpecifications {
     private static final Calendar cal = Calendar.getInstance();
 
     public static Specification<Order> getFilterSpecification(
-            Long clientId, Long warehouseId, Long courierId, String address,
-            OrderStatus status, Date dateStart, Date dateEnd,
-            BigDecimal overallCost, BigDecimal highDemandCoeff,
-            BigDecimal discount, Long promoCodeId,
-            BigDecimal clientRating, BigDecimal deliveryRating){
+            OrderFilterDTO dto){
 
-        return  hasClientId(clientId).
-                and(hasWarehouseId(warehouseId)).
-                and(hasCourierId(courierId)).
-                and(hasAddress(address)).
-                and(hasStatus(status)).
-                and(hasDateStart(dateStart)).
-                and(hasDateEnd(dateEnd)).
-                and(hasOverallCost(overallCost)).
-                and(hasHighDemandCoeff(highDemandCoeff)).
-                and(hasDiscount(discount)).
-                and(hasPromoCodeId(promoCodeId)).
-                and(hasClientRating(clientRating)).
-                and(hasDeliveryRating(deliveryRating));
+        return  hasClientId(dto.getClientId()).
+                and(hasWarehouseId(dto.getWarehouseId())).
+                and(hasCourierId(dto.getCourierId())).
+                and(hasAddress(dto.getAddress())).
+                and(hasStatus(dto.getStatus())).
+                and(hasDateStart(dto.getDateStart())).
+                and(hasDateEnd(dto.getDateEnd())).
+                and(hasOverallCost(dto.getOverallCost())).
+                and(hasHighDemandCoeff(dto.getHighDemandCoeff())).
+                and(hasDiscount(dto.getDiscount())).
+                and(hasPromoCodeId(dto.getPromoCodeId())).
+                and(hasClientRating(dto.getClientRating())).
+                and(hasDeliveryRating(dto.getDeliveryRating()));
     }
 
     public static Specification<Order> hasClientId(Long id){

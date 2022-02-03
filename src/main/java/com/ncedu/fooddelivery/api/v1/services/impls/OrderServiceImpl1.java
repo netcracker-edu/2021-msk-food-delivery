@@ -24,6 +24,7 @@ import com.ncedu.fooddelivery.api.v1.services.CourierService;
 import com.ncedu.fooddelivery.api.v1.services.OrderService;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
 import com.ncedu.fooddelivery.api.v1.services.WarehouseService;
+import com.ncedu.fooddelivery.api.v1.specifications.OrderSpecifications;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -79,8 +80,19 @@ public class OrderServiceImpl1 implements OrderService {
     }
 
     @Override
-    public List<OrderInfoDTO> findFiltered(Specification<Order> spec, Pageable pageable) {
+    public List<OrderInfoDTO> findFiltered(User user, OrderFilterDTO dto, Pageable pageable) {
+        userService.checkIsUserLocked(user);
+        Specification<Order> spec;
 
+        if(user.getRole() == Role.MODERATOR){
+            Long moderatorWarehouseId = user.getModerator().getWarehouseId();
+            if(dto.getWarehouseId() != null){
+                if(!dto.getWarehouseId().equals(moderatorWarehouseId)) throw new CustomAccessDeniedException();
+            }
+
+        } else dto.setWarehouseId(null);
+
+        spec = OrderSpecifications.getFilterSpecification(dto);
         return orderRepo.findAll(spec, pageable).stream().map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
     }
 
