@@ -38,6 +38,7 @@ public class Courier {
     @Column(name = "rating")
     private Float rating;
 
+    @MapsId
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "courier_id")
     private User user;

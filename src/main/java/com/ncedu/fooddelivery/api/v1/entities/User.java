@@ -65,6 +65,15 @@ public class User implements Serializable, UserDetails {
         this.moderator.setUser(this);
     }
 
+    @OneToOne(cascade=CascadeType.ALL, mappedBy = "user")
+    @PrimaryKeyJoinColumn
+    private Courier courier;
+
+    public void setCourier(Courier courier) {
+        this.courier = courier;
+        this.courier.setUser(this);
+    }
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
     private List<File> files;
 
@@ -82,15 +91,12 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return checkUserNotLocked();
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        if (lockDate == null) {
-            return true;
-        }
-        return false;
+        return checkUserNotLocked();
     }
 
     @Override
@@ -100,9 +106,10 @@ public class User implements Serializable, UserDetails {
 
     @Override
     public boolean isEnabled() {
-        if (lockDate == null) {
-            return true;
-        }
-        return false;
+        return checkUserNotLocked();
+    }
+
+    private boolean checkUserNotLocked() {
+        return lockDate == null ? true : false;
     }
 }
