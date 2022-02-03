@@ -60,8 +60,7 @@ public class OrderController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/api/v1/order/price")
-    public ResponseEntity<CountOrderCostResponseDTO> countOrderCost(@AuthenticationPrincipal User user,
-                                                                    @Valid @RequestBody CountOrderCostRequestDTO requestDTO){
+    public ResponseEntity<CountOrderCostResponseDTO> countOrderCost(@Valid @RequestBody CountOrderCostRequestDTO requestDTO){
         CountOrderCostResponseDTO responseDTO = orderService.countOrderCost(requestDTO);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
