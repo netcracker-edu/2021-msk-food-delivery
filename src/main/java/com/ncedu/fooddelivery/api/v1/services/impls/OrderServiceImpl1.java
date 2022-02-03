@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
+import com.ncedu.fooddelivery.api.v1.dto.AreCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.*;
 import com.ncedu.fooddelivery.api.v1.dto.warehouseDTOs.WarehouseInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.*;
@@ -225,6 +226,7 @@ public class OrderServiceImpl1 implements OrderService {
 
         orderHighDemandCoeff = countHighDemandCoeff(warehouseId);
         overallOrderCost = Math.round(overallOrderCost * orderHighDemandCoeff * 100.0) / 100.0;
+
         return new CountOrderCostResponseDTO(overallOrderCost, overallOrderDiscount, orderHighDemandCoeff);
     }
 
@@ -254,7 +256,7 @@ public class OrderServiceImpl1 implements OrderService {
 
     @Override
     @Transactional
-    public CreatedOrdersIdDTO createOrder(CreateOrderDTO dto, User user) {
+    public AreCreatedDTO createOrder(CreateOrderDTO dto, User user) {
         userService.checkIsUserLocked(user);
         checkOrderDataActuality(dto);
 
@@ -296,7 +298,7 @@ public class OrderServiceImpl1 implements OrderService {
                 orders.add(orderRepo.save(order));
             }
 
-            return new CreatedOrdersIdDTO(orders.stream().map(order -> order.getId()).collect(Collectors.toList()));
+            return new AreCreatedDTO(orders.stream().map(order -> order.getId()).collect(Collectors.toList()));
 
         } else {
             Order order = buildOrder(user, coords, dto, productPosPriceMap, productPosAmountMap);
@@ -314,7 +316,7 @@ public class OrderServiceImpl1 implements OrderService {
             order.setCourier(courier);
             order.setStatus(OrderStatus.COURIER_APPOINTED);
             orderRepo.save(order);
-            return new CreatedOrdersIdDTO(List.of(order.getId()));
+            return new AreCreatedDTO(List.of(order.getId()));
         }
     }
 
