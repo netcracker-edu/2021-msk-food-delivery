@@ -132,9 +132,10 @@ public class OrderServiceImpl1 implements OrderService {
         return orderRepo.getCourierOrdersHistory(user.getId(), pageable).stream()
                         .map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
     }
+
     @Override
     public Double[] countOrderCost(CountOrderCostRequestDTO.Geo geo,
-                                   List<CountOrderCostRequestDTO.ProductAmountPair> pairs, Long clientWarehouseId) {
+                                   HashMap<Long, Integer> pairs, Long clientWarehouseId) {
         WarehouseInfoDTO warehouse = warehouseService.getNearestWarehouse(geo.getLat(), geo.getLon());
         if(warehouse == null) throw new NotFoundEx(String.format("{Lat: %s; lon: %s}", geo.getLat().toString(),
                 geo.getLon().toString()));
@@ -148,11 +149,9 @@ public class OrderServiceImpl1 implements OrderService {
         Double overallOrderDiscount = 0.0;
         Double orderHighDemandCoeff;
 
-        checkIdsUnique(pairs);
-
-        for(CountOrderCostRequestDTO.ProductAmountPair pair: pairs){
-            Long productId = pair.getId();
-            Integer requestedAmount = pair.getAmount();
+        for(Map.Entry<Long, Integer> pair: pairs.entrySet()){
+            Long productId = pair.getKey();
+            Integer requestedAmount = pair.getValue();
 
             // 'findByProductIdAndWarehouseId' sets lock on every product position in result set. So no one other thread
             // will be able to interact with these positions before whole transaction will complete.
@@ -219,11 +218,9 @@ public class OrderServiceImpl1 implements OrderService {
         Double overallOrderDiscount = 0.0;
         Double orderHighDemandCoeff;
 
-        checkIdsUnique(dto.getProductAmountPairs());
-
-        for(CountOrderCostRequestDTO.ProductAmountPair pair: dto.getProductAmountPairs()){
-            Long productId = pair.getId();
-            Integer requestedAmount = pair.getAmount();
+        for(Map.Entry<Long, Integer> pair: dto.getProductAmountPairs().entrySet()){
+            Long productId = pair.getKey();
+            Integer requestedAmount = pair.getValue();
 
             List<ProductPosition> productPositions = productPositionRepo.findByProductIdAndWarehouseId(productId, warehouseId);
             if(productPositions.size() == 0){
@@ -306,7 +303,7 @@ public class OrderServiceImpl1 implements OrderService {
         Geometry coords = geometryFactory.createPoint(new Coordinate(dto.getGeo().getLon().doubleValue(),
                 dto.getGeo().getLat().doubleValue()));
 
-        List<CountOrderCostRequestDTO.ProductAmountPair> pairs = dto.getProductAmountPairs();
+        HashMap<Long, Integer> pairs = dto.getProductAmountPairs();
         Object[] productPosMaps = getProductPositionsData(pairs, warehouseId);
 
         // we will use later Maps below to reserve product positions from warehouse and put them in order(s)
@@ -449,14 +446,14 @@ public class OrderServiceImpl1 implements OrderService {
         return productPositions;
     }
 
-    private Object[] getProductPositionsData(List<CountOrderCostRequestDTO.ProductAmountPair> pairs, Long warehouseId){
+    private Object[] getProductPositionsData(HashMap<Long, Integer> pairs, Long warehouseId){
         Map<Long, Double> productPosPriceMap = new HashMap<>();     // productPositionId -> amount * (price -
         // discount)
         Map<Long, Integer> productPosAmountMap = new HashMap<>();   // productPositionId -> amount
 
-        for(CountOrderCostRequestDTO.ProductAmountPair pair: pairs){
-            Long productId = pair.getId();
-            Integer requestedAmount = pair.getAmount();
+        for(Map.Entry<Long, Integer> pair: pairs.entrySet()){
+            Long productId = pair.getKey();
+            Integer requestedAmount = pair.getValue();
             List<ProductPosition> productPositions = productPositionRepo.findByProductIdAndWarehouseId(productId, warehouseId);
 
             //filtering expired product positions and sorting by manufacture date
@@ -525,9 +522,9 @@ public class OrderServiceImpl1 implements OrderService {
                 countedDiscount, countedHighDemandCoeff);
     }
 
-    public Double countOrderWeight(List<CountOrderCostRequestDTO.ProductAmountPair> products){
-        return products.stream().map(
-                        p -> productRepo.findById(p.getId()).get().getWeight() * p.getAmount())
+    public Double countOrderWeight(HashMap<Long, Integer> products){
+        return products.entrySet().stream().map(
+                        p -> productRepo.findById(p.getKey()).get().getWeight() * p.getValue())
                 .reduce( (accum, next) -> accum += next)
                 .get().doubleValue();
     }
@@ -629,12 +626,6 @@ public class OrderServiceImpl1 implements OrderService {
 
         order.setClientRating(dto.getRating());
         orderRepo.save(order);
-    }
-
-    public void checkIdsUnique(List<CountOrderCostRequestDTO.ProductAmountPair> pairs){
-        List<Long> ids = pairs.stream().map(pair -> pair.getId()).collect(Collectors.toList());
-        List<Long> uniqueIds = ids.stream().distinct().collect(Collectors.toList());
-        if(ids.size() != uniqueIds.size()) throw new NotUniqueIdException();
     }
 
     public OrderInfoDTO convertToOrderInfoDTO(Order order){

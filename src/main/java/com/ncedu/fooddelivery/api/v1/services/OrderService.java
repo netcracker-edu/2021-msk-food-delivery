@@ -7,6 +7,7 @@ import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.HashMap;
 import java.util.List;
 
 public interface OrderService {
@@ -20,7 +21,7 @@ public interface OrderService {
 
     CountOrderCostResponseDTO countOrderCost(CountOrderCostRequestDTO dto);
 
-    Double[] countOrderCost(CountOrderCostRequestDTO.Geo geo, List<CountOrderCostRequestDTO.ProductAmountPair> pairs,
+    Double[] countOrderCost(CountOrderCostRequestDTO.Geo geo, HashMap<Long, Integer> pairs,
                             Long warehouseId);
 
     AreCreatedDTO createOrder(CreateOrderDTO dto, User user);

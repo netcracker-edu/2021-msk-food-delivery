@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import javax.validation.constraints.*;
+import java.util.HashMap;
 import java.util.List;
 
 @Data
@@ -34,13 +35,14 @@ public class CreateOrderDTO {
 
     @NotNull
     @JsonProperty(value = "products")
-    private List<CountOrderCostRequestDTO.ProductAmountPair> productAmountPairs;
+    private HashMap<Long, Integer> productAmountPairs;
 
     @NotNull
     @Size(min = 10, max = 100)
     private String address;
 
-    public CreateOrderDTO(Double overallCost, Double discount, Double highDemandCoeff, CountOrderCostRequestDTO.Geo geo, List<CountOrderCostRequestDTO.ProductAmountPair> productAmountPairs, String address) {
+    public CreateOrderDTO(Double overallCost, Double discount, Double highDemandCoeff,
+                          CountOrderCostRequestDTO.Geo geo, HashMap<Long, Integer> productAmountPairs, String address) {
         this.overallCost = overallCost;
         this.discount = discount;
         this.highDemandCoeff = highDemandCoeff;

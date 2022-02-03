@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 
 @Data
@@ -28,23 +29,6 @@ public class CountOrderCostRequestDTO {
         }
     }
 
-    @Data
-    public static class ProductAmountPair{
-
-        @JsonProperty(value = "productId")
-        @NotNull
-        @Min(value = 1L) @Max(value = Long.MAX_VALUE)
-        Long id;
-
-        @JsonProperty(value = "amount")
-        @NotNull
-        @Min(value = 1) @Max(value = Integer.MAX_VALUE)
-        Integer amount;
-
-        public ProductAmountPair() {
-        }
-    }
-
     @NotNull
     private Long warehouseId;
 
@@ -53,6 +37,6 @@ public class CountOrderCostRequestDTO {
 
     @NotNull
     @JsonProperty(value = "products")
-    private List<ProductAmountPair> productAmountPairs;
+    private HashMap<Long, Integer> productAmountPairs;
 
 }
