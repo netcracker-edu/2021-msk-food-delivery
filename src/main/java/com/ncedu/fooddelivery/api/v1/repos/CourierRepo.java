@@ -27,8 +27,17 @@ public interface CourierRepo extends JpaRepository<Courier, Long> {
                 "SELECT courier_id FROM " +
                 "couriers INNER JOIN delivery_sessions USING (courier_id) " +
                 "INNER JOIN orders USING (courier_id) " +
-                "WHERE delivery_sessions.end_time IS NULL AND orders.warehouse_id = :id AND orders.status IN ('CANCELLED', 'DELIVERING')) " +
-            "OR (courier_id NOT IN (SELECT courier_id FROM orders WHERE courier_id IS NOT NULL) AND courier_id IN (SELECT courier_id FROM delivery_sessions INNER JOIN couriers USING (courier_id) WHERE delivery_sessions.end_time IS NULL AND couriers.warehouse_id = :id)) " +
+                "WHERE delivery_sessions.end_time IS NULL AND orders.warehouse_id = :id AND orders.status IN " +
+                "('CANCELLED', 'DELIVERED') AND courier_id NOT IN " +
+                    "(SELECT courier_id FROM orders " +
+                    "WHERE orders.status IN ('COURIER_APPOINTED', 'PACKING', 'DELIVERING')" +
+                    ")" +
+            ") " +
+            "OR " +
+            "(courier_id NOT IN " +
+                "(SELECT courier_id FROM orders WHERE courier_id IS NOT NULL) " +
+                "AND courier_id IN (SELECT courier_id FROM delivery_sessions INNER JOIN couriers USING (courier_id) " +
+                "WHERE delivery_sessions.end_time IS NULL AND couriers.warehouse_id = :id)) " +
             "LIMIT 1",
             nativeQuery = true)
     Courier getWaitingCourierByWarehouse(@Param(value = "id") Long warehouseId);

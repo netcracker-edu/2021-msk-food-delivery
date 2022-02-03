@@ -362,7 +362,7 @@ public class OrderServiceImpl1 implements OrderService {
         order.setCoordinates(coords);
         order.setStatus(OrderStatus.CREATED);
         order.setDateStart(new Timestamp(System.currentTimeMillis()));
-
+        order = orderRepo.save(order);
         // adding records in DB table 'orders_product_positions'
         for(Long productPositionId: productPosAmountMap.keySet()){
             orderProductPositionRepo.save(new OrderProductPosition(order,
