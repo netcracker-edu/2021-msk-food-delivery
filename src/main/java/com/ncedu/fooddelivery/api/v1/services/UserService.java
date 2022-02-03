@@ -24,4 +24,6 @@ public interface UserService {
 
 
     public void setLastSigninFromNow(User user);
+
+    public UserInfoDTO switchLockById(Long userId);
 }

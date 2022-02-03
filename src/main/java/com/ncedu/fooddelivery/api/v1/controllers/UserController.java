@@ -113,6 +113,12 @@ public class UserController {
         return  new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PatchMapping("/api/v1/user/{id}/lock")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
+    public UserInfoDTO switchLock(@PathVariable Long id) {
+        return userService.switchLockById(id);
+    }
+
     @GetMapping("/api/v1/admins")
     @PreAuthorize("hasAuthority('ADMIN')")
     public List<UserInfoDTO> getAdminList() {

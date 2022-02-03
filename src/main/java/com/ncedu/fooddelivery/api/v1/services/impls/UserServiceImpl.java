@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -47,7 +48,7 @@ public class UserServiceImpl implements UserService {
     private UserInfoDTO createUserDTO(User user) {
        return new UserInfoDTO(user.getId(), user.getRole().name(),
                 user.getFullName(), user.getEmail(),
-                user.getLastSigninDate(), user.getAvatarId());
+                user.getLastSigninDate(), user.getAvatarId(), user.getLockDate());
     }
 
     @Override
@@ -133,5 +134,21 @@ public class UserServiceImpl implements UserService {
         Timestamp now = new Timestamp(System.currentTimeMillis());
         user.setLastSigninDate(now);
         userRepo.save(user);
+    }
+
+    @Override
+    public UserInfoDTO switchLockById(Long userId) {
+        User user = getUserById(userId);
+        if (Role.isCOURIER(user.getRole().name())) {
+            user.getCourier().setWarehouse(null);
+        }
+        Timestamp lockDate = user.getLockDate();
+        if (lockDate == null) {
+            user.setLockDate(Timestamp.valueOf(LocalDateTime.now()));
+        } else {
+            user.setLockDate(null);
+        }
+        userRepo.save(user);
+        return createUserDTO(user);
     }
 }
