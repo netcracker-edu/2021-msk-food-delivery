@@ -4,8 +4,8 @@ import com.ncedu.fooddelivery.api.v1.dto.AreCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.*;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
@@ -14,7 +14,9 @@ public interface OrderService {
 
     List<OrderInfoDTO> findFiltered(User user, OrderFilterDTO dto, Pageable pageable);
 
-    List<OrderInfoDTO> getOrdersHistory(User user, Pageable pageable);
+    List<OrderInfoDTO> getOrdersHistory(User user, Long targetId, Pageable pageable);
+
+    List<OrderInfoDTO> getMyOrdersHistory(User user, Pageable pageable);
 
     CountOrderCostResponseDTO countOrderCost(CountOrderCostRequestDTO dto);
 

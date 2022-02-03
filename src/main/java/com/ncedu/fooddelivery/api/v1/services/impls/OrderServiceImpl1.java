@@ -97,11 +97,41 @@ public class OrderServiceImpl1 implements OrderService {
     }
 
     @Override
-    public List<OrderInfoDTO> getOrdersHistory(User user, Pageable pageable) {
-        if(user.getRole() == Role.CLIENT) return orderRepo.getClientOrdersHistory(user.getId(), pageable).stream().map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
-        return orderRepo.getCourierOrdersHistory(user.getId(), pageable).stream().map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
+    public List<OrderInfoDTO> getOrdersHistory(User user, Long targetId, Pageable pageable) {
+        userService.checkIsUserLocked(user);
+        User targetUser = userService.getUserById(targetId);
+        if(targetUser == null) throw new NotFoundEx(String.valueOf(targetId));
+        if(targetUser.getRole() == Role.ADMIN || targetUser.getRole() == Role.MODERATOR) throw new IncorrectUserRoleRequestException();
+
+        List<OrderInfoDTO> orders;
+        if(targetUser.getRole() == Role.CLIENT){
+            orders = orderRepo.getClientOrdersHistory(targetId, pageable).stream()
+                              .map(order -> convertToOrderInfoDTO(order))
+                              .collect(Collectors.toList());
+        } else {
+            orders = orderRepo.getCourierOrdersHistory(targetId, pageable).stream()
+                              .map(order -> convertToOrderInfoDTO(order))
+                              .collect(Collectors.toList());
+        }
+
+        if(user.getRole() == Role.MODERATOR){
+            orders = orders.stream().filter(order -> order.getWarehouse().getId().equals(user.getModerator().getWarehouseId()))
+                                    .collect(Collectors.toList());
+        }
+        return orders;
     }
 
+    @Override
+    public List<OrderInfoDTO> getMyOrdersHistory(User user, Pageable pageable) {
+        userService.checkIsUserLocked(user);
+        if(user.getRole() == Role.ADMIN || user.getRole() == Role.MODERATOR) throw new IncorrectUserRoleRequestException();
+        if(user.getRole() == Role.CLIENT) return orderRepo.getClientOrdersHistory(user.getId(), pageable).stream()
+                                                          .map(order -> convertToOrderInfoDTO(order))
+                                                          .collect(Collectors.toList());
+
+        return orderRepo.getCourierOrdersHistory(user.getId(), pageable).stream()
+                        .map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
+    }
     @Override
     public Double[] countOrderCost(CountOrderCostRequestDTO.Geo geo,
                                    List<CountOrderCostRequestDTO.ProductAmountPair> pairs, Long clientWarehouseId) {
