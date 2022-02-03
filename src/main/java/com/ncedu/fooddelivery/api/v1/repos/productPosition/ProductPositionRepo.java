@@ -54,5 +54,11 @@ public interface ProductPositionRepo extends JpaRepository<ProductPosition, Long
             value = "SELECT ps FROM ProductPosition ps " +
                     "WHERE ps.product.id = :id AND ps.warehouse.id = :warehouseId"
     )
+    List<ProductPosition> findByProductIdAndWarehouseIdWithLock(@Param(value = "id") Long id, @Param(value = "warehouseId") Long warehouseId);
+
+    @Query(
+            value = "SELECT ps FROM ProductPosition ps " +
+                    "WHERE ps.product.id = :id AND ps.warehouse.id = :warehouseId"
+    )
     List<ProductPosition> findByProductIdAndWarehouseId(@Param(value = "id") Long id, @Param(value = "warehouseId") Long warehouseId);
 }

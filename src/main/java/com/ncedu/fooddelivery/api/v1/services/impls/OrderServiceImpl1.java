@@ -153,9 +153,10 @@ public class OrderServiceImpl1 implements OrderService {
             Long productId = pair.getKey();
             Integer requestedAmount = pair.getValue();
 
-            // 'findByProductIdAndWarehouseId' sets lock on every product position in result set. So no one other thread
+            // 'findByProductIdAndWarehouseIdWithLock' sets lock on every product position in result set. So no one
+            // other thread
             // will be able to interact with these positions before whole transaction will complete.
-            List<ProductPosition> productPositions = productPositionRepo.findByProductIdAndWarehouseId(productId, warehouseId);
+            List<ProductPosition> productPositions = productPositionRepo.findByProductIdAndWarehouseIdWithLock(productId, warehouseId);
 
             if(productPositions.size() == 0){
                 notFoundProductsIds.add(productId);
@@ -203,7 +204,6 @@ public class OrderServiceImpl1 implements OrderService {
     }
 
     @Override
-    @Transactional
     public CountOrderCostResponseDTO countOrderCost(CountOrderCostRequestDTO dto) {
         WarehouseInfoDTO warehouse = warehouseService.getNearestWarehouse(dto.getGeo().getLat(), dto.getGeo().getLon());
         if(warehouse == null) throw new NotFoundEx(String.format("{Lat: %s; lon: %s}", dto.getGeo().getLat().toString(),
@@ -270,18 +270,8 @@ public class OrderServiceImpl1 implements OrderService {
     }
 
     public Double countHighDemandCoeff(Long warehouseId){
-        short workingCouriersAmount = 0;
-        short deliveringCouriersAmount = 0;
-        int i = 0;
-        try{
-            for( ; i < 15; i++){
-                workingCouriersAmount = courierRepo.countWorkingCouriersByWarehouse(warehouseId);
-                deliveringCouriersAmount = courierRepo.countDeliveringCouriersByWarehouse(warehouseId);
-                if(workingCouriersAmount != deliveringCouriersAmount) break;
-                Thread.sleep(2000);
-            }
-        } catch (InterruptedException ex){}
-        if(i == 15) throw new CourierAvailabilityEx();
+        short workingCouriersAmount = courierRepo.countWorkingCouriersByWarehouse(warehouseId);
+        short deliveringCouriersAmount = courierRepo.countDeliveringCouriersByWarehouse(warehouseId);
 
         int waitingCouriersAmount = workingCouriersAmount - deliveringCouriersAmount;
 
@@ -454,7 +444,7 @@ public class OrderServiceImpl1 implements OrderService {
         for(Map.Entry<Long, Integer> pair: pairs.entrySet()){
             Long productId = pair.getKey();
             Integer requestedAmount = pair.getValue();
-            List<ProductPosition> productPositions = productPositionRepo.findByProductIdAndWarehouseId(productId, warehouseId);
+            List<ProductPosition> productPositions = productPositionRepo.findByProductIdAndWarehouseIdWithLock(productId, warehouseId);
 
             //filtering expired product positions and sorting by manufacture date
             productPositions = productPositions.stream().filter(new Predicate<ProductPosition>() {
