@@ -1,6 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.dto.order;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ncedu.fooddelivery.api.v1.dto.CoordsDTO;
 import lombok.Data;
 
 import javax.validation.constraints.*;
@@ -31,7 +32,7 @@ public class CreateOrderDTO {
 
     @NotNull
     @JsonProperty(value = "geo")
-    private CountOrderCostRequestDTO.Geo geo;
+    private CoordsDTO geo;
 
     @NotNull
     @JsonProperty(value = "products")
@@ -42,7 +43,7 @@ public class CreateOrderDTO {
     private String address;
 
     public CreateOrderDTO(Double overallCost, Double discount, Double highDemandCoeff,
-                          CountOrderCostRequestDTO.Geo geo, HashMap<Long, Integer> productAmountPairs, String address) {
+                          CoordsDTO geo, HashMap<Long, Integer> productAmountPairs, String address) {
         this.overallCost = overallCost;
         this.discount = discount;
         this.highDemandCoeff = highDemandCoeff;

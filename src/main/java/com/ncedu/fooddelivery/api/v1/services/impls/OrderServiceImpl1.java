@@ -1,6 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
 import com.ncedu.fooddelivery.api.v1.dto.AreCreatedDTO;
+import com.ncedu.fooddelivery.api.v1.dto.CoordsDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.*;
 import com.ncedu.fooddelivery.api.v1.dto.warehouseDTOs.WarehouseInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.*;
@@ -134,7 +135,7 @@ public class OrderServiceImpl1 implements OrderService {
     }
 
     @Override
-    public Double[] countOrderCost(CountOrderCostRequestDTO.Geo geo,
+    public Double[] countOrderCost(CoordsDTO geo,
                                    HashMap<Long, Integer> pairs, Long clientWarehouseId) {
         WarehouseInfoDTO warehouse = warehouseService.getNearestWarehouse(geo.getLat(), geo.getLon());
         if(warehouse == null) throw new NotFoundEx(String.format("{Lat: %s; lon: %s}", geo.getLat().toString(),
