@@ -1,14 +1,24 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
+import com.ncedu.fooddelivery.api.v1.dto.CoordsDTO;
 import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductCreateDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductUpdateDTO;
+import com.ncedu.fooddelivery.api.v1.dto.product.SearchProductDTO;
+import com.ncedu.fooddelivery.api.v1.dto.warehouseDTOs.WarehouseInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Product;
+import com.ncedu.fooddelivery.api.v1.entities.Warehouse;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.mappers.ProductMapper;
 import com.ncedu.fooddelivery.api.v1.repos.ProductRepo;
 import com.ncedu.fooddelivery.api.v1.services.ProductService;
+import com.ncedu.fooddelivery.api.v1.services.WarehouseService;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.PrecisionModel;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,12 +34,18 @@ import java.util.Optional;
 import static org.springframework.data.domain.Sort.Order.desc;
 
 @Service
+@Slf4j
 public class ProductServiceImpl implements ProductService {
 
     @Autowired
     ProductRepo productRepo;
 
+    @Autowired
+    WarehouseService warehouseService;
+
     ProductMapper productMapper = ProductMapper.INSTANCE;
+
+    GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
     @Override
     public Product getProductById(Long productId) {
@@ -88,48 +104,49 @@ public class ProductServiceImpl implements ProductService {
 
     //TODO: rewrite with extracting List forward from page.
     @Override
-    public List<ProductDTO> getProducts(Pageable pageable) {
-        Iterable<Product> products = productRepo.findAll(pageable);
-        Iterator<Product> iterator = products.iterator();
-        List<ProductDTO> productsDTO = new ArrayList<>();
-        while (iterator.hasNext()) {
-            productsDTO.add(productMapper.mapToDTO(iterator.next()));
-        }
-        return productsDTO;
+    public List<ProductDTO> getProducts(CoordsDTO coordinates, Pageable pageable) {
+        Long warehouseId = getWarehouseIdByCoordinates(coordinates);
+        Iterable<Product> products = productRepo.findAll(warehouseId, pageable);
+        return createProductsDtoFromIterable(products);
     }
 
     @Override
-    public List<ProductDTO> getProductsInShowcase(Pageable pageable) {
-        Iterable<Product> products = productRepo.findAllByInShowcase(true, pageable);
-        Iterator<Product> iterator = products.iterator();
-        List<ProductDTO> productsDTO = new ArrayList<>();
-        while (iterator.hasNext()) {
-            productsDTO.add(productMapper.mapToDTO(iterator.next()));
-        }
-        return productsDTO;
-    }
-    //TODO: refactor search funcs (eliminate duplicates)
-    @Override
-    public List<ProductDTO> searchProducts(String phrase, Pageable pageable) {
-
-        String resultPhrase = preparePhraseToSearch(phrase);
-        Iterable<Product> products = productRepo.searchProducts(
-                                resultPhrase,
-                                PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
-        Iterator<Product> iterator = products.iterator();
-        List<ProductDTO> productsDTO = new ArrayList<>();
-        while (iterator.hasNext()) {
-            productsDTO.add(productMapper.mapToDTO(iterator.next()));
-        }
-        return productsDTO;
+    public List<ProductDTO> getProductsInShowcase(CoordsDTO coordinates, Pageable pageable) {
+        Long warehouseId = getWarehouseIdByCoordinates(coordinates);
+        Iterable<Product> products = productRepo.findAllByInShowcase(warehouseId, pageable);
+        return createProductsDtoFromIterable(products);
     }
 
     @Override
-    public List<ProductDTO> searchProductsInShowcase(String phrase, Pageable pageable) {
-        String resultPhrase = preparePhraseToSearch(phrase);
-        Iterable<Product> products = productRepo.searchProductsInShowcase(
-                                resultPhrase,
-                                PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
+    public List<ProductDTO> searchProducts(SearchProductDTO searchDTO, Pageable pageable) {
+        Long warehouseId = getWarehouseIdByCoordinates(searchDTO.getGeo());
+        String resultPhrase = preparePhraseToSearch(searchDTO.getPhrase());
+        Iterable<Product> products = productRepo.searchProducts(resultPhrase, warehouseId, pageable);
+        return createProductsDtoFromIterable(products);
+    }
+
+    @Override
+    public List<ProductDTO> searchProductsInShowcase(SearchProductDTO searchDTO, Pageable pageable) {
+        Long warehouseId = getWarehouseIdByCoordinates(searchDTO.getGeo());
+        String resultPhrase = preparePhraseToSearch(searchDTO.getPhrase());
+        Iterable<Product> products = productRepo.searchProductsInShowcase(resultPhrase, warehouseId,pageable);
+        return createProductsDtoFromIterable(products);
+    }
+
+    private Long getWarehouseIdByCoordinates(CoordsDTO coordinates) {
+        Point geo = makeGeoCoordinates(coordinates);
+        WarehouseInfoDTO nearestWarehouse = warehouseService.getNearestWarehouse(geo);
+        log.debug("WAREHOUSE "+ nearestWarehouse.getId() +" for coords: " + geo);
+        return nearestWarehouse.getId();
+    }
+
+    private Point makeGeoCoordinates(CoordsDTO coordinates) {
+        double lon = coordinates.getLon().doubleValue();
+        double lat = coordinates.getLat().doubleValue();
+        return geometryFactory.createPoint(new Coordinate(lon, lat));
+    }
+
+    private List<ProductDTO> createProductsDtoFromIterable(Iterable<Product> products) {
         Iterator<Product> iterator = products.iterator();
         List<ProductDTO> productsDTO = new ArrayList<>();
         while (iterator.hasNext()) {

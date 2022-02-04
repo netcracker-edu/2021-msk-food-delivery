@@ -1,10 +1,12 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
+import com.ncedu.fooddelivery.api.v1.dto.CoordsDTO;
 import com.ncedu.fooddelivery.api.v1.dto.SearchDTO;
 import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductCreateDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductUpdateDTO;
+import com.ncedu.fooddelivery.api.v1.dto.product.SearchProductDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.services.ProductService;
@@ -28,7 +30,6 @@ import java.util.Map;
 @RestController
 public class ProductController {
     //TODO: maybe add filters
-    //TODO: add unit tests
 
     @Autowired
     ProductService productService;
@@ -91,39 +92,27 @@ public class ProductController {
         return  new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
-    //TODO: modify with warehouse and product positions limits
     @GetMapping("/api/v1/products")
     public List<ProductDTO> getProducts(
-            @PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable,
+            @Valid @RequestBody CoordsDTO coordinates,
+            @PageableDefault(sort = { "product_id" }, direction = Sort.Direction.ASC) Pageable pageable,
             @AuthenticationPrincipal User authedUser) {
         String authedUserRole = authedUser.getRole().name();
-        List<ProductDTO> productsDTO = null;
-
         if (Role.isCLIENT(authedUserRole)) {
-            productsDTO = productService.getProductsInShowcase(pageable);
-        } else {
-            productsDTO = productService.getProducts(pageable);
+            return productService.getProductsInShowcase(coordinates, pageable);
         }
-        return productsDTO;
+        return productService.getProducts(coordinates, pageable);
     }
 
-    //TODO: modify with warehouse and product positions limits
     @GetMapping("/api/v1/products/search")
     public List<ProductDTO> searchProducts(
-            @Valid @RequestBody SearchDTO searchDTO,
+            @Valid @RequestBody SearchProductDTO searchDTO,
             @PageableDefault Pageable pageable,
             @AuthenticationPrincipal User authedUser) {
-        String phrase = searchDTO.getPhrase();
-        List<ProductDTO> productsDTO;
         String authedUserRole = authedUser.getRole().name();
-
         if (Role.isCLIENT(authedUserRole)) {
-            productsDTO = productService.searchProductsInShowcase(phrase, pageable);
-        } else {
-            productsDTO = productService.searchProducts(phrase, pageable);
+            return productService.searchProductsInShowcase(searchDTO, pageable);
         }
-        return productsDTO;
+        return productService.searchProducts(searchDTO, pageable);
     }
-
 }
