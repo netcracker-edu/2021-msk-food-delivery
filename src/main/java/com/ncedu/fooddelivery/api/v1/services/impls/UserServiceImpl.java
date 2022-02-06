@@ -151,4 +151,27 @@ public class UserServiceImpl implements UserService {
         userRepo.save(user);
         return createUserDTO(user);
     }
+
+    @Override
+    public List<UserInfoDTO> searchUsers(String phrase, Pageable pageable) {
+        String resultPhrase = preparePhraseToSearch(phrase);
+        Iterable<User> users = userRepo.searchUsers(resultPhrase, pageable);
+        Iterator<User> iterator = users.iterator();
+        List<UserInfoDTO> usersDTO = new ArrayList<>();
+        while (iterator.hasNext()) {
+            usersDTO.add(createUserDTO(iterator.next()));
+        }
+        return usersDTO;
+    }
+
+    private String preparePhraseToSearch(String phrase) {
+        String[] splitedPhrase = phrase.split(" ");
+        if (splitedPhrase.length == 1) {
+            return phrase + ":*";
+        }
+        for (int i = 0; i < splitedPhrase.length; i++) {
+            splitedPhrase[i] += ":*";
+        }
+        return String.join(" & ", splitedPhrase);
+    }
 }
