@@ -14,6 +14,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -77,6 +78,35 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
+    @ExceptionHandler(BindException.class)
+    protected ResponseEntity<?> handleBindException(BindException ex) {
+        log.error(ex.getMessage(), ex);
+        final String UUID = "6ecfc3db-e67c-41c0-a6fd-468d78c2fa26";
+        final String mainMessage = "Parameters not valid!";
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID);
+        List<ApiSubError> validationErrors = getValidationErrors(ex);
+        apiError.setSubErrors(validationErrors);
+        return buildResponseEntity(apiError);
+    }
+
+    private List<ApiSubError> getValidationErrors(BindException notValidEx) {
+        List<ApiSubError> validationErrors = new ArrayList<>();
+        List<ObjectError> objectErrors = notValidEx.getBindingResult().getAllErrors();
+        for (ObjectError objectError : objectErrors) {
+            validationErrors.add(createValidationSubError(objectError));
+        }
+        return validationErrors;
+    }
+
+    private ValidationSubError createValidationSubError(ObjectError objectError) {
+        FieldError fieldError = (FieldError) objectError;
+        String objectName = fieldError.getObjectName();
+        String fieldName = fieldError.getField();
+        Object rejectedValue = fieldError.getRejectedValue();
+        String errorMessage = fieldError.getDefaultMessage();
+        return new ValidationSubError(objectName, fieldName, rejectedValue, errorMessage);
+    }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<Object> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex){
         final String mainMessage = "Type mismatch. Param: {" + ex.getName() + "}; Value: {" + ex.getValue().toString() + "}.";
@@ -116,24 +146,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ProductPositionNotEnoughException.class)
     protected ResponseEntity<Object> handleProductPositionNotEnoughException (ProductPositionNotEnoughException ex){
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ProductPositionNotEnoughException.UUID));
-    }
-
-    private List<ApiSubError> getValidationErrors(MethodArgumentNotValidException notValidEx) {
-        List<ApiSubError> validationErrors = new ArrayList<>();
-        List<ObjectError> objectErrors = notValidEx.getBindingResult().getAllErrors();
-        for (ObjectError objectError : objectErrors) {
-            validationErrors.add(createValidationSubError(objectError));
-        }
-        return validationErrors;
-    }
-
-    private ValidationSubError createValidationSubError(ObjectError objectError) {
-        FieldError fieldError = (FieldError) objectError;
-        String objectName = fieldError.getObjectName();
-        String fieldName = fieldError.getField();
-        Object rejectedValue = fieldError.getRejectedValue();
-        String errorMessage = fieldError.getDefaultMessage();
-        return new ValidationSubError(objectName, fieldName, rejectedValue, errorMessage);
     }
 
     @ExceptionHandler(AlreadyExistsException.class)
@@ -198,6 +210,14 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, message, UUID));
     }
 
+    @ExceptionHandler(RefreshTokenException.class)
+    public ResponseEntity<Object> handleRefreshTokenException(
+            RefreshTokenException ex) {
+        log.error(ex.getMessage(), ex);
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
+
+    }
+  
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleNotProcessedException(
             Exception ex) {
@@ -206,6 +226,7 @@ public class GlobalExceptionHandler {
         final String message = "Unknown exception. Internal server error";
         return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, message, UUID));
     }
+    
   
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());

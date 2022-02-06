@@ -1,9 +1,11 @@
 package com.ncedu.fooddelivery.api.v1.services;
 
+import com.ncedu.fooddelivery.api.v1.dto.CoordsDTO;
 import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductCreateDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductUpdateDTO;
+import com.ncedu.fooddelivery.api.v1.dto.product.SearchProductDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Product;
 import org.springframework.data.domain.Pageable;
 
@@ -17,8 +19,8 @@ public interface ProductService {
     public void updateProduct(Long id, ProductUpdateDTO updatedProduct);
     public boolean switchInShowcaseStatus(Long id);
     public void deleteProduct(Long id);
-    public List<ProductDTO> getProducts(Pageable pageable);
-    public List<ProductDTO> getProductsInShowcase(Pageable pageable);
-    public List<ProductDTO> searchProducts(String phrase, Pageable pageable);
-    public List<ProductDTO> searchProductsInShowcase(String phrase, Pageable pageable);
+    public List<ProductDTO> getProducts(CoordsDTO coordinates, Pageable pageable);
+    public List<ProductDTO> getProductsInShowcase(CoordsDTO coordinates, Pageable pageable);
+    public List<ProductDTO> searchProducts(SearchProductDTO searchDTO, Pageable pageable);
+    public List<ProductDTO> searchProductsInShowcase(SearchProductDTO searchDTO, Pageable pageable);
 }

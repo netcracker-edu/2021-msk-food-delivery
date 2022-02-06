@@ -51,9 +51,19 @@ public class User implements Serializable, UserDetails {
     @PrimaryKeyJoinColumn
     private Client client;
 
+    public void setClient(Client client) {
+        this.client = client;
+        this.client.setUser(this);
+    }
+
     @OneToOne(cascade=CascadeType.ALL, mappedBy = "user")
     @PrimaryKeyJoinColumn
     private Moderator moderator;
+
+    public void setModerator(Moderator moderator) {
+        this.moderator = moderator;
+        this.moderator.setUser(this);
+    }
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
     private List<File> files;

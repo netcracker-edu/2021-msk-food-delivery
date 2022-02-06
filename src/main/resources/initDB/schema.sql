@@ -61,6 +61,14 @@ CREATE TABLE IF NOT EXISTS moderators
 	warehouse_id BIGINT REFERENCES warehouses (warehouse_id) ON DELETE SET NULL
 );
 
+CREATE TABLE IF NOT EXISTS user_refresh_tokens
+(
+	token_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	create_date TIMESTAMP NOT NULL,
+	user_agent TEXT,
+	owner_id BIGINT REFERENCES users (user_id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS products
 (
 	product_id BIGSERIAL PRIMARY KEY,

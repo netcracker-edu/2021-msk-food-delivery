@@ -27,7 +27,6 @@ import java.util.Map;
 @Slf4j
 @RestController
 public class UserController {
-    //TODO: develop JWT authentication (login, logout endpoints)
     //TODO: finish PATCH role endpoint
     //TODO: add changing warehouse for moderator and courier
     //TODO: delete photo from user (only Admin)
@@ -45,7 +44,6 @@ public class UserController {
     public UserInfoDTO getUserById(
             @PathVariable Long id,
             @AuthenticationPrincipal User authedUser) {
-        log.debug("GET /api/v1/user/"+id);
         UserInfoDTO userInfo = userService.getUserDTOById(id);
         if (userInfo == null) {
             throw new NotFoundEx(id.toString());
@@ -72,7 +70,6 @@ public class UserController {
     public ResponseEntity<?> changeUserInfo(
             @PathVariable Long id,
             @Valid @RequestBody UserChangeInfoDTO newUserInfo) {
-        log.debug("PUT /api/v1/user/"+id);
         User user = userService.getUserById(id);
         String userRole = user.getRole().name();
         boolean isModified = false;
@@ -90,7 +87,6 @@ public class UserController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteUser(
             @PathVariable Long id) {
-        log.debug("DELETE /api/v1/user/" + id);
         boolean isDeleted = userService.deleteUserById(id);
         if (isDeleted) {
             log.debug("Deleted user " + id);
@@ -120,7 +116,6 @@ public class UserController {
     @GetMapping("/api/v1/admins")
     @PreAuthorize("hasAuthority('ADMIN')")
     public List<UserInfoDTO> getAdminList() {
-        log.debug("GET /api/v1/admins");
         List<UserInfoDTO> userList = userService.getAllAdmins();
         return userList;
     }
@@ -130,9 +125,7 @@ public class UserController {
     public List<UserInfoDTO> getUserList(
             @PageableDefault(sort = { "id" }, direction = Sort.Direction.ASC) Pageable pageable
     ) {
-        log.debug("GET /api/v1/users PAGE=" + pageable.getPageSize() + " SIZE=" +pageable.getPageSize());
         List<UserInfoDTO> userList = userService.getAllUsers(pageable);
         return userList;
     }
-
 }
