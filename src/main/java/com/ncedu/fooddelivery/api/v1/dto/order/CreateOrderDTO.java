@@ -2,6 +2,7 @@ package com.ncedu.fooddelivery.api.v1.dto.order;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ncedu.fooddelivery.api.v1.dto.CoordsDTO;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.validation.constraints.*;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
 public class CreateOrderDTO {
 
     @NotNull
@@ -42,18 +44,7 @@ public class CreateOrderDTO {
     @Size(min = 10, max = 100)
     private String address;
 
-    public CreateOrderDTO(Double overallCost, Double discount, Double highDemandCoeff,
-                          CoordsDTO geo, HashMap<Long, Integer> productAmountPairs, String address) {
-        this.overallCost = overallCost;
-        this.discount = discount;
-        this.highDemandCoeff = highDemandCoeff;
-        this.geo = geo;
-        this.productAmountPairs = productAmountPairs;
-        this.address = address;
-    }
-
     public CreateOrderDTO(){
 
     }
-
 }

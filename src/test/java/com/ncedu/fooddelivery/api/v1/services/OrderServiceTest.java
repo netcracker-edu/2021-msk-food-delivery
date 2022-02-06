@@ -11,7 +11,6 @@ import com.ncedu.fooddelivery.api.v1.entities.orderProductPosition.OrderProductP
 import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPosition;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.CourierNotSetException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.CourierReplaceException;
-import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.ProductAvailabilityEx;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
 import com.ncedu.fooddelivery.api.v1.repos.CourierRepo;
@@ -158,14 +157,12 @@ public class OrderServiceTest {
         Courier fakeCourier = getFakeCourier2();
         Order fakeOrder = getFakeOrder();
 
-        Mockito.when(orderRepo.findById(1L)).thenReturn(Optional.of(fakeOrder));
-        Mockito.when(courierRepo.findAnotherAvailableCourier(1L, 1L)).thenReturn(fakeCourier);
+        Mockito.when(courierRepo.getWaitingCourierByWarehouse(1L)).thenReturn(fakeCourier);
 
-        orderService.replaceCourier(1L, fakeUser);
+        orderService.replaceCourier(fakeOrder, fakeUser);
         Assertions.assertEquals(fakeOrder.getCourier(), fakeCourier);
 
-        Mockito.verify(courierRepo, Mockito.times(1)).findAnotherAvailableCourier(1L, 1L);
-        Mockito.verify(orderRepo, Mockito.times(1)).findById(1L);
+        Mockito.verify(courierRepo, Mockito.times(1)).getWaitingCourierByWarehouse(1L);
     }
 
     @Test
@@ -175,17 +172,12 @@ public class OrderServiceTest {
         Order fakeOrder = getFakeOrder();
         fakeOrder.setWarehouse(getFakeWarehouse2());
 
-        Mockito.when(orderRepo.findById(1L)).thenReturn(Optional.of(fakeOrder));
-        Mockito.when(courierRepo.findAnotherAvailableCourier(1L, 1L)).thenReturn(mockCourier);
-
         Assertions.assertThrows(CustomAccessDeniedException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                orderService.replaceCourier(1L, fakeUser);
+                orderService.replaceCourier(fakeOrder, fakeUser);
             }
         });
-
-        Mockito.verify(orderRepo, Mockito.times(1)).findById(1L);
     }
 
     @Test
@@ -195,17 +187,12 @@ public class OrderServiceTest {
         Order fakeOrder = getFakeOrder();
         fakeOrder.setStatus(OrderStatus.DELIVERED);
 
-        Mockito.when(orderRepo.findById(1L)).thenReturn(Optional.of(fakeOrder));
-        Mockito.when(courierRepo.findAnotherAvailableCourier(1L, 1L)).thenReturn(mockCourier);
-
         Assertions.assertThrows(CourierReplaceException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                orderService.replaceCourier(1L, fakeUser);
+                orderService.replaceCourier(fakeOrder, fakeUser);
             }
         });
-
-        Mockito.verify(orderRepo, Mockito.times(1)).findById(1L);
     }
 
     @Test
@@ -277,13 +264,11 @@ public class OrderServiceTest {
         dto.setNewStatus(OrderStatus.DELIVERED);
         Order fakeOrder = getFakeOrder();
 
-        Mockito.when(orderRepo.findById(Mockito.any(Long.class))).thenReturn(Optional.of(fakeOrder));
         Mockito.when(orderRepo.save(Mockito.any(Order.class))).thenReturn(fakeOrder);
 
-        orderService.changeOrderStatus(1L, getFakeUserClient(), dto);
+        orderService.changeOrderStatus(fakeOrder, getFakeUserClient(), dto);
         Assertions.assertTrue(fakeOrder.getStatus() == OrderStatus.DELIVERED);
 
-        Mockito.verify(orderRepo, Mockito.times(1)).findById(1L);
         Mockito.verify(orderRepo, Mockito.times(1)).save(fakeOrder);
     }
 
@@ -293,17 +278,14 @@ public class OrderServiceTest {
         dto.setNewStatus(OrderStatus.DELIVERED);
         Order fakeOrder = getFakeOrder();
 
-        Mockito.when(orderRepo.findById(Mockito.any(Long.class))).thenReturn(Optional.of(fakeOrder));
         Mockito.when(orderRepo.save(Mockito.any(Order.class))).thenReturn(fakeOrder);
 
         Assertions.assertThrows(CustomAccessDeniedException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                orderService.changeOrderStatus(1L, getFakeCourier2().getUser(), dto);
+                orderService.changeOrderStatus(fakeOrder, getFakeCourier2().getUser(), dto);
             }
         });
-
-        Mockito.verify(orderRepo, Mockito.times(1)).findById(1L);
     }
 
     @Test
@@ -313,13 +295,11 @@ public class OrderServiceTest {
         fakeDto.setRating(new BigDecimal(4.5));
         Order fakeOrder = getFakeOrder();
 
-        Mockito.when(orderRepo.findById(Mockito.any(Long.class))).thenReturn(Optional.of(fakeOrder));
         Mockito.when(orderRepo.save(Mockito.any(Order.class))).thenReturn(fakeOrder);
 
-        orderService.changeDeliveryRating(1L, fakeDto, fakeUser);
+        orderService.changeDeliveryRating(fakeOrder, fakeDto, fakeUser);
         Assertions.assertTrue(fakeOrder.getDeliveryRating().equals(new BigDecimal(4.5)));
-
-        Mockito.verify(orderRepo, Mockito.times(1)).findById(1L);
+        Mockito.verify(orderRepo, Mockito.times(1)).save(fakeOrder);
     }
 
     @Test
@@ -329,27 +309,10 @@ public class OrderServiceTest {
         Order fakeOrder = getFakeOrder();
         fakeOrder.setCourier(null);
 
-        Mockito.when(orderRepo.findById(Mockito.any(Long.class))).thenReturn(Optional.of(fakeOrder));
-
         Assertions.assertThrows(CourierNotSetException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
-                orderService.changeDeliveryRating(1L, fakeDto, fakeUser);
-            }
-        });
-    }
-
-    @Test
-    public void changeClientRatingNotFoundExTest(){
-        User fakeUser = getFakeUserClient();
-        ChangeRatingDTO fakeDto = new ChangeRatingDTO();
-
-        Mockito.when(orderRepo.findById(Mockito.any(Long.class))).thenReturn(Optional.empty());
-
-        Assertions.assertThrows(NotFoundEx.class, new Executable() {
-            @Override
-            public void execute() throws Throwable {
-                orderService.changeDeliveryRating(1L, fakeDto, fakeUser);
+                orderService.changeDeliveryRating(fakeOrder, fakeDto, fakeUser);
             }
         });
     }

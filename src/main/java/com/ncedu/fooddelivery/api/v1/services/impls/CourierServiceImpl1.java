@@ -22,12 +22,12 @@ public class CourierServiceImpl1 implements CourierService {
     }
 
     @Override
-    public Courier getAnotherAvailableCourier(Long currentCourierId, Long warehouseId) {
+    public Courier findFreeCourier(Long warehouseId){
         Courier courier = new Courier();
         int i = 0;
         try{
             for( ; i < 15; i++){
-                courier = courierRepo.findAnotherAvailableCourier(currentCourierId, warehouseId);
+                courier = courierRepo.getWaitingCourierByWarehouse(warehouseId);
                 if(courier != null) break;
                 Thread.sleep(2000);
             }

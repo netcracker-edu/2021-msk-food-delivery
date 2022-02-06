@@ -3,6 +3,7 @@ package com.ncedu.fooddelivery.api.v1.controllers;
 import com.ncedu.fooddelivery.api.v1.dto.AreCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.*;
 import com.ncedu.fooddelivery.api.v1.entities.User;
+import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import com.ncedu.fooddelivery.api.v1.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +17,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.*;
 import java.util.List;
 
 @Validated
@@ -37,20 +37,20 @@ public class OrderController {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    @GetMapping("/api/v1/user/{id}/orders")
-    public ResponseEntity<List<OrderInfoDTO>> getOrdersHistory(@AuthenticationPrincipal User user,
-                                                               @PathVariable @Min(value = 1) @Max(value = Long.MAX_VALUE) Long id,
+    @GetMapping("/api/v1/user/{user}/orders")
+    public ResponseEntity<List<OrderInfoDTO>> getOrdersHistory(@AuthenticationPrincipal User authedUser,
+                                                               @PathVariable User targetUser,
                                                                @PageableDefault(sort = { "date_start" },
                                                                direction = Sort.Direction.DESC) Pageable pageable){
 
 
 
-        return new ResponseEntity<>(orderService.getOrdersHistory(user, id, pageable), HttpStatus.OK);
+        return new ResponseEntity<>(orderService.getOrdersHistory(authedUser, targetUser, pageable), HttpStatus.OK);
     }
 
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/api/v1/user/orders")
+    @PreAuthorize("hasAnyAuthority('CLIENT', 'COURIER')")
+    @GetMapping("/api/v1/profile/orders")
     public ResponseEntity<List<OrderInfoDTO>> getMyOrdersHistory(@AuthenticationPrincipal User user,
                                                                  @PageableDefault(sort = { "date_start" },
                                                                  direction = Sort.Direction.DESC) Pageable pageable){
@@ -58,7 +58,6 @@ public class OrderController {
         return new ResponseEntity<>(orderService.getMyOrdersHistory(user, pageable), HttpStatus.OK);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/api/v1/order/price")
     public ResponseEntity<CountOrderCostResponseDTO> countOrderCost(@Valid @RequestBody CountOrderCostRequestDTO requestDTO){
         CountOrderCostResponseDTO responseDTO = orderService.countOrderCost(requestDTO);
@@ -72,48 +71,46 @@ public class OrderController {
         return new ResponseEntity<>(orderService.createOrder(dto, user), HttpStatus.OK);
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/api/v1/order/{id}")
+    @GetMapping("/api/v1/order/{order}")
     public ResponseEntity<OrderInfoDTO> getOrderInfo(@AuthenticationPrincipal User user,
-                                                     @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long id){
-        return new ResponseEntity<>(orderService.getOrderInfo(id, user), HttpStatus.OK);
+                                                     @PathVariable Order order){
+        return new ResponseEntity<>(orderService.getOrderInfo(order, user), HttpStatus.OK);
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @PatchMapping("/api/v1/order/{id}/status")
+    @PatchMapping("/api/v1/order/{order}/status")
     public ResponseEntity<?> changeOrderStatus(@AuthenticationPrincipal User user,
-                                               @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long id,
+                                               @PathVariable Order order,
                                                @Valid @RequestBody ChangeOrderStatusDTO dto
                                                ){
-        orderService.changeOrderStatus(id, user, dto);
+        orderService.changeOrderStatus(order, user, dto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN')")
-    @PatchMapping("/api/v1/order/{orderId}/courier")
+    @PatchMapping("/api/v1/order/{order}/courier")
     public ResponseEntity<?> replaceCourier(@AuthenticationPrincipal User user,
-                                            @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long orderId){
-        orderService.replaceCourier(orderId, user);
+                                            @PathVariable Order order){
+        orderService.replaceCourier(order, user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PreAuthorize("hasAuthority('CLIENT')")
-    @PatchMapping("/api/v1/order/{orderId}/courierRating")
+    @PatchMapping("/api/v1/order/{order}/courierRating")
     public ResponseEntity<?> changeCourierRating(@AuthenticationPrincipal User user,
-                                                 @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long orderId,
+                                                 @PathVariable Order order,
                                                  @Valid @RequestBody ChangeRatingDTO dto){
 
-        orderService.changeDeliveryRating(orderId, dto, user);
+        orderService.changeDeliveryRating(order, dto, user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PreAuthorize("hasAuthority('COURIER')")
-    @PatchMapping("/api/v1/order/{orderId}/clientRating")
+    @PatchMapping("/api/v1/order/{order}/clientRating")
     public ResponseEntity<?> changeClientRating(@AuthenticationPrincipal User user,
-                                                @Min(value = 1) @Max(value = Long.MAX_VALUE) @PathVariable Long orderId,
+                                                @PathVariable Order order,
                                                 @Valid @RequestBody ChangeRatingDTO dto
                                                 ){
-        orderService.changeClientRating(orderId, dto, user);
+        orderService.changeClientRating(order, dto, user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

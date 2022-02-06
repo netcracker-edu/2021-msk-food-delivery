@@ -10,6 +10,7 @@ import com.ncedu.fooddelivery.api.v1.entities.OrderStatus;
 import com.ncedu.fooddelivery.api.v1.entities.Warehouse;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -25,6 +26,7 @@ import java.sql.Timestamp;
 )
 
 @Data
+@AllArgsConstructor
 @Entity
 @Table(name = "orders")
 public class Order {
@@ -94,22 +96,4 @@ public class Order {
     private BigDecimal deliveryRating;
 
     public Order(){}
-
-    public Order(Long id, Client client, String address, Geometry coordinates, Warehouse warehouse, Courier courier, OrderStatus status, Timestamp dateStart, Timestamp dateEnd, Double overallCost, Double highDemandCoeff, Double discount, Long promoCodeId, BigDecimal clientRating, BigDecimal deliveryRating) {
-        this.id = id;
-        this.client = client;
-        this.address = address;
-        this.coordinates = coordinates;
-        this.warehouse = warehouse;
-        this.courier = courier;
-        this.status = status;
-        this.dateStart = dateStart;
-        this.dateEnd = dateEnd;
-        this.overallCost = overallCost;
-        this.highDemandCoeff = highDemandCoeff;
-        this.discount = discount;
-        this.promoCodeId = promoCodeId;
-        this.clientRating = clientRating;
-        this.deliveryRating = deliveryRating;
-    }
 }

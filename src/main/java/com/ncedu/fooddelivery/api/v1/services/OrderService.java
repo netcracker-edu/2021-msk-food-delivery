@@ -15,7 +15,7 @@ public interface OrderService {
 
     List<OrderInfoDTO> findFiltered(User user, OrderFilterDTO dto, Pageable pageable);
 
-    List<OrderInfoDTO> getOrdersHistory(User user, Long targetId, Pageable pageable);
+    List<OrderInfoDTO> getOrdersHistory(User authedUser, User targetUser, Pageable pageable);
 
     List<OrderInfoDTO> getMyOrdersHistory(User user, Pageable pageable);
 
@@ -26,13 +26,13 @@ public interface OrderService {
 
     AreCreatedDTO createOrder(CreateOrderDTO dto, User user);
 
-    OrderInfoDTO getOrderInfo(Long id, User user);
+    OrderInfoDTO getOrderInfo(Order order, User user);
 
-    void changeOrderStatus(Long id, User user, ChangeOrderStatusDTO dto);
+    void changeOrderStatus(Order order, User user, ChangeOrderStatusDTO dto);
 
-    void replaceCourier(Long orderId, User user);
+    void replaceCourier(Order order, User user);
 
-    void changeDeliveryRating(Long orderId, ChangeRatingDTO dto, User user);
+    void changeDeliveryRating(Order order, ChangeRatingDTO dto, User user);
 
-    void changeClientRating(Long orderId, ChangeRatingDTO dto, User user);
+    void changeClientRating(Order order, ChangeRatingDTO dto, User user);
 }

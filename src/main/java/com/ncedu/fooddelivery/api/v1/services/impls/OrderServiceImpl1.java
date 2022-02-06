@@ -82,7 +82,6 @@ public class OrderServiceImpl1 implements OrderService {
 
     @Override
     public List<OrderInfoDTO> findFiltered(User user, OrderFilterDTO dto, Pageable pageable) {
-        userService.checkIsUserLocked(user);
         Specification<Order> spec;
 
         if(user.getRole() == Role.MODERATOR){
@@ -98,25 +97,22 @@ public class OrderServiceImpl1 implements OrderService {
     }
 
     @Override
-    public List<OrderInfoDTO> getOrdersHistory(User user, Long targetId, Pageable pageable) {
-        userService.checkIsUserLocked(user);
-        User targetUser = userService.getUserById(targetId);
-        if(targetUser == null) throw new NotFoundEx(String.valueOf(targetId));
+    public List<OrderInfoDTO> getOrdersHistory(User authedUser, User targetUser, Pageable pageable) {
         if(targetUser.getRole() == Role.ADMIN || targetUser.getRole() == Role.MODERATOR) throw new IncorrectUserRoleRequestException();
 
         List<OrderInfoDTO> orders;
         if(targetUser.getRole() == Role.CLIENT){
-            orders = orderRepo.getClientOrdersHistory(targetId, pageable).stream()
+            orders = orderRepo.getClientOrdersHistory(targetUser.getId(), pageable).stream()
                               .map(order -> convertToOrderInfoDTO(order))
                               .collect(Collectors.toList());
         } else {
-            orders = orderRepo.getCourierOrdersHistory(targetId, pageable).stream()
+            orders = orderRepo.getCourierOrdersHistory(targetUser.getId(), pageable).stream()
                               .map(order -> convertToOrderInfoDTO(order))
                               .collect(Collectors.toList());
         }
 
-        if(user.getRole() == Role.MODERATOR){
-            orders = orders.stream().filter(order -> order.getWarehouse().getId().equals(user.getModerator().getWarehouseId()))
+        if(authedUser.getRole() == Role.MODERATOR){
+            orders = orders.stream().filter(order -> order.getWarehouse().getId().equals(authedUser.getModerator().getWarehouseId()))
                                     .collect(Collectors.toList());
         }
         return orders;
@@ -124,8 +120,6 @@ public class OrderServiceImpl1 implements OrderService {
 
     @Override
     public List<OrderInfoDTO> getMyOrdersHistory(User user, Pageable pageable) {
-        userService.checkIsUserLocked(user);
-        if(user.getRole() == Role.ADMIN || user.getRole() == Role.MODERATOR) throw new IncorrectUserRoleRequestException();
         if(user.getRole() == Role.CLIENT) return orderRepo.getClientOrdersHistory(user.getId(), pageable).stream()
                                                           .map(order -> convertToOrderInfoDTO(order))
                                                           .collect(Collectors.toList());
@@ -143,7 +137,6 @@ public class OrderServiceImpl1 implements OrderService {
         Long warehouseId = warehouse.getId();
         if(!warehouseId.equals(clientWarehouseId)) throw new WarehouseCoordsBindingEx();
 
-        List<Long> notFoundProductsIds = new ArrayList<>();
         Map<Long, Integer> productsAvailableAmounts = new HashMap<>();
 
         Double overallOrderCost = 0.0;
@@ -159,11 +152,6 @@ public class OrderServiceImpl1 implements OrderService {
             // will be able to interact with these positions before whole transaction will complete.
             List<ProductPosition> productPositions = productPositionRepo.findByProductIdAndWarehouseIdWithLock(productId, warehouseId);
 
-            if(productPositions.size() == 0){
-                notFoundProductsIds.add(productId);
-                continue;
-            }
-
             //filtering expired product positions
             productPositions = productPositions.stream().filter(new Predicate<ProductPosition>() {
                 @Override
@@ -195,8 +183,8 @@ public class OrderServiceImpl1 implements OrderService {
 
         }
 
-        if(!productsAvailableAmounts.isEmpty() || !notFoundProductsIds.isEmpty()){
-            throw new ProductAvailabilityEx(notFoundProductsIds, productsAvailableAmounts);
+        if(!productsAvailableAmounts.isEmpty()){
+            throw new ProductAvailabilityEx(productsAvailableAmounts);
         }
 
         orderHighDemandCoeff = countHighDemandCoeff(warehouseId);
@@ -212,7 +200,6 @@ public class OrderServiceImpl1 implements OrderService {
         Long warehouseId = warehouse.getId();
         if(!warehouseId.equals(dto.getWarehouseId())) throw new WarehouseCoordsBindingEx();
 
-        List<Long> notFoundProductsIds = new ArrayList<>();
         Map<Long, Integer> productsAvailableAmounts = new HashMap<>();
 
         Double overallOrderCost = 0.0;
@@ -224,10 +211,6 @@ public class OrderServiceImpl1 implements OrderService {
             Integer requestedAmount = pair.getValue();
 
             List<ProductPosition> productPositions = productPositionRepo.findByProductIdAndWarehouseId(productId, warehouseId);
-            if(productPositions.size() == 0){
-                notFoundProductsIds.add(productId);
-                continue;
-            }
 
             //filtering expired product positions
             productPositions = productPositions.stream().filter(new Predicate<ProductPosition>() {
@@ -260,8 +243,8 @@ public class OrderServiceImpl1 implements OrderService {
 
         }
 
-        if(!productsAvailableAmounts.isEmpty() || !notFoundProductsIds.isEmpty()){
-            throw new ProductAvailabilityEx(notFoundProductsIds, productsAvailableAmounts);
+        if(!productsAvailableAmounts.isEmpty()){
+            throw new ProductAvailabilityEx(productsAvailableAmounts);
         }
 
         orderHighDemandCoeff = countHighDemandCoeff(warehouseId);
@@ -287,7 +270,6 @@ public class OrderServiceImpl1 implements OrderService {
     @Override
     @Transactional
     public AreCreatedDTO createOrder(CreateOrderDTO dto, User user) {
-        userService.checkIsUserLocked(user);
         checkOrderDataActuality(dto);
 
         Long warehouseId = dto.getWarehouseId();
@@ -314,7 +296,7 @@ public class OrderServiceImpl1 implements OrderService {
                 // attaching courier and then order status = 'courier_appointed'
                 Courier courier;
                 try{
-                    courier = findFreeCourier(warehouseId);
+                    courier = courierService.findFreeCourier(warehouseId);
                 } catch (CourierAvailabilityEx ex){
                     for(Order o: orders){
                         o.setStatus(OrderStatus.CANCELLED);   // DB trigger will return all reserved product
@@ -336,7 +318,7 @@ public class OrderServiceImpl1 implements OrderService {
             // attaching courier and then order status = 'courier_appointed'
             Courier courier;
             try{
-                courier = findFreeCourier(warehouseId);
+                courier = courierService.findFreeCourier(warehouseId);
             } catch (CourierAvailabilityEx ex){
                 order.setStatus(OrderStatus.CANCELLED);   // DB trigger will return all reserved product positions back
                 // to warehouse
@@ -520,26 +502,8 @@ public class OrderServiceImpl1 implements OrderService {
                 .get().doubleValue();
     }
 
-    public Courier findFreeCourier(Long warehouseId){
-        Courier courier = new Courier();
-        int i = 0;
-        try{
-            for( ; i < 15; i++){
-                courier = courierRepo.getWaitingCourierByWarehouse(warehouseId);
-                if(courier != null) break;
-                Thread.sleep(2000);
-            }
-        } catch (InterruptedException ex){}
-        if(i == 15) throw new CourierAvailabilityEx();
-        return courier;
-    }
-
     @Override
-    public OrderInfoDTO getOrderInfo(Long id, User user) {
-        userService.checkIsUserLocked(user);
-        Optional<Order> orderOptional = orderRepo.findById(id);
-        if(orderOptional.isEmpty()) throw new NotFoundEx(id.toString());
-        Order order = orderOptional.get();
+    public OrderInfoDTO getOrderInfo(Order order, User user) {
 
         if(user.getRole() == Role.MODERATOR){
             if(!order.getWarehouse().getId().equals(user.getModerator().getWarehouseId())) throw new CustomAccessDeniedException();
@@ -552,11 +516,7 @@ public class OrderServiceImpl1 implements OrderService {
     }
 
     @Override
-    public void changeOrderStatus(Long id, User user, ChangeOrderStatusDTO dto) {
-        userService.checkIsUserLocked(user);
-        Optional<Order> orderOptional = orderRepo.findById(id);
-        if(orderOptional.isEmpty()) throw new NotFoundEx(id.toString());
-        Order order = orderOptional.get();
+    public void changeOrderStatus(Order order, User user, ChangeOrderStatusDTO dto) {
 
         if(user.getRole() == Role.MODERATOR){
             if(!order.getWarehouse().getId().equals(user.getModerator().getWarehouseId())) throw new CustomAccessDeniedException();
@@ -569,17 +529,14 @@ public class OrderServiceImpl1 implements OrderService {
         OrderStatus oldStatus = order.getStatus();
         OrderStatus newStatus = dto.getNewStatus();
         if(oldStatus == OrderStatus.CANCELLED || oldStatus == OrderStatus.DELIVERED
-                || (oldStatus.ordinal() > newStatus.ordinal())) throw new OrderStatusChangeException(id);
+                || (oldStatus.ordinal() > newStatus.ordinal())) throw new OrderStatusChangeException(order.getId());
 
         order.setStatus(newStatus);
         orderRepo.save(order);
     }
 
     @Override
-    public void replaceCourier(Long orderId, User user) {
-        userService.checkIsUserLocked(user);
-        Order order = getOrder(orderId);
-        if(order == null) throw new NotFoundEx(orderId.toString());
+    public void replaceCourier(Order order, User user) {
 
         if(user.getRole() == Role.MODERATOR){
             if(!order.getWarehouse().getId().equals(user.getModerator().getWarehouseId())) throw new CustomAccessDeniedException();
@@ -589,17 +546,14 @@ public class OrderServiceImpl1 implements OrderService {
 
         Courier currentCourier = order.getCourier();
         if(currentCourier == null) throw new CourierNotSetException();
-        Courier newCourier = courierService.getAnotherAvailableCourier(currentCourier.getId(), order.getWarehouse().getId());
+        Courier newCourier = courierRepo.getWaitingCourierByWarehouse(order.getWarehouse().getId());
         order.setCourier(newCourier);
         orderRepo.save(order);
     }
 
     @Override
-    public void changeDeliveryRating(Long orderId, ChangeRatingDTO dto, User user) {
-        userService.checkIsUserLocked(user);
-        Order order = getOrder(orderId);
+    public void changeDeliveryRating(Order order, ChangeRatingDTO dto, User user) {
 
-        if(order == null) throw new NotFoundEx(orderId.toString());
         if(order.getCourier() == null) throw new CourierNotSetException();
         if(!user.getId().equals(order.getClient().getId())) throw new CustomAccessDeniedException();
 
@@ -608,11 +562,8 @@ public class OrderServiceImpl1 implements OrderService {
     }
 
     @Override
-    public void changeClientRating(Long orderId, ChangeRatingDTO dto, User user) {
-        userService.checkIsUserLocked(user);
-        Order order = getOrder(orderId);
+    public void changeClientRating(Order order, ChangeRatingDTO dto, User user) {
 
-        if(order == null) throw new NotFoundEx(orderId.toString());
         if(order.getCourier() == null || !user.getId().equals(order.getCourier().getId())) throw new CustomAccessDeniedException();
 
         order.setClientRating(dto.getRating());

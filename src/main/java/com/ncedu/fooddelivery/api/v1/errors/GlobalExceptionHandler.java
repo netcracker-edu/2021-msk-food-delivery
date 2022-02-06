@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -200,15 +201,9 @@ public class GlobalExceptionHandler {
         ApiError err = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), ex.uuid);
         List<ApiSubError> subErrors = new ArrayList<>();
         err.setSubErrors(subErrors);
-        if(ex.getNotFoundProductsIds().size() != 0){
-            for(Long notFoundId: ex.getNotFoundProductsIds()){
-                subErrors.add(new ProductNotFoundSubError(notFoundId));
-            }
-        }
-        if(ex.getProductsAvailableAmount().size() != 0){
-            for(Map.Entry<Long, Integer> entry: ex.getProductsAvailableAmount().entrySet()){
+
+        for(Map.Entry<Long, Integer> entry: ex.getProductsAvailableAmount().entrySet()){
                 subErrors.add(new ProductNotEnoughSubError(entry.getKey(), entry.getValue()));
-            }
         }
         return buildResponseEntity(err);
     }
@@ -222,6 +217,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OrderCostChangedEx.class)
     public ResponseEntity<Object> handleOrderCostChangedEx(OrderCostChangedEx ex){
         ApiError err = new ApiError(HttpStatus.NOT_ACCEPTABLE, ex.getMessage(), OrderCostChangedEx.uuid);
+        err.setSubErrors(new ArrayList<>(Arrays.asList(new OrderCostChangedSubError(ex.getCurrentOverallCost(),
+                ex.getCurrentDiscount(), ex.getCurrentHighDemandCoeff()))));
         return buildResponseEntity(err);
     }
 

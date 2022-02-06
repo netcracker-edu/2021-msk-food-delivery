@@ -8,7 +8,6 @@ import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.AlreadyExistsException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.PasswordsMismatchException;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
-import com.ncedu.fooddelivery.api.v1.errors.security.UserLockedException;
 import com.ncedu.fooddelivery.api.v1.repos.UserRepo;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,10 +122,5 @@ public class UserServiceImpl implements UserService {
             usersDTO.add(createUserDTO(iterator.next()));
         }
         return usersDTO;
-    }
-
-    @Override
-    public void checkIsUserLocked(User user) {
-        if(user.getLockDate() != null) throw new UserLockedException();
     }
 }
