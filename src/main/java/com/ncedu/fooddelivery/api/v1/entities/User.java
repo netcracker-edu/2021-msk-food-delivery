@@ -54,7 +54,10 @@ public class User implements Serializable, UserDetails {
     @OneToOne(cascade=CascadeType.ALL, mappedBy = "user")
     @PrimaryKeyJoinColumn
     private Courier courier;
-
+public void setCourier(Courier courier) {
+       this.courier = courier;
+       this.courier.setUser(this);
+   }
     @OneToOne(cascade=CascadeType.ALL, mappedBy = "user")
     @PrimaryKeyJoinColumn
     private Moderator moderator;
