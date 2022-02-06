@@ -50,7 +50,7 @@ public class OrderController {
 
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/api/v1/user/orders")
+    @GetMapping("/api/v1/profile/orders")
     public ResponseEntity<List<OrderInfoDTO>> getMyOrdersHistory(@AuthenticationPrincipal User user,
                                                                  @PageableDefault(sort = { "date_start" },
                                                                  direction = Sort.Direction.DESC) Pageable pageable){
