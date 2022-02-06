@@ -48,7 +48,6 @@ public class OrderController {
         return new ResponseEntity<>(orderService.getOrdersHistory(authedUser, targetUser, pageable), HttpStatus.OK);
     }
 
-
     @PreAuthorize("hasAnyAuthority('CLIENT', 'COURIER')")
     @GetMapping("/api/v1/profile/orders")
     public ResponseEntity<List<OrderInfoDTO>> getMyOrdersHistory(@AuthenticationPrincipal User user,
