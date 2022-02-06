@@ -47,6 +47,11 @@ CREATE TABLE IF NOT EXISTS users
 	lock_date TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS users_search (
+	user_search_id BIGINT PRIMARY KEY REFERENCES users (user_id) ON DELETE CASCADE,
+	search_vector tsvector
+);
+
 CREATE TABLE IF NOT EXISTS clients
 (
 	client_id BIGINT PRIMARY KEY REFERENCES users (user_id) ON DELETE CASCADE,
