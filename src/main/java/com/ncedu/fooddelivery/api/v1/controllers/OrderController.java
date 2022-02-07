@@ -37,13 +37,11 @@ public class OrderController {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    @GetMapping("/api/v1/user/{user}/orders")
+    @GetMapping("/api/v1/user/{targetUser}/orders")
     public ResponseEntity<List<OrderInfoDTO>> getOrdersHistory(@AuthenticationPrincipal User authedUser,
                                                                @PathVariable User targetUser,
                                                                @PageableDefault(sort = { "date_start" },
                                                                direction = Sort.Direction.DESC) Pageable pageable){
-
-
 
         return new ResponseEntity<>(orderService.getOrdersHistory(authedUser, targetUser, pageable), HttpStatus.OK);
     }
