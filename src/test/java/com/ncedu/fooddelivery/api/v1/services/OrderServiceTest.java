@@ -31,7 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @SpringBootTest
@@ -398,7 +398,7 @@ public class OrderServiceTest {
     private Order getFakeOrder(){
         return new Order(1l, getFakeUserClient().getClient(), "address", geometryFactory.createPoint(new Coordinate(1.0,
                 1.0)), getFakeWarehouse1(), getFakeCourier1(), OrderStatus.DELIVERING,
-                Mockito.mock(Timestamp.class), Mockito.mock(Timestamp.class), 1000.0, 1.0, 0.0,
+                Mockito.mock(LocalDateTime.class), Mockito.mock(LocalDateTime.class), 1000.0, 1.0, 0.0,
                 1l, new BigDecimal(5.0), new BigDecimal(5.0));
     }
 

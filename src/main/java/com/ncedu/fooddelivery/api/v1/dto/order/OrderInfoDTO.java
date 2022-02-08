@@ -1,8 +1,10 @@
 package com.ncedu.fooddelivery.api.v1.dto.order;
 
 import com.bedatadriven.jackson.datatype.jts.serialization.GeometrySerializer;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.ncedu.fooddelivery.api.v1.dto.ClientInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.CourierInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
@@ -18,7 +20,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @TypeDef(
@@ -47,17 +49,21 @@ public class OrderInfoDTO {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Type(type = "order_status")
-    private OrderStatus status;     /* TODO: don't forget to check if status is null - change it for "CREATED"
-                                       then */
-    private Timestamp dateStart;
+    private OrderStatus status;
 
-    private Timestamp dateEnd;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime dateStart;
+
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime dateEnd;
 
     private Double overallCost;
 
-    private Double highDemandCoeff;      // TODO: similarly "1.0"
+    private Double highDemandCoeff;
 
-    private Double discount;     // TODO: similarly "0.0"
+    private Double discount;
 
     private Long promoCodeId;
 
@@ -68,8 +74,8 @@ public class OrderInfoDTO {
     private List<OrderNotHierarchicalProductPosition> productPositions;
 
     public OrderInfoDTO(Long id, Client client, String address, Geometry coordinates,
-                        Warehouse warehouse, Courier courier, OrderStatus status, Timestamp dateStart,
-                        Timestamp dateEnd, Double overallCost, Double highDemandCoeff,
+                        Warehouse warehouse, Courier courier, OrderStatus status, LocalDateTime dateStart,
+                        LocalDateTime dateEnd, Double overallCost, Double highDemandCoeff,
                         Double discount, Long promoCodeId, BigDecimal clientRating, BigDecimal deliveryRating, List<OrderNotHierarchicalProductPosition> productPositions) {
         this.id = id;
         User userClient = client.getUser();

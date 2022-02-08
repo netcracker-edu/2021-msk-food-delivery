@@ -36,7 +36,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -343,7 +343,7 @@ public class OrderServiceImpl1 implements OrderService {
         order.setAddress(dto.getAddress());
         order.setCoordinates(coords);
         order.setStatus(OrderStatus.CREATED);
-        order.setDateStart(new Timestamp(System.currentTimeMillis()));
+        order.setDateStart(LocalDateTime.now());
         order = orderRepo.save(order);
         // adding records in DB table 'orders_product_positions'
         for(Long productPositionId: productPosAmountMap.keySet()){
@@ -392,7 +392,7 @@ public class OrderServiceImpl1 implements OrderService {
         order.setAddress(dto.getAddress());
         order.setCoordinates(coords);
         order.setStatus(OrderStatus.CREATED);
-        order.setDateStart(new Timestamp(System.currentTimeMillis()));
+        order.setDateStart(LocalDateTime.now());
         order = orderRepo.save(order);
         for(Long psId: currOrderPositions.keySet()) {
             int amount = currOrderPositions.get(psId);

@@ -18,7 +18,7 @@ import org.hibernate.annotations.TypeDef;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @TypeDef(
         name = "order_status",
@@ -64,15 +64,14 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Type(type = "order_status")
     @Column(name = "status")
-    private OrderStatus status;     /* TODO: don't forget to check if status is null - change it for "CREATED"
-                                       then */
+    private OrderStatus status;
 
     @NotNull
     @Column(name = "date_start")
-    private Timestamp dateStart;
+    private LocalDateTime dateStart;
 
     @Column(name = "date_end")
-    private Timestamp dateEnd;
+    private LocalDateTime dateEnd;
 
     @NotNull
     @Column(name = "overall_cost")
@@ -80,11 +79,11 @@ public class Order {
 
     @NotNull
     @Column(name = "high_demand_coeff")
-    private Double highDemandCoeff;      // TODO: similarly "1.0"
+    private Double highDemandCoeff;
 
     @NotNull
     @Column(name = "discount")
-    private Double discount;     // TODO: similarly "0.0"
+    private Double discount;
 
     @Column(name = "promo_code_id")
     private Long promoCodeId;
