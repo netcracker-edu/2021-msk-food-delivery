@@ -12,10 +12,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OrderRepo extends JpaRepository<Order, Long> {
 
-    @Query(value = "SELECT * FROM orders WHERE courier_id = :id", countQuery = "SELECT COUNT(*) FROM orders WHERE courier_id = :id", nativeQuery = true)
+    @Query(value = "SELECT * FROM orders WHERE courier_id = :id",
+            countQuery = "SELECT COUNT(*) FROM orders WHERE courier_id = :id",
+            nativeQuery = true)
     Page<Order> getCourierOrdersHistory(@Param(value = "id") Long userId, Pageable pageable);
 
-    @Query(value = "SELECT * FROM orders WHERE client_id = :id", countQuery = "SELECT COUNT(*) FROM orders WHERE courier_id = :id", nativeQuery = true)
+    @Query(value = "SELECT * FROM orders WHERE client_id = :id",
+            countQuery = "SELECT COUNT(*) FROM orders WHERE client_id = :id",
+            nativeQuery = true)
     Page<Order> getClientOrdersHistory(@Param(value = "id") Long userId, Pageable pageable);
 
     Page<Order> findAll(Specification<Order> spec, Pageable pageable);
