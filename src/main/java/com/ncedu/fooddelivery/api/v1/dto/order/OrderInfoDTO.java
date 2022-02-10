@@ -92,7 +92,8 @@ public class OrderInfoDTO {
             User userCourier = courier.getUser();
             this.courier = new CourierInfoDTO(userCourier.getId(), userCourier.getRole().toString(), userCourier.getFullName(),
                     userCourier.getEmail(), userCourier.getLastSigninDate(), userCourier.getAvatarId(),
-                    courier.getPhoneNumber(), courier.getRating(), courier.getWarehouse() != null ? courier.getWarehouse.getId() : null,
+                    courier.getPhoneNumber(), courier.getRating(), courier.getWarehouse() != null ?
+                    courier.getWarehouse().getId() : null,
                     courier.getAddress(), courier.getCurrentBalance());
         }
         this.status = status;

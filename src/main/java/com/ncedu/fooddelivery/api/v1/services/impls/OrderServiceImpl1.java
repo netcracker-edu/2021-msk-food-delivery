@@ -23,7 +23,6 @@ import com.ncedu.fooddelivery.api.v1.repos.orderProductPosition.OrderProductPosi
 import com.ncedu.fooddelivery.api.v1.repos.productPosition.ProductPositionRepo;
 import com.ncedu.fooddelivery.api.v1.services.CourierService;
 import com.ncedu.fooddelivery.api.v1.services.OrderService;
-import com.ncedu.fooddelivery.api.v1.services.UserService;
 import com.ncedu.fooddelivery.api.v1.services.WarehouseService;
 import com.ncedu.fooddelivery.api.v1.specifications.OrderSpecifications;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -67,9 +66,6 @@ public class OrderServiceImpl1 implements OrderService {
 
     @Autowired
     CourierRepo courierRepo;
-
-    @Autowired
-    UserService userService;
 
     GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
@@ -143,6 +139,7 @@ public class OrderServiceImpl1 implements OrderService {
         Double overallOrderDiscount = 0.0;
         Double orderHighDemandCoeff;
 
+        boolean enoughProductPositions = true;
         for(Map.Entry<Long, Integer> pair: pairs.entrySet()){
             Long productId = pair.getKey();
             Integer requestedAmount = pair.getValue();
@@ -172,18 +169,20 @@ public class OrderServiceImpl1 implements OrderService {
             }
             if(overallAmount < requestedAmount){
                 productsAvailableAmounts.put(productId, overallAmount);
+                enoughProductPositions = false;
             }
 
-            // product price count
-            Product product = productRepo.findById(productId).get();
-            Double productDiscount = product.getDiscount();
-            Double productPrice = product.getPrice();
-            overallOrderCost += requestedAmount * (productPrice - productDiscount);
-            overallOrderDiscount += productDiscount * requestedAmount;
-
+            if(enoughProductPositions){
+                // product price count
+                Product product = productRepo.findById(productId).get();
+                Double productDiscount = product.getDiscount();
+                Double productPrice = product.getPrice();
+                overallOrderCost += requestedAmount * (productPrice - productDiscount);
+                overallOrderDiscount += productDiscount * requestedAmount;
+            }
         }
 
-        if(!productsAvailableAmounts.isEmpty()){
+        if(!enoughProductPositions){
             throw new ProductAvailabilityEx(productsAvailableAmounts);
         }
 
@@ -206,6 +205,7 @@ public class OrderServiceImpl1 implements OrderService {
         Double overallOrderDiscount = 0.0;
         Double orderHighDemandCoeff;
 
+        boolean enoughProductPositions = true;
         for(Map.Entry<Long, Integer> pair: dto.getProductAmountPairs().entrySet()){
             Long productId = pair.getKey();
             Integer requestedAmount = pair.getValue();
@@ -232,18 +232,19 @@ public class OrderServiceImpl1 implements OrderService {
             }
             if(overallAmount < requestedAmount){
                 productsAvailableAmounts.put(productId, overallAmount);
+                enoughProductPositions = false;
             }
-
-            // product price count
-            Product product = productRepo.findById(productId).get();
-            Double productDiscount = product.getDiscount();
-            Double productPrice = product.getPrice();
-            overallOrderCost += requestedAmount * (productPrice - productDiscount);
-            overallOrderDiscount += productDiscount * requestedAmount;
-
+            if(enoughProductPositions){
+                // product price count
+                Product product = productRepo.findById(productId).get();
+                Double productDiscount = product.getDiscount();
+                Double productPrice = product.getPrice();
+                overallOrderCost += requestedAmount * (productPrice - productDiscount);
+                overallOrderDiscount += productDiscount * requestedAmount;
+            }
         }
 
-        if(!productsAvailableAmounts.isEmpty()){
+        if(!enoughProductPositions){
             throw new ProductAvailabilityEx(productsAvailableAmounts);
         }
 
