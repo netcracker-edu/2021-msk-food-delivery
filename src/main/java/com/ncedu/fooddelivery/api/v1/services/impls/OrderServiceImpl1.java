@@ -174,7 +174,7 @@ public class OrderServiceImpl1 implements OrderService {
 
             if(enoughProductPositions){
                 // product price count
-                Product product = productRepo.findById(productId).get();
+                Product product = productPositions.get(0).getProduct();
                 Double productDiscount = product.getDiscount();
                 Double productPrice = product.getPrice();
                 overallOrderCost += requestedAmount * (productPrice - productDiscount);
