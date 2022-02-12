@@ -113,13 +113,13 @@ public class UserController {
     @PatchMapping("/api/v1/user/{user}/lock")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
     public UserInfoDTO lockUser(@PathVariable User user) {
-        return userService.lockById(user);
+        return userService.lockUser(user);
     }
 
     @PatchMapping("/api/v1/user/{user}/unlock")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
     public UserInfoDTO unlockUser(@PathVariable User user) {
-        return userService.unlockById(user);
+        return userService.unlockUser(user);
     }
 
 
