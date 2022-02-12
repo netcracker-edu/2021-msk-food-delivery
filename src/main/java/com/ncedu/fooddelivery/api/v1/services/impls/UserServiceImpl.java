@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserInfoDTO lockById(User user) {
+    public UserInfoDTO lockUser(User user) {
         if (user.getLockDate() != null) {
             return createUserDTO(user);
         }
@@ -148,7 +148,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserInfoDTO unlockById(User user) {
+    public UserInfoDTO unlockUser(User user) {
         if (user.getLockDate() == null) {
             return createUserDTO(user);
         }

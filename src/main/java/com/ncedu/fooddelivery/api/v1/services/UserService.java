@@ -25,7 +25,7 @@ public interface UserService {
 
     public void setLastSigninFromNow(User user);
 
-    public UserInfoDTO lockById(User user);
-    public UserInfoDTO unlockById(User user);
+    public UserInfoDTO lockUser(User user);
+    public UserInfoDTO unlockUser(User user);
     public List<UserInfoDTO> searchUsers(String phrase, Pageable pageable);
 }
