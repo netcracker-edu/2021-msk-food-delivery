@@ -137,17 +137,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserInfoDTO switchLockById(Long userId) {
-        User user = getUserById(userId);
-        if (Role.isCOURIER(user.getRole().name())) {
-            user.getCourier().setWarehouse(null);
+    public UserInfoDTO lockById(User user) {
+        if (user.getLockDate() != null) {
+            return createUserDTO(user);
         }
-        Timestamp lockDate = user.getLockDate();
-        if (lockDate == null) {
-            user.setLockDate(Timestamp.valueOf(LocalDateTime.now()));
-        } else {
-            user.setLockDate(null);
+        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+        user.setLockDate(now);
+        userRepo.save(user);
+        return createUserDTO(user);
+    }
+
+    @Override
+    public UserInfoDTO unlockById(User user) {
+        if (user.getLockDate() == null) {
+            return createUserDTO(user);
         }
+        user.setLockDate(null);
         userRepo.save(user);
         return createUserDTO(user);
     }

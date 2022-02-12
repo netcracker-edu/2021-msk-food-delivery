@@ -110,11 +110,18 @@ public class UserController {
         return  new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PatchMapping("/api/v1/user/{id}/lock")
+    @PatchMapping("/api/v1/user/{user}/lock")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    public UserInfoDTO switchLock(@PathVariable Long id) {
-        return userService.switchLockById(id);
+    public UserInfoDTO lockUser(@PathVariable User user) {
+        return userService.lockById(user);
     }
+
+    @PatchMapping("/api/v1/user/{user}/unlock")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
+    public UserInfoDTO unlockUser(@PathVariable User user) {
+        return userService.unlockById(user);
+    }
+
 
     @GetMapping("/api/v1/admins")
     @PreAuthorize("hasAuthority('ADMIN')")
