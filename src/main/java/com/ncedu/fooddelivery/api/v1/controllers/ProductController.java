@@ -1,7 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
 import com.ncedu.fooddelivery.api.v1.dto.SearchDTO;
-import com.ncedu.fooddelivery.api.v1.dto.IsCreatedDTO;
+import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductCreateDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductUpdateDTO;
@@ -43,9 +43,9 @@ public class ProductController {
 
     @PostMapping("/api/v1/product")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public IsCreatedDTO createProduct(
+    public isCreatedDTO createProduct(
             @Valid @RequestBody ProductCreateDTO newProduct) {
-        IsCreatedDTO createdDTO = productService.createProduct(newProduct);
+        isCreatedDTO createdDTO = productService.createProduct(newProduct);
         return createdDTO;
     }
 

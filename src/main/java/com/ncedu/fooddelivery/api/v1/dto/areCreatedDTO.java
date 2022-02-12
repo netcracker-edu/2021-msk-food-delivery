@@ -5,10 +5,10 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class AreCreatedDTO {
+public class areCreatedDTO {
     private List<Long> ids;
 
-    public AreCreatedDTO(List<Long> ids) {
+    public areCreatedDTO(List<Long> ids) {
         this.ids = ids;
     }
 }

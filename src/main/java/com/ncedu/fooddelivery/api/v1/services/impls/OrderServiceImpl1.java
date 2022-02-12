@@ -1,6 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
-import com.ncedu.fooddelivery.api.v1.dto.AreCreatedDTO;
+import com.ncedu.fooddelivery.api.v1.dto.areCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.CoordsDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.*;
 import com.ncedu.fooddelivery.api.v1.dto.warehouseDTOs.WarehouseInfoDTO;
@@ -270,7 +270,7 @@ public class OrderServiceImpl1 implements OrderService {
 
     @Override
     @Transactional
-    public AreCreatedDTO createOrder(CreateOrderDTO dto, User user) {
+    public areCreatedDTO createOrder(CreateOrderDTO dto, User user) {
         checkOrderDataActuality(dto);
 
         Long warehouseId = dto.getWarehouseId();
@@ -311,7 +311,7 @@ public class OrderServiceImpl1 implements OrderService {
                 orders.add(orderRepo.save(order));
             }
 
-            return new AreCreatedDTO(orders.stream().map(order -> order.getId()).collect(Collectors.toList()));
+            return new areCreatedDTO(orders.stream().map(order -> order.getId()).collect(Collectors.toList()));
 
         } else {
             Order order = buildOrder(user, coords, dto, productPosPriceMap, productPosAmountMap);
@@ -329,7 +329,7 @@ public class OrderServiceImpl1 implements OrderService {
             order.setCourier(courier);
             order.setStatus(OrderStatus.COURIER_APPOINTED);
             orderRepo.save(order);
-            return new AreCreatedDTO(List.of(order.getId()));
+            return new areCreatedDTO(List.of(order.getId()));
         }
     }
 

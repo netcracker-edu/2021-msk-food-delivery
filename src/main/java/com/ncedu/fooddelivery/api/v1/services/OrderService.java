@@ -1,6 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.services;
 
-import com.ncedu.fooddelivery.api.v1.dto.AreCreatedDTO;
+import com.ncedu.fooddelivery.api.v1.dto.areCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.CoordsDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.*;
 import com.ncedu.fooddelivery.api.v1.entities.User;
@@ -24,7 +24,7 @@ public interface OrderService {
     Double[] countOrderCost(CoordsDTO geo, HashMap<Long, Integer> pairs,
                             Long warehouseId);
 
-    AreCreatedDTO createOrder(CreateOrderDTO dto, User user);
+    areCreatedDTO createOrder(CreateOrderDTO dto, User user);
 
     OrderInfoDTO getOrderInfo(Order order, User user);
 

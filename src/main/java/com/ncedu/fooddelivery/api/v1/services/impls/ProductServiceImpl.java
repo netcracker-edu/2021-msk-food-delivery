@@ -1,6 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
-import com.ncedu.fooddelivery.api.v1.dto.IsCreatedDTO;
+import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductCreateDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductUpdateDTO;
@@ -52,10 +52,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public IsCreatedDTO createProduct(ProductCreateDTO newProduct) {
+    public isCreatedDTO createProduct(ProductCreateDTO newProduct) {
         Product product = productMapper.mapToEntity(newProduct);
         product = productRepo.save(product);
-        IsCreatedDTO createdDTO = new IsCreatedDTO();
+        isCreatedDTO createdDTO = new isCreatedDTO();
         createdDTO.setId(product.getId());
         return createdDTO;
     }
