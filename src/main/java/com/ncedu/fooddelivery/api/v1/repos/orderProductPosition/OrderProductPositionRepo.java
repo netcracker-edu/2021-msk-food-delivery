@@ -1,7 +1,7 @@
-package com.ncedu.fooddelivery.api.v1.repos;
+package com.ncedu.fooddelivery.api.v1.repos.orderProductPosition;
 
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
-import com.ncedu.fooddelivery.api.v1.entities.OrderProductPosition;
+import com.ncedu.fooddelivery.api.v1.entities.orderProductPosition.OrderProductPosition;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.*;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
+import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.CourierAvailabilityEx;
+import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.OrderCostChangedEx;
+import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.ProductAvailabilityEx;
+import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.WarehouseCoordsBindingEx;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
-import com.ncedu.fooddelivery.api.v1.errors.wrappers.ApiError;
-import com.ncedu.fooddelivery.api.v1.errors.wrappers.ApiSubError;
-import com.ncedu.fooddelivery.api.v1.errors.wrappers.ValidationSubError;
 import lombok.extern.slf4j.Slf4j;
+import com.ncedu.fooddelivery.api.v1.errors.wrappers.*;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -28,7 +30,9 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
@@ -133,6 +137,11 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, mainMessage, UUID));
     }
 
+    @ExceptionHandler(IncorrectUserRoleRequestException.class)
+    protected ResponseEntity<Object> handleIncorrectUserRoleRequestException(IncorrectUserRoleRequestException ex){
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, IncorrectUserRoleRequestException.message, IncorrectUserRoleRequestException.UUID));
+    }
+
     @ExceptionHandler(IncorrectProductPositionWarehouseBindingException.class)
     protected ResponseEntity<Object> handleIncorrectProductPositionWarehouseBindingException(IncorrectProductPositionWarehouseBindingException ex){
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), IncorrectProductPositionWarehouseBindingException.UUID));
@@ -227,7 +236,56 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, message, UUID));
     }
     
-  
+    @ExceptionHandler(ProductAvailabilityEx.class)
+    public ResponseEntity<Object> handleProductAvailabilityEx(ProductAvailabilityEx ex){
+        ApiError err = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), ex.uuid);
+        List<ApiSubError> subErrors = new ArrayList<>();
+        err.setSubErrors(subErrors);
+
+        for(Map.Entry<Long, Integer> entry: ex.getProductsAvailableAmount().entrySet()){
+                subErrors.add(new ProductNotEnoughSubError(entry.getKey(), entry.getValue()));
+        }
+        return buildResponseEntity(err);
+    }
+
+    @ExceptionHandler(CourierAvailabilityEx.class)
+    public ResponseEntity<Object> handleCourierAvailabilityEx(CourierAvailabilityEx ex){
+        ApiError err = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), CourierAvailabilityEx.uuid);
+        return buildResponseEntity(err);
+    }
+
+    @ExceptionHandler(OrderCostChangedEx.class)
+    public ResponseEntity<Object> handleOrderCostChangedEx(OrderCostChangedEx ex){
+        ApiError err = new ApiError(HttpStatus.NOT_ACCEPTABLE, ex.getMessage(), OrderCostChangedEx.uuid);
+        err.setSubErrors(new ArrayList<>(Arrays.asList(new OrderCostChangedSubError(ex.getCurrentOverallCost(),
+                ex.getCurrentDiscount(), ex.getCurrentHighDemandCoeff()))));
+        return buildResponseEntity(err);
+    }
+
+    @ExceptionHandler(OrderStatusChangeException.class)
+    public ResponseEntity<Object> handleOrderStatusChangeEx(OrderStatusChangeException ex){
+        ApiError err = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), OrderStatusChangeException.uuid);
+        return buildResponseEntity(err);
+    }
+
+    @ExceptionHandler(CourierNotSetException.class)
+    public ResponseEntity<Object> handleCourierNotSetException(CourierNotSetException ex){
+        ApiError err = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), CourierNotSetException.uuid);
+        return buildResponseEntity(err);
+    }
+
+    @ExceptionHandler(CourierReplaceException.class)
+    public ResponseEntity<Object> handleCourierReplaceException(CourierReplaceException ex){
+        ApiError err = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), CourierReplaceException.uuid);
+        return buildResponseEntity(err);
+    }
+
+    @ExceptionHandler(WarehouseCoordsBindingEx.class)
+    public ResponseEntity<Object> handleWarehouseCoordsBindingEx(WarehouseCoordsBindingEx ex){
+        ApiError err = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), WarehouseCoordsBindingEx.uuid);
+        return buildResponseEntity(err);
+    }
+
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }

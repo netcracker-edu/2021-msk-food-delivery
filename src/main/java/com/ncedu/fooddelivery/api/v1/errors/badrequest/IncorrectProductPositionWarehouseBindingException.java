@@ -1,4 +1,4 @@
-package com.ncedu.fooddelivery.api.v1.errors;
+package com.ncedu.fooddelivery.api.v1.errors.badrequest;
 
 import lombok.Data;
 

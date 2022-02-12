@@ -22,6 +22,5 @@ public interface UserService {
     public List<UserInfoDTO> getAllAdmins();
     public List<UserInfoDTO> getAllUsers(Pageable pageable);
 
-
     public void setLastSigninFromNow(User user);
 }

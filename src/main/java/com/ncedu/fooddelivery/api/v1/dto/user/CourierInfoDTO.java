@@ -1,4 +1,4 @@
-package com.ncedu.fooddelivery.api.v1.dto;
+package com.ncedu.fooddelivery.api.v1.dto.user;
 
 import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import lombok.Data;

@@ -10,6 +10,7 @@ import com.ncedu.fooddelivery.api.v1.entities.OrderStatus;
 import com.ncedu.fooddelivery.api.v1.entities.Warehouse;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 )
 
 @Data
+@AllArgsConstructor
 @Entity
 @Table(name = "orders")
 public class Order {
@@ -62,8 +64,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Type(type = "order_status")
     @Column(name = "status")
-    private OrderStatus status;     /* TODO: don't forget to check if status is null - change it for "CREATED"
-                                       then */
+    private OrderStatus status;
 
     @NotNull
     @Column(name = "date_start")
@@ -74,15 +75,15 @@ public class Order {
 
     @NotNull
     @Column(name = "overall_cost")
-    private BigDecimal overallCost;
+    private Double overallCost;
 
     @NotNull
     @Column(name = "high_demand_coeff")
-    private BigDecimal highDemandCoeff;      // TODO: similarly "1.0"
+    private Double highDemandCoeff;
 
     @NotNull
     @Column(name = "discount")
-    private BigDecimal discount;     // TODO: similarly "0.0"
+    private Double discount;
 
     @Column(name = "promo_code_id")
     private Long promoCodeId;
@@ -94,22 +95,4 @@ public class Order {
     private BigDecimal deliveryRating;
 
     public Order(){}
-
-    public Order(Long id, Client client, String address, Geometry coordinates, Warehouse warehouse, Courier courier, OrderStatus status, LocalDateTime dateStart, LocalDateTime dateEnd, BigDecimal overallCost, BigDecimal highDemandCoeff, BigDecimal discount, Long promoCodeId, BigDecimal clientRating, BigDecimal deliveryRating) {
-        this.id = id;
-        this.client = client;
-        this.address = address;
-        this.coordinates = coordinates;
-        this.warehouse = warehouse;
-        this.courier = courier;
-        this.status = status;
-        this.dateStart = dateStart;
-        this.dateEnd = dateEnd;
-        this.overallCost = overallCost;
-        this.highDemandCoeff = highDemandCoeff;
-        this.discount = discount;
-        this.promoCodeId = promoCodeId;
-        this.clientRating = clientRating;
-        this.deliveryRating = deliveryRating;
-    }
 }

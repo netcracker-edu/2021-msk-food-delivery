@@ -1,29 +1,22 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
-import com.ncedu.fooddelivery.api.v1.dto.OrderInfoDTO;
-import com.ncedu.fooddelivery.api.v1.entities.OrderStatus;
-import com.ncedu.fooddelivery.api.v1.entities.Role;
+import com.ncedu.fooddelivery.api.v1.dto.areCreatedDTO;
+import com.ncedu.fooddelivery.api.v1.dto.order.*;
 import com.ncedu.fooddelivery.api.v1.entities.User;
-import com.ncedu.fooddelivery.api.v1.entities.order.OrderNotHierarchical;
-import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
+import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import com.ncedu.fooddelivery.api.v1.services.OrderService;
-import com.ncedu.fooddelivery.api.v1.specifications.OrderSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.*;
-import java.math.BigDecimal;
-import java.util.Date;
+import javax.validation.Valid;
 import java.util.List;
 
 @Validated
@@ -36,46 +29,85 @@ public class OrderController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
     @GetMapping("/api/v1/orders")
     public ResponseEntity<List<OrderInfoDTO>> findFiltered(
-            @RequestParam(name = "clientId", required = false) @Min(value = 1) @Max(value = Long.MAX_VALUE) Long clientId,
-            @RequestParam(name = "warehouseId", required = false) @Min(value = 1) @Max(value = Long.MAX_VALUE) Long warehouseId,
-            @RequestParam(name = "courierId", required = false) @Min(value = 1) @Max(value = Long.MAX_VALUE) Long courierId,
-            @RequestParam(name = "address", required = false) String address,
-            @RequestParam(name = "status", required = false) OrderStatus status,
-            @RequestParam(name = "dateStart", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date dateStart,
-            @RequestParam(name = "dateEnd", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date dateEnd,
-            @RequestParam(name = "overallCost", required = false) @Digits(integer = 5, fraction = 2) @DecimalMin(value = "0.0", inclusive = false) BigDecimal overallCost,
-            @RequestParam(name = "highDemandCoeff", required = false) @Digits (integer = 1, fraction = 2) @DecimalMin("1.0") @DecimalMax("3.0") BigDecimal highDemandCoeff,
-            @RequestParam(name = "discount", required = false)  @Digits(integer = 5, fraction = 2) @DecimalMin(value = "0.0") BigDecimal discount,
-            @RequestParam(name = "promoCodeId", required = false) @Min(value = 1) @Max(value = Long.MAX_VALUE) Long promoCodeId,
-            @RequestParam(name = "clientRating", required = false) @Digits(integer = 1, fraction = 2) @DecimalMin(value = "0.0", inclusive = false) BigDecimal clientRating,
-            @RequestParam(name = "deliveryRating", required = false) @Digits (integer = 1, fraction = 2) @DecimalMin(value = "0.0", inclusive = false) BigDecimal deliveryRating,
-
+            @Valid OrderFilterDTO dto,
             @AuthenticationPrincipal User user,
             Pageable pageable){
 
-        List<OrderInfoDTO> filteredOrders;
+        return new ResponseEntity<>(orderService.findFiltered(user, dto, pageable), HttpStatus.OK);
+    }
 
-        if(user.getRole() == Role.MODERATOR){
-            Long moderatorWarehouseId = user.getModerator().getWarehouseId();
-            if(warehouseId != null){
-                if(!warehouseId.equals(moderatorWarehouseId)) throw new CustomAccessDeniedException();
-            }
-            Specification<OrderNotHierarchical> spec = OrderSpecifications.getFilterSpecification(
-                    clientId, moderatorWarehouseId, courierId, address, status, dateStart, dateEnd,
-                    overallCost, highDemandCoeff, discount, promoCodeId, clientRating,
-                    deliveryRating
-            );
-            filteredOrders = orderService.findFiltered(spec, pageable);
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
+    @GetMapping("/api/v1/user/{targetUser}/orders")
+    public ResponseEntity<List<OrderInfoDTO>> getOrdersHistory(@AuthenticationPrincipal User authedUser,
+                                                               @PathVariable User targetUser,
+                                                               @PageableDefault(sort = { "date_start" },
+                                                               direction = Sort.Direction.DESC) Pageable pageable){
 
-        } else {
-            Specification<OrderNotHierarchical> spec = OrderSpecifications.getFilterSpecification(
-                    clientId, null, courierId, address, status, dateStart, dateEnd,
-                    overallCost, highDemandCoeff, discount, promoCodeId, clientRating,
-                    deliveryRating
-            );
-            filteredOrders = orderService.findFiltered(spec, pageable);
-        }
+        return new ResponseEntity<>(orderService.getOrdersHistory(authedUser, targetUser, pageable), HttpStatus.OK);
+    }
 
-        return new ResponseEntity<>(filteredOrders, HttpStatus.OK);
+    @PreAuthorize("hasAnyAuthority('CLIENT', 'COURIER')")
+    @GetMapping("/api/v1/profile/orders")
+    public ResponseEntity<List<OrderInfoDTO>> getMyOrdersHistory(@AuthenticationPrincipal User user,
+                                                                 @PageableDefault(sort = { "date_start" },
+                                                                 direction = Sort.Direction.DESC) Pageable pageable){
+
+        return new ResponseEntity<>(orderService.getMyOrdersHistory(user, pageable), HttpStatus.OK);
+    }
+
+    @GetMapping("/api/v1/order/price")
+    public ResponseEntity<CountOrderCostResponseDTO> countOrderCost(@Valid @RequestBody CountOrderCostRequestDTO requestDTO){
+        CountOrderCostResponseDTO responseDTO = orderService.countOrderCost(requestDTO);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('CLIENT')")
+    @PostMapping("/api/v1/order")
+    public ResponseEntity<areCreatedDTO> createOrder(@AuthenticationPrincipal User user,
+                                                     @Valid @RequestBody CreateOrderDTO dto){
+        return new ResponseEntity<>(orderService.createOrder(dto, user), HttpStatus.OK);
+    }
+
+    @GetMapping("/api/v1/order/{order}")
+    public ResponseEntity<OrderInfoDTO> getOrderInfo(@AuthenticationPrincipal User user,
+                                                     @PathVariable Order order){
+        return new ResponseEntity<>(orderService.getOrderInfo(order, user), HttpStatus.OK);
+    }
+
+    @PatchMapping("/api/v1/order/{order}/status")
+    public ResponseEntity<?> changeOrderStatus(@AuthenticationPrincipal User user,
+                                               @PathVariable Order order,
+                                               @Valid @RequestBody ChangeOrderStatusDTO dto
+                                               ){
+        orderService.changeOrderStatus(order, user, dto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN')")
+    @PatchMapping("/api/v1/order/{order}/courier")
+    public ResponseEntity<?> replaceCourier(@AuthenticationPrincipal User user,
+                                            @PathVariable Order order){
+        orderService.replaceCourier(order, user);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('CLIENT')")
+    @PatchMapping("/api/v1/order/{order}/courierRating")
+    public ResponseEntity<?> changeCourierRating(@AuthenticationPrincipal User user,
+                                                 @PathVariable Order order,
+                                                 @Valid @RequestBody ChangeRatingDTO dto){
+
+        orderService.changeDeliveryRating(order, dto, user);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('COURIER')")
+    @PatchMapping("/api/v1/order/{order}/clientRating")
+    public ResponseEntity<?> changeClientRating(@AuthenticationPrincipal User user,
+                                                @PathVariable Order order,
+                                                @Valid @RequestBody ChangeRatingDTO dto
+                                                ){
+        orderService.changeClientRating(order, dto, user);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -4,8 +4,8 @@ import com.ncedu.fooddelivery.api.v1.dto.ProductPositionDTOs.ProductPositionsShi
 import com.ncedu.fooddelivery.api.v1.entities.Warehouse;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import com.ncedu.fooddelivery.api.v1.entities.productPosition.ProductPosition;
-import com.ncedu.fooddelivery.api.v1.errors.NotUniqueIdException;
-import com.ncedu.fooddelivery.api.v1.errors.ProductPositionNotEnoughException;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.NotUniqueIdException;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.ProductPositionNotEnoughException;
 import com.ncedu.fooddelivery.api.v1.repos.order.OrderRepo;
 import com.ncedu.fooddelivery.api.v1.repos.productPosition.ProductPositionRepo;
 import org.junit.jupiter.api.Test;
