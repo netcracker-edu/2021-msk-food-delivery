@@ -210,6 +210,16 @@ CREATE TABLE IF NOT EXISTS orders(order_id BIGSERIAL PRIMARY KEY,
                                   FOREIGN KEY(courier_id) REFERENCES couriers(courier_id) ON DELETE SET NULL,
                                   FOREIGN KEY(promo_code_id) REFERENCES promo_codes(promo_code_id) ON DELETE CASCADE);
 
+CREATE TABLE IF NOT EXISTS delivery_sessions(delivery_session_id BIGSERIAL PRIMARY KEY,
+                                             courier_id BIGINT NOT NULL,
+                                             start_time TIMESTAMP NOT NULL,
+                                             end_time TIMESTAMP,
+                                             orders_completed INT4 DEFAULT 0 CHECK(orders_completed >= 0),
+                                             average_time_per_order INTERVAL,
+                                             money_earned NUMERIC(7, 2) DEFAULT 0 CHECK(money_earned >= 0),
+                                             FOREIGN KEY(courier_id) REFERENCES couriers(courier_id) ON DELETE CASCADE);
+
+
 DROP FUNCTION IF EXISTS warehouse_update_is_deactivated() CASCADE;
 CREATE OR REPLACE FUNCTION warehouse_update_is_deactivated() RETURNS TRIGGER
 AS '
@@ -222,6 +232,8 @@ AS '
         RETURN NEW;
     END;
 ' LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS  warehouse_update_is_deactivated ON warehouses;
 
 CREATE TRIGGER warehouse_update_is_deactivated
     AFTER UPDATE OF is_deactivated
@@ -243,11 +255,16 @@ AS '
             END;
             UPDATE orders SET date_end = CURRENT_TIMESTAMP(0) WHERE order_id = NEW.order_id;
         ELSIF NEW.status = ''DELIVERED'' THEN
-            UPDATE orders SET date_end = CURRENT_TIMESTAMP(0) WHERE order_id = NEW.order_id;
+            UPDATE orders SET date_end = CURRENT_TIMESTAMP WHERE order_id = NEW.order_id;
+            UPDATE delivery_sessions SET orders_completed = coalesce(orders_completed, 0) + 1, money_earned = coalesce(money_earned, 0) + ROUND
+            (NEW.overall_cost, 1) / 10, average_time_per_order = ((CURRENT_TIMESTAMP - start_time) /
+            (coalesce(orders_completed, 0) + 1))::INTERVAL WHERE courier_id = NEW.courier_id AND end_time IS NULL;
         END IF;
         RETURN NEW;
     END;
 ' LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS order_update_status ON orders;
 
 CREATE TRIGGER order_update_status
     AFTER UPDATE OF status
@@ -269,17 +286,6 @@ CREATE TABLE IF NOT EXISTS product_positions(product_position_id BIGSERIAL PRIMA
                                              manufacture_date DATE NOT NULL,
                                              FOREIGN KEY(product_id) REFERENCES products (product_id) ON DELETE CASCADE,
                                              FOREIGN KEY(warehouse_id) REFERENCES warehouses (warehouse_id) ON DELETE CASCADE);
-
-
-
-CREATE TABLE IF NOT EXISTS delivery_sessions(delivery_session_id BIGSERIAL PRIMARY KEY,
-                                             courier_id BIGINT NOT NULL,
-                                             start_time TIMESTAMP NOT NULL,
-                                             end_time TIMESTAMP,
-                                             orders_completed INT4 DEFAULT 0 CHECK(orders_completed >= 0),
-                                             average_time_per_order INTERVAL,
-                                             money_earned NUMERIC(7, 2) DEFAULT 0 CHECK(money_earned >= 0),
-                                             FOREIGN KEY(courier_id) REFERENCES couriers(courier_id) ON DELETE CASCADE);
 
 CREATE TABLE IF NOT EXISTS orders_product_positions(order_product_position_id BIGSERIAL PRIMARY KEY,
                                                     order_id BIGINT NOT NULL,
@@ -392,7 +398,7 @@ AS '
 			FROM orders
 			WHERE orders.courier_id = NEW.courier_id AND ((current_timestamp - orders.date_end)::interval < interval ''1 month''))
 		WHERE courier_id = NEW.courier_id;
-		RETURN NEW;
+        RETURN NEW;
     END;
 ' LANGUAGE plpgsql;
 
@@ -403,3 +409,26 @@ CREATE TRIGGER update_orders_courier_rating
     ON orders
     FOR EACH ROW
 EXECUTE FUNCTION update_orders_courier_rating();
+
+DROP FUNCTION IF EXISTS delivery_session_update_end_time() CASCADE;
+CREATE OR REPLACE FUNCTION delivery_session_update_end_time() RETURNS TRIGGER
+AS '
+    BEGIN
+        IF NEW.orders_completed > 0 THEN
+            UPDATE couriers SET current_balance = ROUND(current_balance::NUMERIC + NEW.money_earned, 2) WHERE courier_id =
+            NEW
+            .courier_id;
+            UPDATE delivery_sessions SET average_time_per_order = ((CURRENT_TIMESTAMP - NEW.start_time) / NEW
+            .orders_completed)::INTERVAL WHERE delivery_session_id = NEW.delivery_session_id;
+        END IF;
+		RETURN NEW;
+    END;
+' LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS delivery_session_update_end_time ON delivery_sessions;
+
+CREATE TRIGGER delivery_session_update_end_time
+    AFTER UPDATE OF end_time
+    ON delivery_sessions
+    FOR EACH ROW
+EXECUTE FUNCTION delivery_session_update_end_time();

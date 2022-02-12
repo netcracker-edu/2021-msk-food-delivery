@@ -1,5 +1,8 @@
 package com.ncedu.fooddelivery.api.v1.entities;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
 import org.hibernate.annotations.Type;
 
@@ -11,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @Table(name = "couriers")
 public class Courier {
 
-    @Id     // may be some problems over here. TODO: check later
+    @Id
     @Column(name = "courier_id")
     private Long id;
 
@@ -40,6 +43,8 @@ public class Courier {
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "courier_id")
+
+    @JsonIgnoreProperties("courier")
     private User user;
 
     public Courier(){}

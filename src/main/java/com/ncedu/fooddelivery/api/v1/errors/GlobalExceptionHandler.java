@@ -235,7 +235,7 @@ public class GlobalExceptionHandler {
         final String message = "Unknown exception. Internal server error";
         return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, message, UUID));
     }
-    
+
     @ExceptionHandler(ProductAvailabilityEx.class)
     public ResponseEntity<Object> handleProductAvailabilityEx(ProductAvailabilityEx ex){
         ApiError err = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), ex.uuid);
@@ -286,6 +286,28 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(err);
     }
 
+    @ExceptionHandler(DeliverySessionStartException.class)
+    public ResponseEntity<Object> handleDeliverySessionStartException(DeliverySessionStartException ex){
+        log.error(DeliverySessionStartException.msg, ex);
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, DeliverySessionStartException.msg,
+                DeliverySessionStartException.uuid));
+    }
+
+    @ExceptionHandler(DeliverySessionFinishException.class)
+    public ResponseEntity<Object> handleDeliverySessionFinishException(DeliverySessionFinishException ex){
+        log.error(ex.getMessage(), ex);
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(),
+                DeliverySessionStartException.uuid));
+    }
+
+
+    @ExceptionHandler(NoActiveDeliverySessionException.class)
+    public ResponseEntity<Object> handleDeliverySessionFinishException(NoActiveDeliverySessionException ex){
+        log.error(NoActiveDeliverySessionException.msg, ex);
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, NoActiveDeliverySessionException.msg,
+                NoActiveDeliverySessionException.uuid));
+    }
+  
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }
