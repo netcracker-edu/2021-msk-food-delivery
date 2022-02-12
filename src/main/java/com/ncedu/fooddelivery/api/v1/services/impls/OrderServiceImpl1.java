@@ -1,6 +1,8 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
 import com.ncedu.fooddelivery.api.v1.dto.OrderInfoDTO;
+import com.ncedu.fooddelivery.api.v1.entities.Courier;
+import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import com.ncedu.fooddelivery.api.v1.entities.order.OrderNotHierarchical;
 import com.ncedu.fooddelivery.api.v1.repos.order.OrderNotHierarchicalRepo;
@@ -34,6 +36,11 @@ public class OrderServiceImpl1 implements OrderService {
     @Override
     public List<OrderInfoDTO> findFiltered(Specification<OrderNotHierarchical> spec, Pageable pageable) {
         return orderNotHierarchicalRepo.findAll(spec, pageable).stream().map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
+    }
+
+    @Override
+    public Order findCouriersActiveOrder(Courier courier) {
+        return orderRepo.findCouriersActiveOrder(courier.getId());
     }
 
     public OrderInfoDTO convertToOrderInfoDTO(OrderNotHierarchical orderNotHierarchical){

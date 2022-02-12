@@ -68,6 +68,14 @@ public class User implements Serializable, UserDetails {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
     private List<File> files;
 
+    @OneToOne(cascade=CascadeType.ALL, mappedBy = "user")
+    @PrimaryKeyJoinColumn
+    private Courier courier;
+    public void setCourier(Courier courier) {
+        this.courier = courier;
+        this.courier.setUser(this);
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
