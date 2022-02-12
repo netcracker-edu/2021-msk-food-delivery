@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.services;
 
+import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 
@@ -45,7 +46,15 @@ public class UserUtils {
         user.setFullName(fullName);
         user.setEmail(email);
         user.setRole(role);
+        //"password" hashed
+        user.setPassword("$2a$08$1h5twwivIL7O9gyjIJ/9eO4I2BeSytSpjsbpaPN.dxWSJM0fuWBBm");
         return user;
+    }
+
+    public static UserInfoDTO createUserDTO(User user) {
+        return new UserInfoDTO(user.getId(), user.getRole().name(),
+                user.getFullName(), user.getEmail(),
+                user.getLastSigninDate(), user.getAvatarId(), user.getLockDate());
     }
 
 }
