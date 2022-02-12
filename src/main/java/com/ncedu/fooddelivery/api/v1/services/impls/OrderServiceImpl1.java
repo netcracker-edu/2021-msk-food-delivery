@@ -128,7 +128,7 @@ public class OrderServiceImpl1 implements OrderService {
     public Double[] countOrderCost(CoordsDTO geo,
                                    HashMap<Long, Integer> pairs, Long clientWarehouseId) {
         WarehouseInfoDTO warehouse = warehouseService.getNearestWarehouse(geo.getLat(), geo.getLon());
-        if(warehouse == null) throw new NotFoundEx(String.format("{Lat: %s; lon: %s}", geo.getLat().toString(),
+        if(warehouse == null) throw new NotFoundEx(String.format("Lat: %s; lon: %s", geo.getLat().toString(),
                 geo.getLon().toString()));
         Long warehouseId = warehouse.getId();
         if(!warehouseId.equals(clientWarehouseId)) throw new WarehouseCoordsBindingEx();
