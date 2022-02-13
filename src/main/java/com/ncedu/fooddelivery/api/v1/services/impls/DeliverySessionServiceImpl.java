@@ -81,7 +81,9 @@ public class DeliverySessionServiceImpl implements DeliverySessionService {
     }
 
     @Override
-    public void finishSession(User user, Courier courier) {
+    public void finishSession(User user, User targetUser) {
+        if(targetUser.getRole() != Role.COURIER) throw new IncorrectUserRoleRequestException();
+        Courier courier = targetUser.getCourier();
         if(user.getRole() == Role.MODERATOR){
             if(!user.getModerator().getWarehouseId().equals(courier.getWarehouse().getId()))
                 throw new CustomAccessDeniedException();

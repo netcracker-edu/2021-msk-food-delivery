@@ -13,7 +13,7 @@ public interface DeliverySessionService {
     DeliverySessionInfoDTO getInfo(User user, DeliverySession deliverySession);
     isCreatedDTO startSession(User user);
     void finishSession(User user);
-    void finishSession(User user, Courier courier);
+    void finishSession(User user, User targetUser);
     void finishSession(User user, DeliverySession deliverySession);
     List<DeliverySessionInfoDTO> getSessionsHistory(User user, Pageable pageable);
     List<DeliverySessionInfoDTO> getSessionsHistory(User user, User targetUser, Pageable pageable);

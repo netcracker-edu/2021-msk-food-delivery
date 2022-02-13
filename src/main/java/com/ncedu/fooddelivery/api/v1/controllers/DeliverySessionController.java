@@ -44,10 +44,10 @@ public class DeliverySessionController {
     }
 
     @PreAuthorize("hasAnyAuthority('MODERATOR', 'ADMIN')")
-    @PatchMapping("/api/v1/courier/{courier}/deliverySession")
+    @PatchMapping("/api/v1/user/{targetUser}/deliverySession")
     public ResponseEntity<Object> finishSession(@AuthenticationPrincipal User user,
-                                                @PathVariable(value = "courier") Courier courier){
-        deliverySessionService.finishSession(user, courier);
+                                                @PathVariable(value = "targetUser") User targetUser){
+        deliverySessionService.finishSession(user, targetUser);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

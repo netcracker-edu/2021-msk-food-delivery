@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Data
 @AllArgsConstructor
@@ -31,4 +32,20 @@ public class DeliverySessionInfoDTO {
     private Float moneyEarned;
 
     public DeliverySessionInfoDTO(){}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DeliverySessionInfoDTO that = (DeliverySessionInfoDTO) o;
+        return id.equals(that.id) && courier.getId().equals(that.courier.getId()) && startTime.equals(that.startTime)
+                && Objects.equals(endTime, that.endTime) && Objects.equals(ordersCompleted, that.ordersCompleted)
+                && Objects.equals(averageTimePerOrder, that.averageTimePerOrder)
+                && Objects.equals(moneyEarned, that.moneyEarned);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, courier.getId(), startTime, endTime, ordersCompleted, averageTimePerOrder, moneyEarned);
+    }
 }
