@@ -67,3 +67,6 @@ build/
 /logs/
 ### FILES STORAGE FOR TESTS ###
 /testfiles/
+
+### FRONT ###
+/front/node_modules/

@@ -29,6 +29,9 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -226,15 +229,6 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
 
     }
-  
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleNotProcessedException(
-            Exception ex) {
-        log.error(ex.getMessage(), ex);
-        final String UUID = "3155227c-2001-4878-b2e7-040c4d4d803c";
-        final String message = "Unknown exception. Internal server error";
-        return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, message, UUID));
-    }
     
     @ExceptionHandler(ProductAvailabilityEx.class)
     public ResponseEntity<Object> handleProductAvailabilityEx(ProductAvailabilityEx ex){
@@ -284,6 +278,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleWarehouseCoordsBindingEx(WarehouseCoordsBindingEx ex){
         ApiError err = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), WarehouseCoordsBindingEx.uuid);
         return buildResponseEntity(err);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleNotProcessedException(
+            Exception ex) {
+        log.error(ex.getMessage(), ex);
+        final String UUID = "3155227c-2001-4878-b2e7-040c4d4d803c";
+        final String message = "Unknown exception. Internal server error";
+        return buildResponseEntity(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, message, UUID, ex));
     }
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {

@@ -49,8 +49,7 @@ public class FileController {
 
     @GetMapping("/api/v1/file/{file}")
     public ResponseEntity<?> download(
-            @PathVariable File file,
-            @AuthenticationPrincipal User authedUser) {
+            @PathVariable File file) {
         return buildDownloadResponseEntity(file);
     }
 
