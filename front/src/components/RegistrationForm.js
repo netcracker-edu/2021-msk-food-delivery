@@ -1,17 +1,13 @@
 import { useState } from 'react';
-import UserClient from '../api/UserClient';
 import { useNavigate } from 'react-router-dom';
+import UserClient from '../api/UserClient';
 import {
-  Form, Input, Select, Row, Col, Button, Alert, Layout
+  Form, Input, Select, Button, Alert, Layout, Card
 } from 'antd';
 const { Option } = Select;
+const { Content } = Layout;
 
 const RegistrationForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [role, setRole] = useState("");
   const [errMsg, setErrMsg] = useState();
   const userClient = new UserClient();
   const navigate = useNavigate();
@@ -29,19 +25,16 @@ const RegistrationForm = () => {
   }
 
   return (
-    <Layout>
+    <Content className='wrapper'>
       <h1>REGISTRATION FORM</h1>
       <span style={{display: errMsg ? "block" : "none"}}>
         <Alert message={errMsg} type="error"/>
       </span>
-      <Form
-        name="register"
+      <Card>
+      <Form name="register" scrollToFirstError
         onFinish={handleFinish}
-        scrollToFirstError
       >
-        <Form.Item
-          name="email"
-          label="E-mail"
+        <Form.Item name="email" label="E-mail"
           rules={[
             {
               type: 'email',
@@ -53,31 +46,31 @@ const RegistrationForm = () => {
             },
           ]}
         >
-          <Input placeholder="example@domain.com"
-                onChange={(e) => setEmail(e.target.value)}
-          />
+          <Input placeholder="example@domain.com"/>
         </Form.Item>
 
-        <Form.Item
-          name="password"
-          label="Password"
+        <Form.Item name="password" label="Password"
           rules={[
             {
               required: true,
               message: 'Please input your password!',
             },
+            {
+              max: 64,
+              message: 'Password too small!',
+            },
+            {
+              min: 8,
+              message: 'Password too small!',
+            },
           ]}
           hasFeedback
         >
-          <Input.Password placeholder="Enter your password..."
-                  onChange={(e) => setPassword(e.target.values)}/>
+          <Input.Password placeholder="Enter your password..."/>
         </Form.Item>
 
-        <Form.Item
-          name="confirm"
-          label="Confirm Password"
-          dependencies={['password']}
-          hasFeedback
+        <Form.Item name="confirm" label="Confirm Password"
+          dependencies={['password']} hasFeedback
           rules={[
             {
               required: true,
@@ -88,8 +81,8 @@ const RegistrationForm = () => {
                 if (!value || getFieldValue('password') === value) {
                   return Promise.resolve();
                 }
-
-                return Promise.reject(new Error('The two passwords that you entered do not match!'));
+                return Promise.reject(
+                  new Error('The two passwords that you entered do not match!'));
               },
             }),
           ]}
@@ -97,9 +90,7 @@ const RegistrationForm = () => {
           <Input.Password placeholder="Repeat your password..."/>
         </Form.Item>
 
-        <Form.Item
-          name="fullName"
-          label="Full name"
+        <Form.Item name="fullName" label="Full name"
           rules={[
             {
               required: true,
@@ -108,13 +99,10 @@ const RegistrationForm = () => {
             },
           ]}
         >
-          <Input placeholder="Full name"
-                onChange = {(e) => setFullName(e.target.value)}/>
+          <Input placeholder="Full name"/>
         </Form.Item>
 
-        <Form.Item
-          name="phoneNumber"
-          label="Phone Number"
+        <Form.Item name="phoneNumber" label="Phone Number"
           tooltip="Phone format +7 XXX XXX-XX-XX"
           rules={[
             {
@@ -123,13 +111,10 @@ const RegistrationForm = () => {
             },
           ]}
         >
-          <Input placeholder="+7 XXX XXX-XX-XX"
-                onChange = {(e) => setPhoneNumber(e.target.value)}/>
+          <Input placeholder="+7 XXX XXX-XX-XX"/>
         </Form.Item>
 
-        <Form.Item
-          name="role"
-          label="Role"
+        <Form.Item name="role" label="Role"
           rules={[
             {
               required: true,
@@ -137,20 +122,20 @@ const RegistrationForm = () => {
             },
           ]}
         >
-          <Select placeholder="select your role"
-                onChange = {(value) => setRole(value)}>
+          <Select placeholder="select your role">
             <Option value="CLIENT">Client</Option>
             <Option value="COURIER">Courier</Option>
           </Select>
         </Form.Item>
 
         <Form.Item >
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" size="large">
             Register
           </Button>
         </Form.Item>
       </Form>
-    </Layout>
+      </Card>
+    </Content>
   );
 }
 

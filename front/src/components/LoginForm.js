@@ -1,7 +1,9 @@
-import { Form, Input, Button, Checkbox, Alert } from 'antd';
+import { Form, Input, Button, Checkbox, Alert, Layout, Card } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useNavigate, Link } from "react-router-dom";
+const { Content } = Layout;
+
 
 const LoginForm = ({ auth }) => {
   const [login, setLogin] = useState();
@@ -26,45 +28,49 @@ const LoginForm = ({ auth }) => {
   };
 
   return (
-    <div>
+    <Content className="wrapper">
     <h1> LOGIN FORM </h1>
-    <Form name="normal_login" className="login-form" onFinish={handleFinish}>
-      <span style={{display: errMsg ? "block" : "none"}}>
-        <Alert message={errMsg} type="error" />
-      </span>
-      <Form.Item name="login"
-        rules={[
-          {
-            required: true,
-            message: 'Please input your Login!',
-          },
-        ]}
-      >
-        <Input prefix={<UserOutlined className="site-form-item-icon" />}
-          placeholder="Login" onChange={(e) => setLogin(e.target.value)}
-        />
-      </Form.Item>
-      <Form.Item name="password"
-        rules={[
-          {
-            required: true,
-            message: 'Please input your Password!',
-          },
-        ]}
-      >
-        <Input prefix={<LockOutlined className="site-form-item-icon" />}
-          type="password" placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </Form.Item>
-      <Form.Item>
-        <Button type="primary" htmlType="submit" className="login-form-button">
-          Log in
-        </Button>
-        Or <Link to="/signup" >register now!</Link>
-      </Form.Item>
-    </Form>
-    </div>
+    <Card>
+      <Form name="normal_login" className="login-form" onFinish={handleFinish}>
+        <span style={{display: errMsg ? "block" : "none"}}>
+          <Alert message={errMsg} type="error" />
+        </span>
+        <Form.Item name="login"
+          rules={[
+            {
+              required: true,
+              message: 'Please input your Login!',
+            },
+          ]}
+        >
+          <Input prefix={<UserOutlined className="site-form-item-icon" />}
+            placeholder="Login" onChange={(e) => setLogin(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item name="password"
+          rules={[
+            {
+              required: true,
+              message: 'Please input your Password!',
+            },
+          ]}
+        >
+          <Input prefix={<LockOutlined className="site-form-item-icon" />}
+            type="password" placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit" className="login-form-button">
+            Log in
+          </Button>
+          <br/>
+          <br/>
+          or <Link to="/signup" >register now!</Link>
+        </Form.Item>
+      </Form>
+    </Card>
+    </Content>
   );
 };
 

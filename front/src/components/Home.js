@@ -1,7 +1,5 @@
-import Header from './Header';
 import { Layout, Button } from 'antd';
-const { Footer, Sider, Content } = Layout;
-
+const { Content } = Layout;
 
 const Home = ({ auth }) => {
 
@@ -15,8 +13,7 @@ const Home = ({ auth }) => {
   }
 
   return (
-    <Layout>
-      <Content>
+      <Content className="wrapper">
         <h1>Hello from React, {auth.token ? auth.token.user.fullName : "Guest"}!</h1>
         <h3>YOUR TOKEN IS {auth.token ? auth.token.accessToken : "nothing"}</h3>
         <Button type="primary"
@@ -25,8 +22,6 @@ const Home = ({ auth }) => {
           Refresh token
         </Button>
       </Content>
-      <Footer>Footer</Footer>
-    </Layout>
   );
 }
 

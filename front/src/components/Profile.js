@@ -1,8 +1,10 @@
 import ProfileClient from "../api/ProfileClient";
 import {useState, useEffect} from 'react';
-import {Row, Col, List, Card} from 'antd';
+import { List, Card, Layout, Avatar} from 'antd';
+import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
 
 const { Meta } = Card;
+const { Content } = Layout;
 
 const Profile = ({auth}) => {
   const profileClient = new ProfileClient(auth);
@@ -22,20 +24,22 @@ const Profile = ({auth}) => {
   }, []);
 
   return (
-    <Row justify="center">
-      <Col>
+    <Content className="wrapper">
         <h1>{profile?.role} PROFILE</h1>
         <Card
-          hoverable
-          style={{ width: 300 }}
-          cover={<img height="400px" alt="example"
-                  src = "http://localhost:8080/api/v1/file/62bbb602-08b0-4b60-b036-8e56c632f861"/>}
+          style={{ width: 500 }}
+          actions={[
+            <EditOutlined key="edit" onClick={(e) => alert("GOTCHA")}/>,
+            <EllipsisOutlined key="ellipsis" />,
+          ]}
         >
-          <Meta title={profile?.fullName} description={profile?.email} />
+          <Meta
+            avatar = {<Avatar size={100}
+                      src="http://localhost:8080/api/v1/file/62bbb602-08b0-4b60-b036-8e56c632f861"/>}
+            title={profile?.fullName} description={profile?.email} />
 
         </Card>
-      </Col>
-    </Row>
+    </Content>
   );
 }
 
