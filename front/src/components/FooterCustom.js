@@ -1,10 +1,11 @@
 import {Layout} from 'antd';
+import { CopyrightOutlined } from '@ant-design/icons';
 const {Footer} = Layout;
 
 const FooterCustom = () => {
   return (
     <Footer className="footer">
-      Footer
+      ncedu/food-delivery <CopyrightOutlined /> {new Date().getFullYear()}
     </Footer>
   );
 }

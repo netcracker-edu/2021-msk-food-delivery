@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UserClient from '../api/UserClient';
+import EmailInput from './user_form/EmailInput';
+import PasswordInput from './user_form/PasswordInput';
+import FullNameInput from './user_form/FullNameInput';
+import PhoneInput from './user_form/PhoneInput';
+import RoleSelect from './user_form/RoleSelect';
+import PasswordInputConfirm from './user_form/PasswordInputConfirm';
 import {
   Form, Input, Select, Button, Alert, Layout, Card
 } from 'antd';
@@ -34,99 +40,13 @@ const RegistrationForm = () => {
       <Form name="register" scrollToFirstError
         onFinish={handleFinish}
       >
-        <Form.Item name="email" label="E-mail"
-          rules={[
-            {
-              type: 'email',
-              message: 'The input is not valid E-mail!',
-            },
-            {
-              required: true,
-              message: 'Please input your E-mail!',
-            },
-          ]}
-        >
-          <Input placeholder="example@domain.com"/>
-        </Form.Item>
+        <EmailInput initValue="" />
+        <PasswordInput inputName="password" label="Password" />
+        <PasswordInputConfirm dependency="password"/>
 
-        <Form.Item name="password" label="Password"
-          rules={[
-            {
-              required: true,
-              message: 'Please input your password!',
-            },
-            {
-              max: 64,
-              message: 'Password too small!',
-            },
-            {
-              min: 8,
-              message: 'Password too small!',
-            },
-          ]}
-          hasFeedback
-        >
-          <Input.Password placeholder="Enter your password..."/>
-        </Form.Item>
-
-        <Form.Item name="confirm" label="Confirm Password"
-          dependencies={['password']} hasFeedback
-          rules={[
-            {
-              required: true,
-              message: 'Please confirm your password!',
-            },
-            ({ getFieldValue }) => ({
-              validator(_, value) {
-                if (!value || getFieldValue('password') === value) {
-                  return Promise.resolve();
-                }
-                return Promise.reject(
-                  new Error('The two passwords that you entered do not match!'));
-              },
-            }),
-          ]}
-        >
-          <Input.Password placeholder="Repeat your password..."/>
-        </Form.Item>
-
-        <Form.Item name="fullName" label="Full name"
-          rules={[
-            {
-              required: true,
-              message: 'Please input your full name!',
-              whitespace: true,
-            },
-          ]}
-        >
-          <Input placeholder="Full name"/>
-        </Form.Item>
-
-        <Form.Item name="phoneNumber" label="Phone Number"
-          tooltip="Phone format +7 XXX XXX-XX-XX"
-          rules={[
-            {
-              required: false,
-              message: 'Please input your phone number!',
-            },
-          ]}
-        >
-          <Input placeholder="+7 XXX XXX-XX-XX"/>
-        </Form.Item>
-
-        <Form.Item name="role" label="Role"
-          rules={[
-            {
-              required: true,
-              message: 'Please select role!',
-            },
-          ]}
-        >
-          <Select placeholder="select your role">
-            <Option value="CLIENT">Client</Option>
-            <Option value="COURIER">Courier</Option>
-          </Select>
-        </Form.Item>
+        <FullNameInput />
+        <PhoneInput />
+        <RoleSelect mode="register" />
 
         <Form.Item >
           <Button type="primary" htmlType="submit" size="large">
