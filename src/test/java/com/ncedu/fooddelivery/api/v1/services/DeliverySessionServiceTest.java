@@ -1,10 +1,11 @@
 package com.ncedu.fooddelivery.api.v1.services;
 
 import com.ncedu.fooddelivery.api.v1.dto.deliverySession.DeliverySessionInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.CourierInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.*;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
+import com.ncedu.fooddelivery.api.v1.errors.badrequest.DeliverySessionAlreadyStartedException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.DeliverySessionFinishException;
-import com.ncedu.fooddelivery.api.v1.errors.badrequest.DeliverySessionStartException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.IncorrectUserRoleRequestException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.NoActiveDeliverySessionException;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
@@ -79,7 +80,7 @@ public class DeliverySessionServiceTest {
     public void courierStartSessionFailTest(){
         Mockito.when(deliverySessionRepo.getActiveSession(Mockito.any(Long.class))).thenReturn(deliverySession);
 
-        Assertions.assertThrows(DeliverySessionStartException.class, new Executable() {
+        Assertions.assertThrows(DeliverySessionAlreadyStartedException.class, new Executable() {
             @Override
             public void execute() throws Throwable {
                 deliverySessionService.startSession(targetUser);
@@ -179,14 +180,19 @@ public class DeliverySessionServiceTest {
 
     @Test
     public void getSessionsHistoryTest(){
+        Page<DeliverySession> fakePagedSessions = getFakePagedSessions();
         Mockito.when(deliverySessionRepo.getSessionsByCourierId(Mockito.any(Long.class), Mockito.any(Pageable.class)))
-                .thenReturn(getFakePagedSessions());
+                .thenReturn(fakePagedSessions);
         Assertions.assertArrayEquals(getFakeSessionInfoDTOs().toArray(),
                 deliverySessionService.getSessionsHistory(targetUser, Mockito.mock(Pageable.class)).toArray());
     }
 
     private Page<DeliverySession> getFakePagedSessions(){
         DeliverySession ds1 = deliverySession;
+        User user = UserUtils.courierHowardWolowitz(100L);
+        ds1.getCourier().setUser(user);
+        Mockito.when(targetCourier.getUser()).thenReturn(user);
+
         DeliverySession ds2 = new DeliverySession(userId, targetCourier, currDateTime.minusHours(3),
                 currDateTime.minusHours(2), 2, Duration.ofMinutes(30), 2000.0F);
         ds2.setId(2L);
@@ -197,15 +203,22 @@ public class DeliverySessionServiceTest {
     }
 
     private List<DeliverySessionInfoDTO> getFakeSessionInfoDTOs(){
-        DeliverySessionInfoDTO dto1 = new DeliverySessionInfoDTO(userId, targetCourier, currDateTime,
+        Courier c = UserUtils.courierHowardWolowitz(100L).getCourier();
+        CourierInfoDTO targetCourierInfoDTO = new CourierInfoDTO(targetCourier.getId(), Role.COURIER.name(),
+                user.getFullName(), user.getEmail(), user.getLastSigninDate(), user.getAvatarId(),
+                targetCourier.getPhoneNumber(), targetCourier.getRating(), targetCourier.getWarehouse().getId(),
+                targetCourier.getAddress(), targetCourier.getCurrentBalance());
+        DeliverySessionInfoDTO dto1 = new DeliverySessionInfoDTO(userId, targetCourierInfoDTO, currDateTime,
                 currDateTime.plusHours(1L), 1, "01:00:00", 1000.0F);
         dto1.setId(1L);
 
-        DeliverySessionInfoDTO dto2 = new DeliverySessionInfoDTO(userId, targetCourier, currDateTime.minusHours(3),
+        DeliverySessionInfoDTO dto2 = new DeliverySessionInfoDTO(userId, targetCourierInfoDTO,
+                currDateTime.minusHours(3),
                 currDateTime.minusHours(2), 2, "00:30:00", 2000.0F);
         dto2.setId(2L);
 
-        DeliverySessionInfoDTO dto3 = new DeliverySessionInfoDTO(userId, targetCourier, currDateTime.minusDays(1),
+        DeliverySessionInfoDTO dto3 = new DeliverySessionInfoDTO(userId, targetCourierInfoDTO,
+                currDateTime.minusDays(1),
                 currDateTime.minusDays(1).plusHours(4), 7, "00:34:17", 5000.0F);
         dto3.setId(3L);
         return new ArrayList<>(Arrays.asList(dto1, dto2, dto3));

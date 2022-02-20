@@ -3,7 +3,7 @@ package com.ncedu.fooddelivery.api.v1.dto.deliverySession;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.ncedu.fooddelivery.api.v1.entities.Courier;
+import com.ncedu.fooddelivery.api.v1.dto.user.CourierInfoDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -15,7 +15,7 @@ import java.util.Objects;
 public class DeliverySessionInfoDTO {
     private Long id;
 
-    private Courier courier;
+    private CourierInfoDTO courierInfoDTO;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -38,7 +38,7 @@ public class DeliverySessionInfoDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeliverySessionInfoDTO that = (DeliverySessionInfoDTO) o;
-        return id.equals(that.id) && courier.getId().equals(that.courier.getId()) && startTime.equals(that.startTime)
+        return id.equals(that.id) && courierInfoDTO.getId().equals(that.courierInfoDTO.getId()) && startTime.equals(that.startTime)
                 && Objects.equals(endTime, that.endTime) && Objects.equals(ordersCompleted, that.ordersCompleted)
                 && Objects.equals(averageTimePerOrder, that.averageTimePerOrder)
                 && Objects.equals(moneyEarned, that.moneyEarned);
@@ -46,6 +46,7 @@ public class DeliverySessionInfoDTO {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, courier.getId(), startTime, endTime, ordersCompleted, averageTimePerOrder, moneyEarned);
+        return Objects.hash(id, courierInfoDTO.getId(), startTime, endTime, ordersCompleted, averageTimePerOrder,
+                moneyEarned);
     }
 }
