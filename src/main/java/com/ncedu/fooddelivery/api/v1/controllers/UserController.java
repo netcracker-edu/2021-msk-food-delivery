@@ -1,9 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
-import com.ncedu.fooddelivery.api.v1.dto.user.ClientInfoDTO;
-import com.ncedu.fooddelivery.api.v1.dto.user.ModeratorInfoDTO;
-import com.ncedu.fooddelivery.api.v1.dto.user.UserChangeInfoDTO;
-import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.*;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
@@ -113,6 +110,19 @@ public class UserController {
         return  new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PatchMapping("/api/v1/user/{user}/lock")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
+    public UserInfoDTO lockUser(@PathVariable User user) {
+        return userService.lockUser(user);
+    }
+
+    @PatchMapping("/api/v1/user/{user}/unlock")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
+    public UserInfoDTO unlockUser(@PathVariable User user) {
+        return userService.unlockUser(user);
+    }
+
+
     @GetMapping("/api/v1/admins")
     @PreAuthorize("hasAuthority('ADMIN')")
     public List<UserInfoDTO> getAdminList() {
@@ -127,5 +137,15 @@ public class UserController {
     ) {
         List<UserInfoDTO> userList = userService.getAllUsers(pageable);
         return userList;
+    }
+
+    @GetMapping("/api/v1/users/search")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
+    public List<UserInfoDTO> searchUsers(
+        @Valid @RequestBody UserSearchDTO searchDTO,
+        @PageableDefault(sort = { "rank" }, direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        String phrase = searchDTO.getPhrase();
+        return userService.searchUsers(phrase, pageable);
     }
 }

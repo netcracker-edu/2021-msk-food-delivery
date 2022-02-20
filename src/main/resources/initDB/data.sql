@@ -108,6 +108,21 @@ BEGIN
     END;
 ' language plpgsql;
 
+/*
+    USERS SEARCH
+*/
+DO ' DECLARE
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM users_search WHERE user_search_id=1) THEN
+        INSERT INTO users_search
+            	SELECT u.user_id, setweight(to_tsvector(''russian'', u.email), ''A'') ||
+            						  setweight(to_tsvector(''russian'', u.full_name), ''B'') ||
+            						  setweight(to_tsvector(''russian'', u.role), ''C'') AS tsv
+            	FROM users AS u;
+
+    END IF;
+END;
+' language plpgsql;
 
     /*
                 CLIENTS

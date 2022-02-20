@@ -35,6 +35,55 @@ CREATE TABLE IF NOT EXISTS users
 	lock_date TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS users_search (
+	user_search_id BIGINT PRIMARY KEY REFERENCES users (user_id) ON DELETE CASCADE,
+	search_vector tsvector
+);
+
+/*
+    INSERT TO  USERS_SEARCH if NEW USER ADDED
+*/
+CREATE OR REPLACE FUNCTION copy_users_to_search() RETURNS TRIGGER AS '
+BEGIN
+    INSERT INTO users_search
+        VALUES(new.user_id,
+			   setweight(to_tsvector(''russian'', new.email), ''A'') ||
+			   setweight(to_tsvector(''russian'', new.full_name), ''B'') ||
+			   setweight(to_tsvector(''russian'', new.role::text), ''C''));
+    RETURN new;
+END;
+' language plpgsql;
+
+DROP TRIGGER IF EXISTS copy_users_to_search ON users;
+
+CREATE TRIGGER copy_users_to_search
+	 AFTER INSERT ON users
+     FOR EACH ROW
+     EXECUTE PROCEDURE copy_users_to_search();
+
+/*
+    UPDATE USERS_SEARCH if USER UPDATED
+*/
+CREATE OR REPLACE FUNCTION update_users_in_search() RETURNS TRIGGER AS '
+BEGIN
+    UPDATE users_search
+        SET search_vector =
+			   setweight(to_tsvector(''russian'', new.email), ''A'') ||
+			   setweight(to_tsvector(''russian'', new.full_name), ''B'') ||
+			   setweight(to_tsvector(''russian'', new.role::text), ''C'')
+		WHERE user_search_id = new.user_id;
+    RETURN new;
+END;
+'
+language plpgsql;
+
+DROP TRIGGER IF EXISTS update_users_in_search ON users;
+
+CREATE TRIGGER update_users_in_search
+	 AFTER UPDATE ON users
+     FOR EACH ROW
+     EXECUTE PROCEDURE update_users_in_search();
+
 CREATE TABLE IF NOT EXISTS clients
 (
 	client_id BIGINT PRIMARY KEY REFERENCES users (user_id) ON DELETE CASCADE,
