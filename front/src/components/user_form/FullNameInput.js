@@ -3,6 +3,7 @@ import {Form, Input} from "antd";
 const FullNameInput = () => {
   return (
     <Form.Item name="fullName" label="Full name"
+
       rules={[
         {
           required: true,

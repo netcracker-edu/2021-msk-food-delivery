@@ -40,11 +40,11 @@ const RegistrationForm = () => {
       <Form name="register" scrollToFirstError
         onFinish={handleFinish}
       >
-        <EmailInput initValue="" />
+        <EmailInput/>
         <PasswordInput inputName="password" label="Password" />
         <PasswordInputConfirm dependency="password"/>
 
-        <FullNameInput />
+        <FullNameInput/>
         <PhoneInput />
         <RoleSelect mode="register" />
 

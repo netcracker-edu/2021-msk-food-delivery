@@ -1,6 +1,6 @@
 import { Form, Input} from "antd";
 
-const EmailInput = ({initValue}) => {
+const EmailInput = () => {
   return (
     <Form.Item name="email" label="E-mail"
       rules={[
@@ -14,8 +14,7 @@ const EmailInput = ({initValue}) => {
         },
       ]}
     >
-      <Input placeholder="example@domain.com"
-        value={initValue == null ? "" : initValue}/>
+      <Input placeholder="example@domain.com"/>
     </Form.Item>
   );
 }
