@@ -38,7 +38,7 @@ exports.tokenFetch = async (url, headers, body, clear, store) => {
 };
 
 exports.clearTokenFetch = async (url, headers, body, clear) => {
-  return fetch(this.config.SIGNOUT_URL, {
+  return fetch(url, {
     method: "POST",
     mode: "cors",
     headers: {
