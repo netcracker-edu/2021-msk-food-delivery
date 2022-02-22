@@ -64,6 +64,7 @@ public class OrderServiceTest {
 
     private static final Calendar cal = Calendar.getInstance();
     private static final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+    private static final LocalDateTime currDateTime = LocalDateTime.now();
 
     @Test
     public void getOrderNullTest(){
@@ -398,7 +399,7 @@ public class OrderServiceTest {
     private Order getFakeOrder(){
         return new Order(1l, getFakeUserClient().getClient(), "address", geometryFactory.createPoint(new Coordinate(1.0,
                 1.0)), getFakeWarehouse1(), getFakeCourier1(), OrderStatus.DELIVERING,
-                Mockito.mock(LocalDateTime.class), Mockito.mock(LocalDateTime.class), 1000.0, 1.0, 0.0,
+                currDateTime, currDateTime.plusHours(1L), 1000.0, 1.0, 0.0,
                 1l, new BigDecimal(5.0), new BigDecimal(5.0));
     }
 

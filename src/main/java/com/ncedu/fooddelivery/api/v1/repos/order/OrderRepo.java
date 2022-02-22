@@ -24,4 +24,8 @@ public interface OrderRepo extends JpaRepository<Order, Long> {
 
     Page<Order> findAll(Specification<Order> spec, Pageable pageable);
 
+    @Query(value = "SELECT * FROM orders " +
+                   "WHERE courier_id = :id AND status NOT IN ('CANCELLED', 'DELIVERED')",
+            nativeQuery = true)
+    Order findCouriersActiveOrder(@Param(value = "id") Long id);
 }

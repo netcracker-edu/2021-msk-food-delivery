@@ -3,6 +3,7 @@ package com.ncedu.fooddelivery.api.v1.services;
 import com.ncedu.fooddelivery.api.v1.dto.areCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.CoordsDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.*;
+import com.ncedu.fooddelivery.api.v1.entities.Courier;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import org.springframework.data.domain.Pageable;
@@ -35,4 +36,6 @@ public interface OrderService {
     void changeDeliveryRating(Order order, ChangeRatingDTO dto, User user);
 
     void changeClientRating(Order order, ChangeRatingDTO dto, User user);
+
+    Order findCouriersActiveOrder(Courier courier);
 }
