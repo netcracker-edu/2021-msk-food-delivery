@@ -1,4 +1,5 @@
 import Config from "./Config";
+import { tokenFetch, clearTokenFetch } from "../helpers/fetchers.js";
 
 class Auth {
   token;
@@ -11,84 +12,30 @@ class Auth {
   }
 
   async loginUser(credentials) {
-    return fetch(this.config.SIGNIN_URL, {
-      method: "POST",
-      headers: {
-        ...this.config.defaultHeaders(),
-      },
-      body: JSON.stringify(credentials),
-    })
-      .then((response) => Promise.all([response, response.json()]))
-      .then(([response, json]) => {
-        if (!response.ok) {
-          return { success: false, error: json };
-        }
-        this.storeTokens(json);
-        return { success: true, data: json };
-      })
-      .catch((e) => {
-        return this.handleError(e);
-      });
+    return tokenFetch(
+            this.config.SIGNIN_URL,
+            this.config.defaultHeaders(),
+            JSON.stringify(credentials),
+            this.clearTokens.bind(this),
+            this.storeTokens.bind(this));
   }
 
   async refreshToken() {
-    return fetch(this.config.REFRESH_TOKEN_URL, {
-      method: "POST",
-      mode: "cors",
-      headers: {
-        ...this.config.headersWithAuthorization(),
-      },
-      body: JSON.stringify({ refreshToken: this.token.refreshToken }),
-    })
-      .then((response) => Promise.all([response, response.json()]))
-      .then(([response, json]) => {
-        if (!response.ok) {
-          this.clearTokens();
-          return { success: false, error: json };
-        }
-        this.storeTokens(json);
-        return { success: true, data: json };
-      })
-      .catch((e) => {
-        return this.handleError(e);
-      });
+    return tokenFetch(
+          this.config.REFRESH_TOKEN_URL,
+          this.config.headersWithAuthorization(),
+          JSON.stringify({ refreshToken: this.token.refreshToken }),
+          this.clearTokens.bind(this),
+          this.storeTokens.bind(this));
   }
 
   async logoutUser(refreshToken) {
-    return fetch(this.config.SIGNOUT_URL, {
-      method: "POST",
-      mode: "cors",
-      headers: {
-        ...this.config.defaultHeaders(),
-      },
-      body: JSON.stringify(refreshToken),
-    })
-      .then(this.handleSignoutResponse.bind(this))
-      .catch((e) => {
-        this.handleError(e);
-      });
-  }
-
-  handleSignoutResponse(response) {
-    this.clearTokens();
-    if (!response.ok) {
-      const error = response.json();
-      console.log(error);
-      throw Error(error);
-    }
-    return response;
-  }
-
-  handleError(error) {
-    this.clearTokens();
-    const err = new Map([
-      [TypeError, "Can't connect to server."],
-      [SyntaxError, "There was a problem parsing the response."],
-      [Error, error.message],
-    ]).get(error.constructor);
-    console.log(err);
-    return err;
-  }
+     return clearTokenFetch(
+              this.config.SIGNOUT_URL,
+              this.config.defaultHeaders(),
+              JSON.stringify(refreshToken),
+              this.clearTokens.bind(this));
+   }
 
   storeTokens(json) {
     this.setToken(json);

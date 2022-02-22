@@ -1,4 +1,5 @@
 import Config from "./Config";
+import { commonFetch } from "../helpers/fetchers.js";
 
 export default class ProfileClient {
   auth;
@@ -11,111 +12,43 @@ export default class ProfileClient {
     if (this.config.tokenExpired()) {
       await this.auth.refreshToken();
     }
-    return fetch(this.config.PROFILE_URL, {
-      method: "GET",
-      mode: "cors",
-      headers: {
-        ...this.config.headersWithAuthorization(),
-      },
-    })
-      .then((response) => Promise.all([response, response.json()]))
-      .then(([response, json]) => {
-        console.log("Response JSON: " + JSON.stringify(json));
-        if (!response.ok) {
-          return { success: false, error: json };
-        }
-        return { success: true, data: json };
-      })
-      .catch((e) => {
-        this.handleError(e);
-      });
+    return commonFetch(
+            this.config.PROFILE_URL,
+            "GET",
+            this.config.headersWithAuthorization(),
+            null);
   }
 
   async editCommonInfo(info) {
     if (this.config.tokenExpired()) {
       await this.auth.refreshToken();
     }
-    return fetch(this.config.PROFILE_URL, {
-      method: "PUT",
-      mode: "cors",
-      headers: {
-        ...this.config.headersWithAuthorization(),
-      },
-      body: JSON.stringify(info),
-    })
-      .then((response) => Promise.all([response, response.json()]))
-      .then(([response, json]) => {
-        console.log("Response JSON: " + JSON.stringify(json));
-        if (!response.ok) {
-          return { success: false, error: json };
-        }
-        return { success: true, data: json };
-      })
-      .catch((e) => {
-        this.handleError(e);
-      });
+    return commonFetch(
+            this.config.PROFILE_URL,
+            "PUT",
+            this.config.headersWithAuthorization(),
+            JSON.stringify(info));
   }
 
   async editEmail(info) {
     if (this.config.tokenExpired()) {
       await this.auth.refreshToken();
     }
-    return fetch(this.config.PROFILE_URL+"/email", {
-      method: "PATCH",
-      mode: "cors",
-      headers: {
-        ...this.config.headersWithAuthorization(),
-      },
-      body: JSON.stringify(info),
-    })
-      .then((response) => Promise.all([response, response.json()]))
-      .then(([response, json]) => {
-        console.log("Response JSON: " + JSON.stringify(json));
-        if (!response.ok) {
-          return { success: false, error: json };
-        }
-        return this.auth.refreshToken()
-          .then((res) => {
-             return { success: true, data: json };
-          });
-      })
-      .catch((e) => {
-        this.handleError(e);
-      });
+    return commonFetch(
+            this.config.PROFILE_URL+"/email",
+            "PATCH",
+            this.config.headersWithAuthorization(),
+            JSON.stringify(info));
   }
 
   async editPassword(values) {
-    if (this.config.tokenExpired()) {
-      await this.auth.refreshToken();
-    }
-    return fetch(this.config.PROFILE_URL+"/password", {
-      method: "PATCH",
-      mode: "cors",
-      headers: {
-        ...this.config.headersWithAuthorization(),
-      },
-      body: JSON.stringify(values),
-    })
-      .then((response) => Promise.all([response, response.json()]))
-      .then(([response, json]) => {
-        console.log("Response JSON: " + JSON.stringify(json));
-        if (!response.ok) {
-          return { success: false, error: json };
-        }
-          return { success: true, data: json };
-      })
-      .catch((e) => {
-        this.handleError(e);
-      });
-  }
-
-  handleError(error) {
-  const err = new Map([
-    [TypeError, "There was a problem fetching the response."],
-    [SyntaxError, "There was a problem parsing the response."],
-    [Error, error.message],
-  ]).get(error.constructor);
-  console.log(err);
-  return err;
-}
+     if (this.config.tokenExpired()) {
+       await this.auth.refreshToken();
+     }
+     return commonFetch(
+              this.config.PROFILE_URL+"/password",
+              "PATCH",
+              this.config.headersWithAuthorization(),
+              JSON.stringify(values));
+   }
 }
