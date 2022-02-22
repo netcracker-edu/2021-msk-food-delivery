@@ -19,10 +19,10 @@ const RegistrationForm = () => {
   const navigate = useNavigate();
 
   const handleFinish = async (values) => {
+    //backend not support unknown fields
     delete values["confirm"];
     const response = await userClient.register(values);
     if (response && response.success) {
-       console.log(response.data);
        setErrMsg(null);
        navigate("/signin");
     } else {
@@ -37,23 +37,22 @@ const RegistrationForm = () => {
         <Alert message={errMsg} type="error"/>
       </span>
       <Card>
-      <Form name="register" scrollToFirstError
-        onFinish={handleFinish}
-      >
-        <EmailInput/>
-        <PasswordInput inputName="password" label="Password" />
-        <PasswordInputConfirm dependency="password"/>
+        <Form name="register" scrollToFirstError
+          onFinish={handleFinish}
+        >
+          <EmailInput/>
+          <PasswordInput inputName="password" label="Password" />
+          <PasswordInputConfirm dependency="password"/>
+          <FullNameInput/>
+          <PhoneInput />
+          <RoleSelect mode="register" />
 
-        <FullNameInput/>
-        <PhoneInput />
-        <RoleSelect mode="register" />
-
-        <Form.Item >
-          <Button type="primary" htmlType="submit" size="large">
-            Register
-          </Button>
-        </Form.Item>
-      </Form>
+          <Form.Item >
+            <Button type="primary" htmlType="submit" size="large">
+              Register
+            </Button>
+          </Form.Item>
+        </Form>
       </Card>
     </Content>
   );

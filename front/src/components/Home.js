@@ -16,10 +16,10 @@ const Home = ({ auth }) => {
       <Content className="wrapper">
         <h1>Hello from React, {auth.token ? auth.token.user.fullName : "Guest"}!</h1>
         <h3>YOUR TOKEN IS {auth.token ? auth.token.accessToken : "nothing"}</h3>
-        <Button type="primary"
+        <Button type = "primary"
           disabled = {auth.token ? false : true}
-          onClick={handleRefreshToken}>
-          Refresh token
+          onClick = {handleRefreshToken}>
+            Refresh token
         </Button>
       </Content>
   );

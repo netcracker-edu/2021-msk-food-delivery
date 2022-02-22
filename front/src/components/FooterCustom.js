@@ -1,6 +1,6 @@
-import {Layout} from 'antd';
+import { Layout } from 'antd';
 import { CopyrightOutlined } from '@ant-design/icons';
-const {Footer} = Layout;
+const { Footer } = Layout;
 
 const FooterCustom = () => {
   return (
