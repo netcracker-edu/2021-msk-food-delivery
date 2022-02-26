@@ -204,4 +204,18 @@ public class UserServiceImpl implements UserService {
             fileService.delete(avatar, user);
         }
     }
+
+    @Override
+    public void deleteAvatar(User targetUser, User authedUser) {
+        UUID avatarId = targetUser.getAvatarId();
+        if (avatarId == null) {
+            return;
+        }
+        targetUser.setAvatarId(null);
+        userRepo.save(targetUser);
+        File avatar = fileService.getFile(avatarId);
+        if (avatar != null) {
+            fileService.delete(avatar, authedUser);
+        }
+    }
 }

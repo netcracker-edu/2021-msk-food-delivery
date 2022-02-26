@@ -29,4 +29,5 @@ public interface UserService {
     public List<UserInfoDTO> searchUsers(String phrase, Pageable pageable);
     public UserInfoDTO addAvatar(User authedUser, String fileUuid);
     public void deleteAvatar(User user);
+    public void deleteAvatar(User targetUser, User authedUser);
 }
