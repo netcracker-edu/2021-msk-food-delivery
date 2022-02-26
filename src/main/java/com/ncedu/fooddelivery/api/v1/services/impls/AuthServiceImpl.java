@@ -106,10 +106,7 @@ public class AuthServiceImpl implements AuthService {
     public JwtResponseDTO refresh(RefreshTokenDTO refreshTokenDTO, String authHeader) {
         UUID refreshToken = UUID.fromString(refreshTokenDTO.getRefreshToken());
         UserRefreshToken urt = userRefreshTokenService.getTokenById(refreshToken);
-        boolean isUsernamesNotEquals = checkUsernamesNotEquals(urt, authHeader);
-        if (isUsernamesNotEquals) {
-            throw new RefreshTokenException();
-        }
+
         //change lastSignin on owner of token
         userService.setLastSigninFromNow(urt.getOwner());
         final String accessToken = jwtUtil.createToken(urt.getOwner());
