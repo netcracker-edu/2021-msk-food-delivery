@@ -91,6 +91,13 @@ public class ProfileController {
         return new ResponseEntity<>(refreshedInfo, HttpStatus.OK);
     }
 
+    @DeleteMapping("/api/v1/profile/avatar")
+    public ResponseEntity<?> deleteAvatar(
+            @AuthenticationPrincipal User authedUser) {
+        userService.deleteAvatar(authedUser);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     private ResponseEntity<?> createModifyResponse(boolean isModified) {
         Map<String, Boolean> response = new HashMap<>();
         response.put("isModified", isModified);

@@ -190,4 +190,18 @@ public class UserServiceImpl implements UserService {
         userRepo.save(authedUser);
         return createUserDTO(authedUser);
     }
+
+    @Override
+    public void deleteAvatar(User user) {
+        UUID avatarId = user.getAvatarId();
+        if (avatarId == null) {
+            return;
+        }
+        user.setAvatarId(null);
+        userRepo.save(user);
+        File avatar = fileService.getFile(avatarId);
+        if (avatar != null) {
+            fileService.delete(avatar, user);
+        }
+    }
 }
