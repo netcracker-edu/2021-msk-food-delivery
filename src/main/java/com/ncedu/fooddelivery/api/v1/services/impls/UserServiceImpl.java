@@ -3,12 +3,14 @@ package com.ncedu.fooddelivery.api.v1.services.impls;
 import com.ncedu.fooddelivery.api.v1.dto.user.EmailChangeDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.PasswordChangeDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
+import com.ncedu.fooddelivery.api.v1.entities.File;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.AlreadyExistsException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.PasswordsMismatchException;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.repos.UserRepo;
+import com.ncedu.fooddelivery.api.v1.services.FileService;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -17,15 +19,15 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
     UserRepo userRepo;
+
+    @Autowired
+    FileService fileService;
 
     @Autowired
     PasswordEncoder encoder;
@@ -178,5 +180,14 @@ public class UserServiceImpl implements UserService {
             splitedPhrase[i] += ":*";
         }
         return String.join(" & ", splitedPhrase);
+    }
+
+    @Override
+    public UserInfoDTO addAvatar(User authedUser, String fileUuid) {
+        UUID avatarId = UUID.fromString(fileUuid);
+        File avatar = fileService.getFile(avatarId);
+        authedUser.setAvatarId(avatar.getId());
+        userRepo.save(authedUser);
+        return createUserDTO(authedUser);
     }
 }
