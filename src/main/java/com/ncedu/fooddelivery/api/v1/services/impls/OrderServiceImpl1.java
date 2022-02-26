@@ -571,6 +571,11 @@ public class OrderServiceImpl1 implements OrderService {
         orderRepo.save(order);
     }
 
+    @Override
+    public Order findCouriersActiveOrder(Courier courier) {
+        return orderRepo.findCouriersActiveOrder(courier.getId());
+    }
+
     public OrderInfoDTO convertToOrderInfoDTO(Order order){
         return new OrderInfoDTO(
                 order.getId(), order.getClient(), order.getAddress(),

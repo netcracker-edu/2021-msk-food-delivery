@@ -2,6 +2,7 @@ package com.ncedu.fooddelivery.api.v1.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ncedu.fooddelivery.api.v1.configs.SecurityConfig;
+import com.ncedu.fooddelivery.api.v1.errors.security.CustomAuthenticationEntryPoint;
 import com.ncedu.fooddelivery.api.v1.errors.wrappers.ApiError;
 import com.ncedu.fooddelivery.api.v1.services.impls.UserDetailsServiceImpl;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -10,6 +11,7 @@ import io.jsonwebtoken.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -62,7 +64,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String token = jwtUtil.getJwt(authHeader);
         try {
             if (jwtUtil.isTokenValid(token) && jwtUtil.isTokenNotExpired(token)) {
-                UsernamePasswordAuthenticationToken upaToken  = createUpaToken(token, request);
+                UserDetails userDetails = getUserDetails(token);
+                if (!userDetails.isAccountNonLocked()) {
+                    sendLockError(request, response);
+                    return;
+                }
+                UsernamePasswordAuthenticationToken upaToken  = createUpaToken(userDetails, request);
                 SecurityContextHolder.getContext().setAuthentication(upaToken);
                 filterChain.doFilter(request, response);
             }
@@ -79,9 +86,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
     }
 
-    private UsernamePasswordAuthenticationToken createUpaToken(String token, HttpServletRequest request) {
+    private UserDetails getUserDetails(String token) {
         String username = jwtUtil.getUsernameFromToken(token);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        return userDetailsService.loadUserByUsername(username);
+    }
+
+    private void sendLockError(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            new CustomAuthenticationEntryPoint().commence(request, response, new LockedException("User account is locked"));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    private UsernamePasswordAuthenticationToken createUpaToken(UserDetails userDetails, HttpServletRequest request) {
         UsernamePasswordAuthenticationToken upaToken =
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         upaToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

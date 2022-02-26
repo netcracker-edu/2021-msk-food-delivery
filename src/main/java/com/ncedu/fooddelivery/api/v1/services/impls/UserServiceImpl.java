@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -47,7 +48,7 @@ public class UserServiceImpl implements UserService {
     private UserInfoDTO createUserDTO(User user) {
        return new UserInfoDTO(user.getId(), user.getRole().name(),
                 user.getFullName(), user.getEmail(),
-                user.getLastSigninDate(), user.getAvatarId());
+                user.getLastSigninDate(), user.getAvatarId(), user.getLockDate());
     }
 
     @Override
@@ -133,5 +134,49 @@ public class UserServiceImpl implements UserService {
         Timestamp now = new Timestamp(System.currentTimeMillis());
         user.setLastSigninDate(now);
         userRepo.save(user);
+    }
+
+    @Override
+    public UserInfoDTO lockUser(User user) {
+        if (user.getLockDate() != null) {
+            return createUserDTO(user);
+        }
+        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+        user.setLockDate(now);
+        userRepo.save(user);
+        return createUserDTO(user);
+    }
+
+    @Override
+    public UserInfoDTO unlockUser(User user) {
+        if (user.getLockDate() == null) {
+            return createUserDTO(user);
+        }
+        user.setLockDate(null);
+        userRepo.save(user);
+        return createUserDTO(user);
+    }
+
+    @Override
+    public List<UserInfoDTO> searchUsers(String phrase, Pageable pageable) {
+        String resultPhrase = preparePhraseToSearch(phrase);
+        Iterable<User> users = userRepo.searchUsers(resultPhrase, pageable);
+        Iterator<User> iterator = users.iterator();
+        List<UserInfoDTO> usersDTO = new ArrayList<>();
+        while (iterator.hasNext()) {
+            usersDTO.add(createUserDTO(iterator.next()));
+        }
+        return usersDTO;
+    }
+
+    private String preparePhraseToSearch(String phrase) {
+        String[] splitedPhrase = phrase.split(" ");
+        if (splitedPhrase.length == 1) {
+            return phrase + ":*";
+        }
+        for (int i = 0; i < splitedPhrase.length; i++) {
+            splitedPhrase[i] += ":*";
+        }
+        return String.join(" & ", splitedPhrase);
     }
 }

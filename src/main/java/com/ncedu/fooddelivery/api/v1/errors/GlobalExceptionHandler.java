@@ -229,7 +229,7 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getUuid()));
 
     }
-    
+  
     @ExceptionHandler(ProductAvailabilityEx.class)
     public ResponseEntity<Object> handleProductAvailabilityEx(ProductAvailabilityEx ex){
         ApiError err = new ApiError(HttpStatus.NOT_FOUND, ex.getMessage(), ex.uuid);
@@ -280,6 +280,35 @@ public class GlobalExceptionHandler {
         return buildResponseEntity(err);
     }
 
+    @ExceptionHandler(DeliverySessionAlreadyStartedException.class)
+    public ResponseEntity<Object> handleDeliverySessionAlreadyStartedException(DeliverySessionAlreadyStartedException ex){
+        log.error(com.ncedu.fooddelivery.api.v1.errors.badrequest.DeliverySessionAlreadyStartedException.msg, ex);
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, com.ncedu.fooddelivery.api.v1.errors.badrequest.DeliverySessionAlreadyStartedException.msg,
+                com.ncedu.fooddelivery.api.v1.errors.badrequest.DeliverySessionAlreadyStartedException.uuid));
+    }
+
+    @ExceptionHandler(DeliverySessionAlreadyFinishedException.class)
+    public ResponseEntity<Object> handleDeliverySessionAlreadyFinishedException(DeliverySessionAlreadyFinishedException ex){
+        log.error(ex.getMessage(), ex);
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(),
+                DeliverySessionAlreadyFinishedException.uuid));
+    }
+
+    @ExceptionHandler(DeliverySessionFinishException.class)
+    public ResponseEntity<Object> handleDeliverySessionFinishException(DeliverySessionFinishException ex){
+        log.error(ex.getMessage(), ex);
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(),
+                DeliverySessionFinishException.uuid));
+    }
+
+
+    @ExceptionHandler(NoActiveDeliverySessionException.class)
+    public ResponseEntity<Object> handleNoActiveDeliverySessionException(NoActiveDeliverySessionException ex){
+        log.error(NoActiveDeliverySessionException.msg, ex);
+        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, NoActiveDeliverySessionException.msg,
+                NoActiveDeliverySessionException.uuid));
+    }
+  
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleNotProcessedException(
             Exception ex) {
