@@ -2,11 +2,13 @@ package com.ncedu.fooddelivery.api.v1.controllers;
 
 import com.ncedu.fooddelivery.api.v1.dto.CoordsDTO;
 import com.ncedu.fooddelivery.api.v1.dto.SearchDTO;
+import com.ncedu.fooddelivery.api.v1.dto.file.FileLinkDTO;
 import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductCreateDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductUpdateDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.SearchProductDTO;
+import com.ncedu.fooddelivery.api.v1.entities.Product;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.services.ProductService;
@@ -92,8 +94,38 @@ public class ProductController {
         return  new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PatchMapping("/api/v1/product/{product}/picture")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
+    public ProductDTO addPicture(
+            @PathVariable Product product,
+            @RequestBody FileLinkDTO fileLinkDTO) {
+        ProductDTO productDTO = productService.addPicture(product, fileLinkDTO.getFileUuid());
+        return productDTO;
+    }
+
+    @DeleteMapping("/api/v1/product/{product}/picture")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> deletePicture(
+            @PathVariable Product product,
+            @AuthenticationPrincipal User authedUser) {
+        productService.deletePicture(product, authedUser);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @GetMapping("/api/v1/products")
     public List<ProductDTO> getProducts(
+            @Valid @RequestBody CoordsDTO coordinates,
+            @PageableDefault(sort = { "product_id" }, direction = Sort.Direction.ASC) Pageable pageable,
+            @AuthenticationPrincipal User authedUser) {
+        String authedUserRole = authedUser.getRole().name();
+        if (Role.isCLIENT(authedUserRole)) {
+            return productService.getProductsInShowcase(coordinates, pageable);
+        }
+        return productService.getProducts(coordinates, pageable);
+    }
+
+    @PostMapping("/api/v1/products")
+    public List<ProductDTO> getWithPostProducts(
             @Valid @RequestBody CoordsDTO coordinates,
             @PageableDefault(sort = { "product_id" }, direction = Sort.Direction.ASC) Pageable pageable,
             @AuthenticationPrincipal User authedUser) {

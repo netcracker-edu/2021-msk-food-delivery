@@ -7,11 +7,14 @@ import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductUpdateDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.SearchProductDTO;
 import com.ncedu.fooddelivery.api.v1.dto.warehouseDTOs.WarehouseInfoDTO;
+import com.ncedu.fooddelivery.api.v1.entities.File;
 import com.ncedu.fooddelivery.api.v1.entities.Product;
+import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.entities.Warehouse;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.mappers.ProductMapper;
 import com.ncedu.fooddelivery.api.v1.repos.ProductRepo;
+import com.ncedu.fooddelivery.api.v1.services.FileService;
 import com.ncedu.fooddelivery.api.v1.services.ProductService;
 import com.ncedu.fooddelivery.api.v1.services.WarehouseService;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -24,10 +27,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -38,6 +38,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     WarehouseService warehouseService;
+
+    @Autowired
+    FileService fileService;
 
     ProductMapper productMapper = ProductMapper.INSTANCE;
 
@@ -96,6 +99,27 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProduct(Long id) {
         Product product = getProductById(id);
         productRepo.delete(product);
+    }
+
+    @Override
+    public ProductDTO addPicture(Product product, String pictureCode) {
+        UUID pictureUuid = UUID.fromString(pictureCode);
+        File file = fileService.getFile(pictureUuid);
+        product.setPictureUUID(file.getId());
+        productRepo.save(product);
+        return productMapper.mapToDTO(product);
+    }
+
+    @Override
+    public void deletePicture(Product product, User authedUser) {
+        UUID pictureUuid = product.getPictureUUID();
+        if (pictureUuid == null) {
+            return;
+        }
+        File productFile = fileService.getFile(pictureUuid);
+        fileService.delete(productFile, authedUser);
+        product.setPictureUUID(null);
+        productRepo.save(product);
     }
 
     //TODO: rewrite with extracting List forward from page.

@@ -7,6 +7,7 @@ import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductUpdateDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.SearchProductDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Product;
+import com.ncedu.fooddelivery.api.v1.entities.User;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public interface ProductService {
     public void updateProduct(Long id, ProductUpdateDTO updatedProduct);
     public boolean switchInShowcaseStatus(Long id);
     public void deleteProduct(Long id);
+    public ProductDTO addPicture(Product product, String pictureUuid);
+    public void deletePicture(Product product, User authedUser);
     public List<ProductDTO> getProducts(CoordsDTO coordinates, Pageable pageable);
     public List<ProductDTO> getProductsInShowcase(CoordsDTO coordinates, Pageable pageable);
     public List<ProductDTO> searchProducts(SearchProductDTO searchDTO, Pageable pageable);
