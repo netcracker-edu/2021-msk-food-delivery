@@ -1,6 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.services;
 
 import com.ncedu.fooddelivery.api.v1.dto.CoordsDTO;
+import com.ncedu.fooddelivery.api.v1.dto.CountDTO;
 import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductCreateDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
@@ -23,4 +24,8 @@ public interface ProductService {
     public List<ProductDTO> getProductsInShowcase(CoordsDTO coordinates, Pageable pageable);
     public List<ProductDTO> searchProducts(SearchProductDTO searchDTO, Pageable pageable);
     public List<ProductDTO> searchProductsInShowcase(SearchProductDTO searchDTO, Pageable pageable);
+    public CountDTO getProductsCount(CoordsDTO coordinates);
+    public CountDTO getProductsCountInShowcase(CoordsDTO coordinates);
+    public CountDTO searchCountProducts(SearchProductDTO searchDTO);
+    public CountDTO searchProductsCountInShowcase(SearchProductDTO searchDTO);
 }
