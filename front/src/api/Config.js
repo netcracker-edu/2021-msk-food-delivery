@@ -10,6 +10,7 @@ class Config {
   SIGNUP_URL = `${this.BASE_PATH}auth/signup`;
   REFRESH_TOKEN_URL = `${this.BASE_PATH}auth/refresh`;
   PROFILE_URL = `${this.BASE_PATH}profile`;
+  PRODUCTS_URL = `${this.BASE_PATH}products`;
   ACCESS_TOKEN = "accessToken";
   EXPIRATION = "expiration";
 

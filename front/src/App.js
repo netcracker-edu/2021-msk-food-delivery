@@ -12,6 +12,7 @@ import NotFound from "./components/NotFound";
 import Profile from "./components/Profile";
 import Logout from "./components/Logout";
 import RegistrationForm from "./components/RegistrationForm";
+import ProductList from "./components/ProductList";
 
 function App() {
   const { token, setToken } = useToken();
@@ -29,6 +30,10 @@ function App() {
             <Route
               path="/profile"
               element={<Profile auth={auth}/>}
+            />
+            <Route
+              path="/products"
+              element={<ProductList auth={auth}/>}
             />
             <Route
               path="/signin"

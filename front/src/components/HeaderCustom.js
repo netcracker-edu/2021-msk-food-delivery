@@ -16,7 +16,13 @@ const HeaderCustom = ({ auth }) => {
           </Item>)
           : <></>
         }
-        <Item key={auth.token ? 3 : 2}>
+        {auth.token ? (
+          <Item key={3}>
+            <Link to="/products">Products</Link>
+          </Item>)
+          : <></>
+        }
+        <Item key={auth.token ? 4 : 2}>
           <Link to={auth.token ? "/signout" : "/signin"}>
             {auth.token ? "SignOut" : "SignIn"}
           </Link>
