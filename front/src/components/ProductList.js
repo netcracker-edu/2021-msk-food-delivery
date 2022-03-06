@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import ProductClient from "../api/ProductClient";
 import Products from "./Products";
 import { Layout, Pagination, Input } from "antd";
-const {Content} = Layout;
+const { Content } = Layout;
 const { Search } = Input;
 
 const ProductList = ({auth}) => {

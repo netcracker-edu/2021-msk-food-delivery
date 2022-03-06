@@ -29,21 +29,21 @@ export function removeItem(index) {
 export function cartReducer(state, action) {
   switch (action.type) {
     case UPDATE_CART:
-      let products = action?.items;
-      localStorage.setItem("products", JSON.stringify(products));
-      return products;
+      let prods = action?.items;
+      localStorage.setItem("products", JSON.stringify(prods));
+      return prods;
     case ADD_ITEM:
       let products = localStorage.getItem("products");
-      products = products ? JSON.pase(products) : {};
+      products = products ? JSON.parse(products) : {};
       products[action.item.key] = action.item.value;
       localStorage.setItem("products", JSON.stringify(products));
       return products;
     case REMOVE_ITEM:
-      let products = localStorage.getItem("products");
-      products = products ? JSON.parse(products) : {};
-      delete products[index];
-      localStorage.setItem("products", JSON.stringify(products));
-      return products;
+      let products2 = localStorage.getItem("products");
+      products2 = products2 ? JSON.parse(products2) : {};
+      delete products2[action.index];
+      localStorage.setItem("products", JSON.stringify(products2));
+      return products2;
     default:
       return state;
   }

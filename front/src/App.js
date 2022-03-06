@@ -13,6 +13,7 @@ import Profile from "./components/Profile";
 import Logout from "./components/Logout";
 import RegistrationForm from "./components/RegistrationForm";
 import ProductList from "./components/ProductList";
+import { CartContextProvider } from "./hooks/CartContext";
 
 function App() {
   const { token, setToken } = useToken();
@@ -22,6 +23,7 @@ function App() {
     <Layout className="App">
        <Router>
         <HeaderCustom auth={auth} />
+        <CartContextProvider>
           <Routes>
             <Route
               path="/"
@@ -49,6 +51,7 @@ function App() {
             />
             <Route path="*" element={<NotFound/>} />
           </Routes>
+        </CartContextProvider>
         <FooterCustom />
       </Router>
     </Layout>
