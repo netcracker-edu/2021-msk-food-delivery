@@ -13,6 +13,7 @@ import Profile from "./components/Profile";
 import Logout from "./components/Logout";
 import RegistrationForm from "./components/RegistrationForm";
 import ProductList from "./components/ProductList";
+import Cart from "./components/Cart";
 import { CartContextProvider } from "./hooks/CartContext";
 
 function App() {
@@ -32,6 +33,10 @@ function App() {
             <Route
               path="/profile"
               element={<Profile auth={auth}/>}
+            />
+            <Route
+              path="/profile/cart"
+              element={<Cart auth={auth}/>}
             />
             <Route
               path="/products"
