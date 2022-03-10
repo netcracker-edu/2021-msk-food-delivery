@@ -51,7 +51,7 @@ const ProductList = ({auth}) => {
   }
 
   useEffect(() => {
-    fetchProducts(1, 10);
+    fetchProducts(1, 12);
   }, []);
 
   return (
@@ -64,11 +64,14 @@ const ProductList = ({auth}) => {
             enterButton="Search"
             size="large"
             onSearch={(value) => value == null || value == ""
-                            ? fetchProducts(1, 10)
-                            : onSearch(value, 1, 10)}
+                            ? fetchProducts(1, 12)
+                            : onSearch(value, 1, 12)}
           />
+          <br></br><br></br>
           <Products auth={auth} productList={productList ? productList : []} />
+          <br></br>
           <Pagination total={total == null ? 0 : total}
+                      defaultPageSize={12}
                       onChange={(page, pageSize) =>
                             searchPhrase == null || searchPhrase == ""
                               ? fetchProducts(page, pageSize)

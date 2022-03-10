@@ -33,6 +33,7 @@ export function cartReducer(state, action) {
       localStorage.setItem("products", JSON.stringify(prods));
       return prods;
     case ADD_ITEM:
+      console.log(state);
       let products = localStorage.getItem("products");
       products = products ? JSON.parse(products) : {};
       products[action.item.key] = action.item.value;
@@ -45,7 +46,9 @@ export function cartReducer(state, action) {
       localStorage.setItem("products", JSON.stringify(products2));
       return products2;
     default:
-      return state;
+      let products3 = localStorage.getItem("products");
+      products3 = products3 ? JSON.parse(products3) : {};
+      return products3;
   }
 }
 
