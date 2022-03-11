@@ -4,6 +4,7 @@ import { Card, Col, Button, Row, InputNumber, Modal, Image, Layout, Typography} 
 import { DeleteTwoTone } from '@ant-design/icons';
 import { addItem, removeItem, useCartContext } from "../hooks/CartContext";
 import "../productCard.css";
+import CountCartInput from "./CountCartInput.js";
 const { Meta } = Card;
 const { Sider, Content } = Layout;
 const { Text, Paragraph, Title, Link } = Typography;
@@ -20,11 +21,11 @@ const ProductCard = ({ auth, product }) => {
   const PICTURE_BASE = "http://localhost:8080/api/v1/file/";
 
 
-  const addToCart = (count) => {
-    setCount(count);
+  const addToCart = (value) => {
     let id = `${product.id}`;
-    let data = { "key" : id, "value" : count};
+    let data = { "key" : id, "value" : value};
     dispatch(addItem(data));
+    setCount(value);
   }
 
   const deleteFromCart = () => {
@@ -60,22 +61,7 @@ const ProductCard = ({ auth, product }) => {
 
         <Row>
           <Col span={12}>
-            {count == 0
-              ? <Button onClick={() => addToCart(1)}> В корзину </Button>
-              : <>
-                <InputNumber
-                        addonAfter={
-                          <Link onClick={deleteFromCart}>
-                            <DeleteTwoTone style={{ fontSize: '20px' }} twoToneColor="#eb2f96" />
-                          </Link>
-                        }
-                        defaultValue={count} min={0} max={100}
-                        onChange={(value) => { value == 0
-                                                ? deleteFromCart()
-                                                : addToCart(value)}}/>
-
-                </>
-            }
+            <CountCartInput count={count} addToCart={addToCart} deleteFromCart={deleteFromCart}/>
           </Col>
           <Col span={12}>
             <Button type="primary">Купить</Button>
@@ -85,7 +71,7 @@ const ProductCard = ({ auth, product }) => {
       <Modal
         title={product.name}
         visible={isModalVisible}
-        onCancel = {() => setIsModalVisible(false)}
+        onCancel = {() => {setIsModalVisible(false);}}
         footer={null}>
             <Layout>
               <Sider theme="light">
@@ -122,18 +108,7 @@ const ProductCard = ({ auth, product }) => {
                 </Paragraph>
                 <Row>
                   <Col span={14}>
-                    {count == 0
-                      ? <Button onClick={() => addToCart(1)}> В корзину </Button>
-                      : <>
-                        <InputNumber defaultValue={count} min={0} max={100}
-                                onChange={(value) => { value == 0
-                                                        ? deleteFromCart()
-                                                        : addToCart(value)}}/>
-                        <Button type="link" onClick={deleteFromCart}>
-                          <DeleteTwoTone style={{ fontSize: '20px' }} twoToneColor="#eb2f96" />
-                        </Button>
-                        </>
-                    }
+                    <CountCartInput count={count} addToCart={addToCart} deleteFromCart={deleteFromCart}/>
                   </Col>
                   <Col span={10}>
                     <Button type="primary">Купить</Button>

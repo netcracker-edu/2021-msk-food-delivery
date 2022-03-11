@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ProductClient from "../api/ProductClient";
 import Products from "./Products";
-import { Layout, Pagination, Input } from "antd";
+import { Layout, Pagination, Input, Divider } from "antd";
 const { Content } = Layout;
 const { Search } = Input;
 
@@ -58,6 +58,7 @@ const ProductList = ({auth}) => {
     <Content className="wrapper">
       {productList ? (
         <>
+          <br></br>
           <Search
             placeholder="input search text"
             allowClear
@@ -67,9 +68,9 @@ const ProductList = ({auth}) => {
                             ? fetchProducts(1, 12)
                             : onSearch(value, 1, 12)}
           />
-          <br></br><br></br>
+          <Divider></Divider>
           <Products auth={auth} productList={productList ? productList : []} />
-          <br></br>
+          <Divider></Divider>
           <Pagination total={total == null ? 0 : total}
                       defaultPageSize={12}
                       onChange={(page, pageSize) =>

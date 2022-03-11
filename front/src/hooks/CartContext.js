@@ -55,7 +55,9 @@ export function cartReducer(state, action) {
 // ----------------------------------------------------------------
 
 const CartContextProvider = (props) => {
-  const [cartItems, dispatch] = useReducer(cartReducer, []);
+  let products = localStorage.getItem("products");
+  products = products ? JSON.parse(products) : {};
+  const [cartItems, dispatch] = useReducer(cartReducer, products);
   const cartData = { cartItems, dispatch };
   return <CartContext.Provider value={cartData} {...props} />;
 };

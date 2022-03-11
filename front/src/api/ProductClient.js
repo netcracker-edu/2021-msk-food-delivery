@@ -67,4 +67,14 @@ export default class ProductClient {
                           "phrase" : phrase
                         }));
   }
+
+  async fetchCartProducts(cartItems) {
+    if (this.config.tokenExpired()) {
+      await this.auth.refreshToken();
+    }
+    return commonFetch(this.config.PRODUCTS_URL+"/cart",
+                    "POST",
+                    this.config.headersWithAuthorization(),
+                    JSON.stringify(cartItems));
+  }
 }
