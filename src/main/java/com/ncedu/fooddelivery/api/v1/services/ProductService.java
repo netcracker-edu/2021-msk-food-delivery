@@ -28,4 +28,6 @@ public interface ProductService {
     public CountDTO getProductsCountInShowcase(CoordsDTO coordinates);
     public CountDTO searchCountProducts(SearchProductDTO searchDTO);
     public CountDTO searchProductsCountInShowcase(SearchProductDTO searchDTO);
+
+    public List<ProductDTO> getProductsByIds(List<Long> productIds);
 }

@@ -138,4 +138,10 @@ public interface ProductRepo extends CrudRepository<Product, Long> {
             nativeQuery = true)
     int searchProductsCountInShowcase(@Param(value = "phrase") String search,
                                       @Param(value = "warehouseId") Long warehouseId);
+
+    @Query( value = "SELECT *" +
+            " FROM products AS p" +
+            " WHERE p.product_id IN :ids",
+            nativeQuery = true)
+    Iterable<Product> findByIds(@Param("ids") List<Long> productIds);
 }

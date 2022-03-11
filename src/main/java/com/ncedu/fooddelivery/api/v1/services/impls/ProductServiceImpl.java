@@ -160,6 +160,12 @@ public class ProductServiceImpl implements ProductService {
         return new CountDTO(countInShowcase);
     }
 
+    @Override
+    public List<ProductDTO> getProductsByIds(List<Long> productIds) {
+        Iterable<Product> products = productRepo.findByIds(productIds);
+        return createProductsDtoFromIterable(products);
+    }
+
     private Long getWarehouseIdByCoordinates(CoordsDTO coordinates) {
         Point geo = makeGeoCoordinates(coordinates);
         WarehouseInfoDTO nearestWarehouse = warehouseService.getNearestWarehouse(geo);

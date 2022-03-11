@@ -26,6 +26,7 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -149,6 +150,14 @@ public class ProductController {
             return productService.searchProductsCountInShowcase(searchDTO);
         }
         return productService.searchCountProducts(searchDTO);
+    }
+
+    @PostMapping("/api/v1/products/cart")
+    public List<ProductDTO> getProductsFromCartWithPost(
+            @RequestBody HashMap<Long, Integer> productAmountPairs,
+            @AuthenticationPrincipal User authedUser) {
+        List<Long> productIds = productAmountPairs.entrySet().stream().map((entry) -> entry.getKey()).collect(Collectors.toList());
+        return productService.getProductsByIds(productIds);
     }
 
     @GetMapping("/api/v1/products/search")
