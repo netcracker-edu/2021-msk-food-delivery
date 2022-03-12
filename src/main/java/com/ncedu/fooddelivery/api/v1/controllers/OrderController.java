@@ -110,4 +110,10 @@ public class OrderController {
         orderService.changeClientRating(order, dto, user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PreAuthorize("hasAnyAuthority('CLIENT', 'COURIER')")
+    @GetMapping("/api/v1/profile/orders/amount")
+    public ResponseEntity<OrdersAmountDTO> getOrdersAmount(@AuthenticationPrincipal User user){
+        return new ResponseEntity<OrdersAmountDTO>(orderService.getOrdersAmount(user), HttpStatus.OK);
+    }
 }

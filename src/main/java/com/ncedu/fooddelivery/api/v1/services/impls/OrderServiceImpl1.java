@@ -3,6 +3,7 @@ package com.ncedu.fooddelivery.api.v1.services.impls;
 import com.ncedu.fooddelivery.api.v1.dto.areCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.CoordsDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.*;
+import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
 import com.ncedu.fooddelivery.api.v1.dto.warehouseDTOs.WarehouseInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.*;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
@@ -15,10 +16,10 @@ import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.OrderCostChangedEx
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.ProductAvailabilityEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.WarehouseCoordsBindingEx;
 import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
+import com.ncedu.fooddelivery.api.v1.mappers.ProductMapper;
 import com.ncedu.fooddelivery.api.v1.repos.CourierRepo;
 import com.ncedu.fooddelivery.api.v1.repos.ProductRepo;
 import com.ncedu.fooddelivery.api.v1.repos.order.OrderRepo;
-import com.ncedu.fooddelivery.api.v1.repos.orderProductPosition.OrderNotHierarchicalProductPositionRepo;
 import com.ncedu.fooddelivery.api.v1.repos.orderProductPosition.OrderProductPositionRepo;
 import com.ncedu.fooddelivery.api.v1.repos.productPosition.ProductPositionRepo;
 import com.ncedu.fooddelivery.api.v1.services.CourierService;
@@ -47,9 +48,6 @@ public class OrderServiceImpl1 implements OrderService {
     OrderRepo orderRepo;
 
     @Autowired
-    OrderNotHierarchicalProductPositionRepo orderNotHierarchicalProductPositionRepo;
-
-    @Autowired
     OrderProductPositionRepo orderProductPositionRepo;
 
     @Autowired
@@ -68,6 +66,7 @@ public class OrderServiceImpl1 implements OrderService {
     CourierRepo courierRepo;
 
     GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+    ProductMapper productMapper = ProductMapper.INSTANCE;
 
     @Override
     public Order getOrder(Long id) {
@@ -576,14 +575,25 @@ public class OrderServiceImpl1 implements OrderService {
         return orderRepo.findCouriersActiveOrder(courier.getId());
     }
 
+    @Override
+    public OrdersAmountDTO getOrdersAmount(User user) {
+        return new OrdersAmountDTO(orderRepo.getOrdersAmount(user.getId()));
+    }
+
     public OrderInfoDTO convertToOrderInfoDTO(Order order){
+        List<OrderProductPosition> orderProductPositions = orderProductPositionRepo.findAllByOrder(order);
+        List<OrderInfoDTO.ProductAmountPair> products = new ArrayList<>();
+        for(OrderProductPosition orderProductPosition: orderProductPositions){
+            ProductDTO p = productMapper.mapToDTO(orderProductPosition.getProductPosition().getProduct());
+            Integer amount = orderProductPosition.getAmount();
+            products.add(new OrderInfoDTO.ProductAmountPair(p, amount));
+        }
         return new OrderInfoDTO(
                 order.getId(), order.getClient(), order.getAddress(),
                 order.getCoordinates(), order.getWarehouse(),
                 order.getCourier(), order.getStatus(), order.getDateStart(),
                 order.getDateEnd(), order.getOverallCost(), order.getHighDemandCoeff(),
                 order.getDiscount(), order.getPromoCodeId(), order.getClientRating(),
-                order.getDeliveryRating(), orderNotHierarchicalProductPositionRepo.findAllByOrderId(order.getId())
-        );
+                order.getDeliveryRating(), products);
     }
 }

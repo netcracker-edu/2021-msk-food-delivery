@@ -16,6 +16,15 @@ exports.commonFetch = async (url, method, headers, body) => {
     .catch((e) => handleError(e));
 };
 
+exports.patchFetch = async (url, headers, body) => {
+  return fetch(url, {
+    method: 'PATCH',
+    mode: "cors",
+    headers: { ...headers, },
+    body: body,
+  })
+};
+
 exports.tokenFetch = async (url, headers, body, clear, store) => {
   return fetch(url, {
     method: "POST",
