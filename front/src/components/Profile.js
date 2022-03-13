@@ -88,7 +88,7 @@ const Profile = ({auth}) => {
 
   useEffect(() => {
     getProfile();
-  }, []);
+  });
 
   return (
     <Content className="wrapper">
@@ -225,7 +225,7 @@ const Profile = ({auth}) => {
         </Form>
       </Modal>
 
-      //TODO: rewrite. Not working
+
       <Modal title="Edit avatar"
              visible={isEditAvatarVisible}
              okText="Edit"
