@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Layout, Card, Row, Col, Space} from "antd";
-import { UserOutlined, HomeOutlined, CreditCardOutlined } from "@ant-design/icons";
+import { UserOutlined, HomeOutlined, CreditCardOutlined, ShoppingOutlined } from "@ant-design/icons";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Config from "../../api/Config";
 import { commonFetch } from "../../helpers/fetchers";
@@ -19,7 +19,7 @@ const OrderDetails = (props) => {
     const [profile, setProfile] = useState({});
     const config = new Config();
     const navigate = useNavigate();
-    const [order, setOrder] = useState({client: {}});
+    const [order, setOrder] = useState({client: {}, courier: {}});
     const profileClient = new ProfileClient(props.auth);
     const [products, setProducts] = useState([]);
     const [cancelButtonPressed, setCancelButtonPressed] = useState(false);
@@ -88,6 +88,15 @@ const OrderDetails = (props) => {
                             </div>    
                         </Col>
 
+                        <Col span={8}>
+                            <div>
+                                <ShoppingOutlined className='order_details_card_icon'/><span className='order_details_card_key'>Courier</span><br/>
+                                <span className='order_details_card_value'>{order.courier.fullName}</span><br/>
+                                <span className='order_details_card_value'>{order.courier.phoneNumber}</span><br/>
+                                <span className='order_details_card_value'>{order.courier.email}</span>    
+                            </div>
+                        </Col>
+
                         <Col span={6}>
                             <div>
                                 <CreditCardOutlined className='order_details_card_icon'/><span className='order_details_card_key'>Payed</span><br/>
@@ -103,15 +112,14 @@ const OrderDetails = (props) => {
                                 <span className='order_details_card_value'>{order.highDemandCoeff?.toFixed(2)}</span>
                             </div>                        
                         </Col>
-
-                        <Col offset={1} span={7}>
+                    </Row>
+                    <Row justify='space-between' align="middle">
+                        <Col>
                             <div>
                                 <HomeOutlined className='order_details_card_icon'/><span className='order_details_card_key'>Delivery</span><br/>
                                 <span className='order_details_card_value'>{order.address}</span><br/>
                             </div>
                         </Col>
-                    </Row>
-                    <Row justify='end'>
                         <Col>
                             <UserRatingChanger auth={props.auth} orderStatus={orderStatus} role={profile.role} 
                             rating={rating} setRating={setRating} orderId={orderId}/>    
