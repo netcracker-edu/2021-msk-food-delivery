@@ -1,13 +1,12 @@
 
 import { useState } from "react";
-import { Card, Col, Button, Row, InputNumber, Modal, Image, Layout, Typography} from "antd";
-import { DeleteTwoTone } from '@ant-design/icons';
+import {useNavigate} from "react-router-dom";
+import { Card, Col, Button, Row, Modal, Typography, Image} from "antd";
 import { addItem, removeItem, useCartContext } from "../hooks/CartContext";
 import "../productCard.css";
-import CountCartInput from "./CountCartInput.js";
-const { Meta } = Card;
-const { Sider, Content } = Layout;
-const { Text, Paragraph, Title, Link } = Typography;
+import ItemCountInput from "./ItemCountInput.js";
+import ProductDetail from "./ProductDetail.js";
+const { Text, Title, Link } = Typography;
 
 const ProductCard = ({ auth, product }) => {
   const { cartItems, dispatch } = useCartContext();
@@ -18,6 +17,7 @@ const ProductCard = ({ auth, product }) => {
   }
   const [count, setCount] = useState(getCountFromCart());
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const navigate = useNavigate();
   const PICTURE_BASE = "http://localhost:8080/api/v1/file/";
 
 
@@ -37,8 +37,8 @@ const ProductCard = ({ auth, product }) => {
   return (
     <Col span={6}>
       <Card
-        cover={ <img alt={product.name}
-                  height={300}
+        cover={ <Image preview={false}
+                  alt={product.name}
                   src={product?.pictureUUID == null
                     ? PICTURE_BASE+"a3026e4e-02b0-4fc0-a92a-bdcdf064fa06"
                     : PICTURE_BASE+product.pictureUUID}
@@ -61,61 +61,30 @@ const ProductCard = ({ auth, product }) => {
 
         <Row>
           <Col span={12}>
-            <CountCartInput count={count} addToCart={addToCart} deleteFromCart={deleteFromCart}/>
+            <ItemCountInput count={count} addToCart={addToCart} deleteFromCart={deleteFromCart}/>
           </Col>
           <Col span={12}>
-            <Button type="primary">Купить</Button>
+            <Button type="primary"
+              onClick={() => {
+                count == 0 ? addToCart(1) : addToCart(count);
+                navigate("/profile/cart")}}
+            >
+                Купить
+            </Button>
           </Col>
         </Row>
       </Card>
       <Modal
         title={product.name}
         visible={isModalVisible}
-        onCancel = {() => {setIsModalVisible(false);}}
+        onCancel = {() => setIsModalVisible(false)}
         footer={null}>
-            <Layout>
-              <Sider theme="light">
-                <Image src={product?.pictureUUID == null
-                            ? PICTURE_BASE+"a3026e4e-02b0-4fc0-a92a-bdcdf064fa06"
-                            : PICTURE_BASE+product.pictureUUID}
-                      alt={product.name}
-                />
-              </Sider>
-              <Content className="white-background">
-                <Text type="secondary">Описание:
-                </Text>
-                <p>{product.description}</p>
-                <Text type="secondary">Состав:
-                </Text>
-                <p>{product.composition}</p>
-                <Paragraph type="secondary">
-                  Срок годности: {" "}
-                  <Text>{product.expirationDays} суток</Text>
-                </Paragraph>
-                <Paragraph type="secondary">
-                  Вес: {" "}
-                  <Text>{product.weight} г.</Text>
-                </Paragraph>
-                <Paragraph type="secondary">
-                  Цена: {" "}
-                  <Text>{product.discount == 0
-                          ? product.price
-                          : <>
-                              <del>{product.price}</del> {product.price - product.discount}
-                            </>
-                        }
-                  </Text>
-                </Paragraph>
-                <Row>
-                  <Col span={14}>
-                    <CountCartInput count={count} addToCart={addToCart} deleteFromCart={deleteFromCart}/>
-                  </Col>
-                  <Col span={10}>
-                    <Button type="primary">Купить</Button>
-                  </Col>
-                </Row>
-              </Content>
-            </Layout>
+            <ProductDetail
+              count={count}
+              addToCart={addToCart}
+              deleteFromCart={deleteFromCart}
+              product={product}
+            />
       </Modal>
     </Col>
   );

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { addItem, removeItem, useCartContext } from "../hooks/CartContext";
 import {Row, Col, Avatar, Typography, InputNumber} from "antd";
 import { DeleteTwoTone } from '@ant-design/icons';
+import ItemCountInput from "./ItemCountInput.js";
 const {Text, Link} = Typography;
 
 const CartItem = ({product, itemCount}) => {
@@ -26,7 +27,7 @@ const CartItem = ({product, itemCount}) => {
     <>
     {count == 0
       ? <></>
-      : <Row>
+      : <Row align="middle">
           <Col span={4}>
             <Avatar size={50}
                     src={product?.pictureUUID == null
@@ -47,17 +48,7 @@ const CartItem = ({product, itemCount}) => {
             </Text>
           </Col>
           <Col span={5}>
-            <InputNumber
-                  addonAfter={
-                    <Link onClick={deleteFromCart}>
-                      <DeleteTwoTone style={{ fontSize: '20px' }} twoToneColor="#eb2f96" />
-                    </Link>
-                  }
-                  defaultValue={count} min={0} max={100}
-                  onChange={(value) => ( value == 0
-                                          ? deleteFromCart()
-                                          : addToCart(value))}
-            />
+            <ItemCountInput count={count} addToCart={addToCart} deleteFromCart={deleteFromCart}/>
           </Col>
         </Row>
     }
