@@ -1,7 +1,6 @@
-
 import { useState } from "react";
 import {useNavigate} from "react-router-dom";
-import { Card, Col, Button, Row, Modal, Typography, Image} from "antd";
+import { Card, Col, Button, Modal, Typography, Image} from "antd";
 import { addItem, removeItem, useCartContext } from "../hooks/CartContext";
 import "../productCard.css";
 import ItemCountInput from "./ItemCountInput.js";
@@ -19,7 +18,6 @@ const ProductCard = ({ auth, product }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const navigate = useNavigate();
   const PICTURE_BASE = "http://localhost:8080/api/v1/file/";
-
 
   const addToCart = (value) => {
     let id = `${product.id}`;
@@ -42,43 +40,46 @@ const ProductCard = ({ auth, product }) => {
                   src={product?.pictureUUID == null
                     ? PICTURE_BASE+"a3026e4e-02b0-4fc0-a92a-bdcdf064fa06"
                     : PICTURE_BASE+product.pictureUUID}
-                />}>
+                />}
+      >
         <Link onClick={() => setIsModalVisible(true)}>
           <b>{product.name}</b>
         </Link>
-        <Row>
-          <Col span={24}>
-            <Title level={5}>
-              Цена: {product.discount == 0
-                      ? product.price
-                      : <>
-                          <Text delete type="danger">{product.price}</Text> {product.price - product.discount}
-                        </>
-                    }
-            </Title>
-          </Col>
-        </Row>
 
-        <Row>
-          <Col span={12}>
-            <ItemCountInput count={count} addToCart={addToCart} deleteFromCart={deleteFromCart}/>
-          </Col>
-          <Col span={12}>
-            <Button type="primary"
-              onClick={() => {
+        <Title level={5}>
+          Цена: {product.discount == 0
+                  ? product.price
+                  : <>
+                      <Text delete type="danger">
+                        {product.price}
+                      </Text>
+                      {product.price - product.discount}
+                    </>
+                }
+        </Title>
+
+        <ItemCountInput
+          count={count}
+          addToCart={addToCart}
+          deleteFromCart={deleteFromCart}
+        />
+
+        <Button type="primary"
+          onClick={() => {
                 count == 0 ? addToCart(1) : addToCart(count);
                 navigate("/profile/cart")}}
-            >
-                Купить
-            </Button>
-          </Col>
-        </Row>
+        >
+          Купить
+        </Button>
       </Card>
+
+      {/*PRODUCT DETAILS*/}
       <Modal
         title={product.name}
         visible={isModalVisible}
         onCancel = {() => setIsModalVisible(false)}
-        footer={null}>
+        footer={null}
+      >
             <ProductDetail
               count={count}
               addToCart={addToCart}
