@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {useNavigate} from "react-router-dom";
-import { Card, Col, Button, Modal, Typography, Image} from "antd";
+import { Card, Row, Col, Button, Modal, Typography, Image} from "antd";
 import { addItem, removeItem, useCartContext } from "../hooks/CartContext";
 import "../productCard.css";
 import ItemCountInput from "./ItemCountInput.js";
@@ -57,20 +57,24 @@ const ProductCard = ({ auth, product }) => {
                     </>
                 }
         </Title>
-
-        <ItemCountInput
-          count={count}
-          addToCart={addToCart}
-          deleteFromCart={deleteFromCart}
-        />
-
-        <Button type="primary"
-          onClick={() => {
-                count == 0 ? addToCart(1) : addToCart(count);
-                navigate("/profile/cart")}}
-        >
-          Купить
-        </Button>
+        <Row>
+          <Col span={12}>
+            <ItemCountInput
+              count={count}
+              addToCart={addToCart}
+              deleteFromCart={deleteFromCart}
+            />
+          </Col>
+          <Col offset={4} span={8}>
+            <Button type="primary"
+              onClick={() => {
+                    count == 0 ? addToCart(1) : addToCart(count);
+                    navigate("/profile/cart")}}
+            >
+              Купить
+            </Button>
+          </Col>
+        </Row>
       </Card>
 
       {/*PRODUCT DETAILS*/}
