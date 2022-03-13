@@ -10,6 +10,7 @@ import OrderDetailsProductCard from "./OrderDetailsProductCard";
 import './styles/style.css';
 import OrderSteps from "./OrderSteps";
 import OrderCancelButton from "./OrderCancelButton";
+import OrderFinishButton from "./OrderFinishButton";
 
 const {Content} = Layout;
 
@@ -22,6 +23,7 @@ const OrderDetails = (props) => {
     const profileClient = new ProfileClient(props.auth);
     const [products, setProducts] = useState([]);
     const [cancelButtonPressed, setCancelButtonPressed] = useState(false);
+    const [finishButtonPressed, setFinishButtonPressed] = useState(false);
     const [rating, setRating] = useState(null);
     const [orderStatus, setOrderStatus] = useState(null);
 
@@ -32,7 +34,9 @@ const OrderDetails = (props) => {
           setProfile(response.data);
         }
 
-        response = await commonFetch(config.ORDER_URL + `/${orderId}`, 'GET', config.headersWithAuthorization(), null); 
+        response = await commonFetch(config.ORDER_URL + `/${orderId}`, 'GET', 
+        config.headersWithAuthorization(), null); 
+        
         if(response.success){
             setOrder(response.data);
             setOrderStatus(response.data.status);
@@ -116,16 +120,23 @@ const OrderDetails = (props) => {
             </Card>
             <div className='order_details_products_wrapper'>
                 
-                <div className='order_details_steps_cancell_button_wrapper'>
-                    <OrderSteps status={order.status} cancelButtonPressed={cancelButtonPressed} />
+                <div className='order_details_steps_buttons_wrapper'>
+                    <OrderSteps status={order.status} cancelButtonPressed={cancelButtonPressed} 
+                    finishButtonPressed={finishButtonPressed}/>
                     {
-                    order.status === "CANCELLED" || order.status === "DELIVERED" ? 
+                    orderStatus === null || orderStatus === "CANCELLED" || orderStatus === "DELIVERED" ? 
                         <></>
-                    : 
+                    :   <>{profile.role === "COURIER" && orderStatus === "DELIVERING" ? 
+                            <div className="order_details_finish_button_wrapper">
+                                <OrderFinishButton auth={props.auth} orderId={orderId} 
+                                setOrderStatus={setOrderStatus} setFinishButtonPressed={setFinishButtonPressed}/>
+                            </div>
+                            : <></>
+                        }
                         <div className="order_details_cancel_button_wrapper">
                             <OrderCancelButton auth={props.auth} orderId={orderId} 
                             setCancelButtonPressed={setCancelButtonPressed} setOrderStatus={setOrderStatus}/>            
-                        </div>
+                        </div></>
                     }
                 </div> 
                 

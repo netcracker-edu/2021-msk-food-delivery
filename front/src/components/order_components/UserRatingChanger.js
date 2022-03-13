@@ -31,7 +31,7 @@ const UserRatingChanger = (props) => {
             <div>
                 <Space size={10}>
                 <div style={{marginTop: '4px'}} className="order_details_card_key">{role === 'COURIER' ? 'Client' : 'Delivery'} rating:</div>
-                {orderStatus !== "CREATED" && orderStatus !== "CANCELLED" &&  orderStatus !== "COURIER_APPOINTED" && orderStatus !== "PACKING" ? 
+                {orderStatus === "DELIVERING" || orderStatus === "DELIVERED" ? 
                     <Rate allowHalf allowClear={false} onChange={handleRatingChange}  value={rating} defaultValue={rating ? rating : 0}></Rate>
                  : 
                     orderStatus === "CREATED" ?  

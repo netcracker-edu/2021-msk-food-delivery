@@ -13,6 +13,7 @@ import com.ncedu.fooddelivery.api.v1.entities.*;
 import com.ncedu.fooddelivery.api.v1.entities.orderProductPosition.OrderNotHierarchicalProductPosition;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -77,15 +78,13 @@ public class OrderInfoDTO {
 
     private List<ProductAmountPair> products;
 
+    @AllArgsConstructor
     @Data
     public static class ProductAmountPair{
         ProductDTO product;
         Integer amount;
 
-        public ProductAmountPair(ProductDTO product, Integer amount) {
-            this.product = product;
-            this.amount = amount;
-        }
+        public ProductAmountPair(){}
     }
 
     public OrderInfoDTO(Long id, Client client, String address, Geometry coordinates,

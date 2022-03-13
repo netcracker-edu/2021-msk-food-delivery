@@ -52,13 +52,11 @@
       font: 600 15px sans-serif;
 }
 
-.order_details_cancel_button_wrapper{
-    display: flex;
-    justify-content: center;
-    margin-top: 8px;
+.order_details_cancel_button_wrapper, .order_details_finish_button_wrapper{
+    margin-top: 12px;
   }
 
-.order_details_steps_cancell_button_wrapper{
+.order_details_steps_buttons_wrapper{
     display: flex;
     flex-basis: 30%;
     flex-direction: column;
