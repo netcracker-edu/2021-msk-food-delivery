@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Layout, Card, Row, Col, Space} from "antd";
 import { UserOutlined, HomeOutlined, CreditCardOutlined, ShoppingOutlined } from "@ant-design/icons";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import Config from "../../api/Config";
 import { commonFetch } from "../../helpers/fetchers";
 import ProfileClient from '../../api/ProfileClient';
@@ -27,6 +27,10 @@ const OrderDetails = (props) => {
     const [rating, setRating] = useState(null);
     const [orderStatus, setOrderStatus] = useState(null);
 
+    const location = useLocation();
+    const page = location.state?.page;
+    const size = location.state?.size;
+    
     const fetchData = async () => {
 
         let response = await profileClient.get();
@@ -59,9 +63,10 @@ const OrderDetails = (props) => {
             <Space direction='vertical' size={8} style={{marginBottom: '8px'}}>
                 <Row>
                     <Col>
-                        <Link to="/profile/orderHistory" style={{fontSize: '13px'}}>
-                            Back to order history
-                        </Link>
+                    <Link to={"/profile/orderHistory"} state={{ page: page, size: size}} 
+                    style={{fontSize: '13px'}}>
+                        Back to order history
+                    </Link>
                     </Col>
                 </Row>
                 <Space direction='vertical' size={4}>   

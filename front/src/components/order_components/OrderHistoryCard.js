@@ -12,14 +12,17 @@ const OrderItem = (props) => {
     statusTagMap.set('DELIVERED', ['green', 'Delivered']);
     statusTagMap.set('CANCELLED', ['red', 'Cancelled']);
     
-    const {order} = {...props}; 
+    const {order, page, size} = {...props}; 
     const navigate = useNavigate();
     const currPath = useLocation();
     
     return (
         <>
         <Card hoverable className='order_history_card'
-        onClick={() => navigate(`${currPath.pathname}/${order.id}`)}>
+        onClick={() => navigate(`${currPath.pathname}/${order.id}`, { state : {
+            page: page,
+            size: size
+        }})}>
         <Row justify="space-between" className="order_card_header">
                     <Col>{`Order №${order.id}`}</Col>
                     <Col>{`Started: ${order.dateStart}`}</Col>

@@ -5,6 +5,7 @@ import { commonFetch } from '../../helpers/fetchers';
 import Config from '../../api/Config';
 import ProfileClient from '../../api/ProfileClient';
 import './styles/style.css';
+import { useLocation } from 'react-router-dom';
 
 const OrderHistory = ({auth}) => {
 
@@ -14,8 +15,11 @@ const OrderHistory = ({auth}) => {
   
   const [profile, setProfile] = useState({});
   const [orders, setOrders] = useState([]);
-  const [page, setPage] = useState(1);
-  const [size, setSize] = useState(5);  // default page size
+  
+  const location = useLocation();
+  const [page, setPage] = useState(location.state?.page ?? 1);
+  const [size, setSize] = useState(location.state?.size ?? 5);  // default page size
+
   const [overallOrdersAmount, setOverallOrderAmount] = useState(null);
 
   async function getOverallOrdersAmount(){
@@ -57,7 +61,8 @@ const OrderHistory = ({auth}) => {
       <h1>Order history</h1>
       <Row gutter={[0, 24]}>
         {orders == null ? <h2>No orders currently.</h2>:
-        orders.map((order) => <Col span={24}><OrderHistoryCard order={order} profile={profile} auth={auth}/></Col>)}
+        orders.map((order) => <Col span={24}><OrderHistoryCard order={order} 
+        page={page} size={size}/></Col>)}
       </Row>
       <div className='pagination' style={{margin: '15px 0'}}>
         <Pagination showSizeChanger current={page} onChange={onPageChange} 

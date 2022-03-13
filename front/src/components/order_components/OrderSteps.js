@@ -15,7 +15,7 @@ const OrderSteps = (props) => {
 
     const {status, cancelButtonPressed, finishButtonPressed} = {...props};
     const stage = statuses.indexOf(status);
-    debugger;
+    
     return ( 
         <div className="order_steps">
         {
