@@ -11,6 +11,7 @@ class Config {
   REFRESH_TOKEN_URL = `${this.BASE_PATH}auth/refresh`;
   PROFILE_URL = `${this.BASE_PATH}profile`;
   PRODUCTS_URL = `${this.BASE_PATH}products`;
+  ORDER_URL = `${this.BASE_PATH}order`;
   ACCESS_TOKEN = "accessToken";
   EXPIRATION = "expiration";
 

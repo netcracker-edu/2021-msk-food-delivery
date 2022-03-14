@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { addItem, removeItem, useCartContext } from "../hooks/CartContext";
-import {Row, Col, Avatar, Typography, InputNumber} from "antd";
+import {Row, Col, Avatar, Typography, InputNumber, Divider} from "antd";
 import { DeleteTwoTone } from '@ant-design/icons';
 import ItemCountInput from "./ItemCountInput.js";
 const {Text, Link} = Typography;
@@ -27,8 +27,9 @@ const CartItem = ({product, itemCount}) => {
     <>
     {count == 0
       ? <></>
-      : <Row align="middle">
-          <Col span={4}>
+      : <>
+        <Row align="middle">
+          <Col span={2}>
             <Avatar size={50}
                     src={product?.pictureUUID == null
                           ? PICTURE_BASE+"a3026e4e-02b0-4fc0-a92a-bdcdf064fa06"
@@ -37,12 +38,12 @@ const CartItem = ({product, itemCount}) => {
           <Col span={10}>
             <Text>{product.name}</Text>
           </Col>
-          <Col span={5}>
-            <Text strong>
+          <Col span={4}>
+            <Text>
               {product.discount == 0
-                    ? product.price
+                    ? (product.price).toFixed(2)
                     : <>
-                        <Text delete type="danger">{product.price}</Text> {product.price - product.discount}
+                        <Text delete type="danger">{(product.price).toFixed(2)}</Text> {(product.price - product.discount).toFixed(2)}
                       </>
               }
             </Text>
@@ -50,7 +51,17 @@ const CartItem = ({product, itemCount}) => {
           <Col span={5}>
             <ItemCountInput count={count} addToCart={addToCart} deleteFromCart={deleteFromCart}/>
           </Col>
+          <Col span={3}>
+            {product.discount == 0
+                  ? <Text> {(product.price * count).toFixed(2)}</Text>
+                  : <>
+                      <Text> {((product.price - product.discount) * count).toFixed(2)}</Text>
+                    </>
+            }
+          </Col>
         </Row>
+        <Divider></Divider>
+        </>
     }
     </>
   );
