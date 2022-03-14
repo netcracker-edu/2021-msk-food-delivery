@@ -1,3 +1,4 @@
+import {useNavigate} from "react-router-dom";
 import {Layout, Image, Typography, Row, Col, Button} from "antd";
 import ItemCountInput from "./ItemCountInput.js";
 
@@ -6,6 +7,7 @@ const {Text, Paragraph} = Typography;
 
 const ProductDetail = ({product, count, addToCart, deleteFromCart}) => {
   const PICTURE_BASE = "http://localhost:8080/api/v1/file/";
+  const navigate = useNavigate();
   return (
     <Layout>
       <Sider theme="light">
@@ -31,21 +33,25 @@ const ProductDetail = ({product, count, addToCart, deleteFromCart}) => {
           <Text>{product.weight} г.</Text>
         </Paragraph>
         <Paragraph type="secondary">
-          Цена: {" "}
-          <Text>{product.discount == 0
+          Цена: {product.discount == 0
                   ? product.price
                   : <>
                       <Text delete type="danger">{product.price}</Text> {product.price - product.discount}
                     </>
                 }
-          </Text>
         </Paragraph>
         <Row>
           <Col span={10}>
             <ItemCountInput count={count} addToCart={addToCart} deleteFromCart={deleteFromCart}/>
           </Col>
           <Col offset = {4} span={10}>
-            <Button type="primary">Купить</Button>
+          <Button type="primary"
+            onClick={() => {
+                  count == 0 ? addToCart(1) : addToCart(count);
+                  navigate("/profile/cart")}}
+          >
+            Купить
+          </Button>
           </Col>
         </Row>
       </Content>
