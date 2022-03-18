@@ -14,18 +14,18 @@ const OrderItem = (props) => {
     
     const {order, page, size} = {...props}; 
     const navigate = useNavigate();
-    const currPath = useLocation();
+    const location = useLocation();
     
     return (
         <>
         <Card hoverable className='order_history_card'
-        onClick={() => navigate(`${currPath.pathname}/${order.id}`, { state : {
+        onClick={() => navigate(`${location.pathname}/${order.id}`, { state : {
             page: page,
             size: size
         }})}>
         <Row justify="space-between" className="order_card_header">
-                    <Col>{`Order №${order.id}`}</Col>
-                    <Col>{`Started: ${order.dateStart}`}</Col>
+                <Col>{`Order №${order.id}`}</Col>
+                <Col>{`Started: ${order.dateStart}`}</Col>
         </Row>
         <Divider style={{margin: '14px'}}/>
             <Descriptions>
@@ -53,7 +53,6 @@ const OrderItem = (props) => {
                     ) 
                 : null}
             </Descriptions>
-            
         </Card>
         </>
     );

@@ -16,7 +16,9 @@ const OrderDetailsProductCard = (props) => {
                 </Row>
                 <Divider style={{margin: "12px"}}/>
                 <Row align="middle">
-                    <Col span={8}><img src={product.pictureUUID ? config.FILE_URL + `/${product.pictureUUID}` : defaultPic} alt="Product" className="order_details_product_card_picture"/></Col>
+                    <Col span={8}><img src={product.pictureUUID ? config.FILE_URL + `/${product.pictureUUID}` : defaultPic} 
+                         alt="Product" className="order_details_product_card_picture"/>
+                    </Col>
                     <Col span={6}>{`${product.name}`}</Col>
                     <Col offset={6} span={4}>
                         <span className='order_details_card_key'>{(product.price * amount).toFixed(2)}</span><br/>    

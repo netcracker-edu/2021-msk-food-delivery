@@ -8,7 +8,6 @@ import PhoneInput from './user_form/PhoneInput';
 import EmailInput from './user_form/EmailInput';
 import PasswordInput from './user_form/PasswordInput';
 import PasswordInputConfirm from './user_form/PasswordInputConfirm';
-import OrderHistory from './order_components/OrderHistory';
 
 const { Meta } = Card;
 const { Content } = Layout;

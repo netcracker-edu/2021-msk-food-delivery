@@ -3,7 +3,6 @@ import { Layout, Pagination, Row, Col, Empty } from 'antd';
 import OrderHistoryCard from './OrderHistoryCard';
 import { commonFetch } from '../../helpers/fetchers';
 import Config from '../../api/Config';
-import ProfileClient from '../../api/ProfileClient';
 import './styles/style.css';
 import { useLocation } from 'react-router-dom';
 
@@ -11,14 +10,12 @@ const OrderHistory = ({auth}) => {
 
   const { Content } = Layout;
   const config = new Config();
-  const profileClient = new ProfileClient(auth);
 
   const location = useLocation();
 
-  const [profile, setProfile] = useState({});
   const [orders, setOrders] = useState([]);
   const [page, setPage] = useState(location.state?.page ?? 1);
-  const [size, setSize] = useState(location.state?.size ?? 5);  // default page size
+  const [size, setSize] = useState(location.state?.size ?? 5);
   const [overallOrdersAmount, setOverallOrderAmount] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -31,20 +28,23 @@ const OrderHistory = ({auth}) => {
   }
 
   async function fetchData(){
-    let response = await profileClient.get();
-    if (response && response.success) {
-      setProfile(response.data);
+    if (config.tokenExpired()) {
+      await auth.refreshToken();
     }
 
-    response = await getOverallOrdersAmount();
+    let response = await getOverallOrdersAmount();
     if (response && response.success) {
       setOverallOrderAmount(response.data.amount);
       if(overallOrdersAmount === 0){
         setIsLoading(false);
         return;
       }
+    } else {
+      console.log(JSON.stringify(response.error));
     }
-    setOrders(await commonFetch(buildPaginationQuery(page, size), 'GET', config.headersWithAuthorization(), null)
+
+    setOrders(await commonFetch(buildPaginationQuery(page, size), 'GET', 
+    config.headersWithAuthorization(), null)
     .then(result => [...result.data]));
     setIsLoading(false);
   }
@@ -56,7 +56,8 @@ const OrderHistory = ({auth}) => {
   const onPageChange = async (newPageNumber, newOrdersPerPage) => {
     setPage(newPageNumber);
     setSize(newOrdersPerPage);
-    setOrders(await commonFetch(buildPaginationQuery(newPageNumber, newOrdersPerPage), 'GET', config.headersWithAuthorization(), null)
+    setOrders(await commonFetch(buildPaginationQuery(newPageNumber, newOrdersPerPage), 'GET', 
+    config.headersWithAuthorization(), null)
     .then(result => [...result.data]));
   }
 

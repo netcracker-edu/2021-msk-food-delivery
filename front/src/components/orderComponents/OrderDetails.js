@@ -35,7 +35,6 @@ const OrderDetails = (props) => {
     const [isLoading, setIsLoading] = useState(true);
 
     const fetchData = async () => {
-
         let response = await profileClient.get();
         if (response && response.success) {
           setProfile(response.data);
@@ -55,7 +54,6 @@ const OrderDetails = (props) => {
         } else {
             navigate(config.BASE_PATH + 'notFound');
         }
-
     }
 
     useEffect(() => {
@@ -63,7 +61,6 @@ const OrderDetails = (props) => {
       }, []);
 
     return (
-        
         <Content className="order_details_wrapper">
         {isLoading ? <></> :
             <><Space direction='vertical' size={8} style={{marginBottom: '8px'}}>
@@ -92,7 +89,8 @@ const OrderDetails = (props) => {
                     <Row>
                         <Col span={8}>
                             <div>
-                                <UserOutlined className='order_details_card_icon'/><span className='order_details_card_key'>Client</span><br/>
+                                <UserOutlined className='order_details_card_icon'/>
+                                <span className='order_details_card_key'>Client</span><br/>
                                 <span className='order_details_card_value'>{order.client.fullName}</span><br/>
                                 <span className='order_details_card_value'>{order.client.phoneNumber}</span><br/>
                                 <span className='order_details_card_value'>{order.client.email}</span>
@@ -101,7 +99,8 @@ const OrderDetails = (props) => {
 
                         <Col span={8}>
                             <div>
-                                <ShoppingOutlined className='order_details_card_icon'/><span className='order_details_card_key'>Courier</span><br/>
+                                <ShoppingOutlined className='order_details_card_icon'/>
+                                <span className='order_details_card_key'>Courier</span><br/>
                                 <span className='order_details_card_value'>{order.courier.fullName}</span><br/>
                                 <span className='order_details_card_value'>{order.courier.phoneNumber}</span><br/>
                                 <span className='order_details_card_value'>{order.courier.email}</span>    
@@ -110,7 +109,8 @@ const OrderDetails = (props) => {
 
                         <Col span={6}>
                             <div>
-                                <CreditCardOutlined className='order_details_card_icon'/><span className='order_details_card_key'>Payed</span><br/>
+                                <CreditCardOutlined className='order_details_card_icon'/>
+                                <span className='order_details_card_key'>Payed</span><br/>
                                 <span className='order_details_card_value'>Discount</span><br/>
                                 <span className='order_details_card_value'>High demand coefficient</span><br/>
                             </div>
@@ -127,7 +127,8 @@ const OrderDetails = (props) => {
                     <Row justify='space-between' align="middle">
                         <Col>
                             <div>
-                                <HomeOutlined className='order_details_card_icon'/><span className='order_details_card_key'>Delivery</span><br/>
+                                <HomeOutlined className='order_details_card_icon'/>
+                                <span className='order_details_card_key'>Delivery</span><br/>
                                 <span className='order_details_card_value'>{order.address}</span><br/>
                             </div>
                         </Col>

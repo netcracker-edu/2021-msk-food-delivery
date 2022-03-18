@@ -12,8 +12,8 @@ import NotFound from "./components/NotFound";
 import Profile from "./components/Profile";
 import Logout from "./components/Logout";
 import RegistrationForm from "./components/RegistrationForm";
-import OrderHistory from "./components/order_components/OrderHistory";
-import OrderDetails from "./components/order_components/OrderDetails";
+import OrderHistory from "./components/orderComponents/OrderHistory";
+import OrderDetails from "./components/orderComponents/OrderDetails";
 
 function App() {
   const { token, setToken } = useToken();
