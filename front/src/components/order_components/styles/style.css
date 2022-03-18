@@ -69,3 +69,13 @@
 .order_details_card_icon{
   padding-right: 4px;
 }
+
+.order_history_wrapper{
+  min-height: 163px;
+}  
+
+.empty_wrapper{
+  position: sticky;
+  top: calc(50% - 81.5px);
+  left: calc(50% - 100px);
+}

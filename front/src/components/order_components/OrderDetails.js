@@ -15,22 +15,25 @@ import OrderFinishButton from "./OrderFinishButton";
 const {Content} = Layout;
 
 const OrderDetails = (props) => {
-    const {orderId} = useParams();
-    const [profile, setProfile] = useState({});
     const config = new Config();
-    const navigate = useNavigate();
-    const [order, setOrder] = useState({client: {}, courier: {}});
     const profileClient = new ProfileClient(props.auth);
+
+    const {orderId} = useParams();
+    const navigate = useNavigate();
+ 
+    const location = useLocation();
+    const page = location.state?.page;
+    const size = location.state?.size;
+       
+    const [order, setOrder] = useState({client: {}, courier: {}});
+    const [profile, setProfile] = useState({});
     const [products, setProducts] = useState([]);
     const [cancelButtonPressed, setCancelButtonPressed] = useState(false);
     const [finishButtonPressed, setFinishButtonPressed] = useState(false);
     const [rating, setRating] = useState(null);
     const [orderStatus, setOrderStatus] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const location = useLocation();
-    const page = location.state?.page;
-    const size = location.state?.size;
-    
     const fetchData = async () => {
 
         let response = await profileClient.get();
@@ -47,6 +50,7 @@ const OrderDetails = (props) => {
             setProducts(response.data.products);
             if(profile.role === 'CLIENT') setRating(response.data.deliveryRating);
             else setRating(response.data.clientRating);
+            setIsLoading(false);
 
         } else {
             navigate(config.BASE_PATH + 'notFound');
@@ -58,9 +62,11 @@ const OrderDetails = (props) => {
         fetchData();
       }, []);
 
-    return ( 
+    return (
+        
         <Content className="order_details_wrapper">
-            <Space direction='vertical' size={8} style={{marginBottom: '8px'}}>
+        {isLoading ? <></> :
+            <><Space direction='vertical' size={8} style={{marginBottom: '8px'}}>
                 <Row>
                     <Col>
                     <Link to={"/profile/orderHistory"} state={{ page: page, size: size}} 
@@ -164,6 +170,7 @@ const OrderDetails = (props) => {
                     </Row>
                 </div>
             </div>
+        </>}   
         </Content>
      );
 }
