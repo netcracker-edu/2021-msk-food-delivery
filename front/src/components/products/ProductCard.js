@@ -1,9 +1,9 @@
 import { useState } from "react";
 import {useNavigate} from "react-router-dom";
 import { Card, Row, Col, Button, Modal, Typography, Image} from "antd";
-import { addItem, removeItem, useCartContext } from "../hooks/CartContext";
-import "../productCard.css";
-import ItemCountInput from "./ItemCountInput.js";
+import { addItem, removeItem, useCartContext } from "../../hooks/CartContext";
+import "./productCard.css";
+import ItemCountInput from "../ItemCountInput.js";
 import ProductDetail from "./ProductDetail.js";
 const { Text, Title, Link } = Typography;
 

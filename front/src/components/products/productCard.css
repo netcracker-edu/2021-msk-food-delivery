@@ -1,3 +1,7 @@
 .white-background {
   background-color: white;
 }
+
+.min-width-30 {
+  min-width: 30%;
+}

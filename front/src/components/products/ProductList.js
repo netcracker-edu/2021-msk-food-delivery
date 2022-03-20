@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import ProductClient from "../api/ProductClient";
+import ProductClient from "../../api/ProductClient";
 import Products from "./Products";
 import { Layout, Pagination, Input, Divider } from "antd";
 const { Content } = Layout;

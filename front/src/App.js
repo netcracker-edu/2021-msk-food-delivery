@@ -12,7 +12,7 @@ import NotFound from "./components/NotFound";
 import Profile from "./components/Profile";
 import Logout from "./components/Logout";
 import RegistrationForm from "./components/RegistrationForm";
-import ProductList from "./components/ProductList";
+import ProductList from "./components/products/ProductList";
 import Cart from "./components/cart/Cart";
 import { CartContextProvider } from "./hooks/CartContext";
 

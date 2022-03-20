@@ -1,6 +1,6 @@
 import {useNavigate} from "react-router-dom";
 import {Layout, Image, Typography, Row, Col, Button} from "antd";
-import ItemCountInput from "./ItemCountInput.js";
+import ItemCountInput from "../ItemCountInput.js";
 
 const {Sider, Content} = Layout;
 const {Text, Paragraph} = Typography;
