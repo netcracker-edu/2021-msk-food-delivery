@@ -9,6 +9,7 @@ import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.AlreadyExistsException;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.PasswordsMismatchException;
 import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
+import com.ncedu.fooddelivery.api.v1.errors.security.CustomAccessDeniedException;
 import com.ncedu.fooddelivery.api.v1.repos.UserRepo;
 import com.ncedu.fooddelivery.api.v1.services.FileService;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
@@ -211,11 +212,21 @@ public class UserServiceImpl implements UserService {
         if (avatarId == null) {
             return;
         }
-        targetUser.setAvatarId(null);
-        userRepo.save(targetUser);
         File avatar = fileService.getFile(avatarId);
-        if (avatar != null) {
-            fileService.delete(avatar, authedUser);
-        }
+
+         boolean isAdminOrOwner = checkAdminOrOwner(avatar, authedUser);
+         if (!isAdminOrOwner) {
+               throw new CustomAccessDeniedException();
+         }
+         targetUser.setAvatarId(null);
+         userRepo.save(targetUser);
+         fileService.delete(avatar, authedUser);
+    }
+
+    private boolean checkAdminOrOwner(File file, User authedUser) {
+        Long fileOwnerId = file.getOwner().getId();
+        boolean isAdmin = Role.isADMIN(authedUser.getRole().name());
+        boolean isOwner = fileOwnerId.equals(authedUser.getId());
+        return isAdmin || isOwner;
     }
 }
