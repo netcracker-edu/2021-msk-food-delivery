@@ -88,7 +88,7 @@ const Profile = ({auth}) => {
 
   useEffect(() => {
     getProfile();
-  });
+  }, []);
 
   return (
     <Content className="wrapper">
