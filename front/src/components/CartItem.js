@@ -1,25 +1,33 @@
-import { useState } from "react";
-import { addItem, removeItem, useCartContext } from "../hooks/CartContext";
+import { useState, useEffect } from "react";
+import { addItem, removeItem, updateCart, useCartContext } from "../hooks/CartContext";
 import {Row, Col, Avatar, Typography, InputNumber, Divider} from "antd";
 import { DeleteTwoTone } from '@ant-design/icons';
 import ItemCountInput from "./ItemCountInput.js";
 const {Text, Link} = Typography;
 
-const CartItem = ({product, itemCount}) => {
+const CartItem = ({product, itemCount,
+                    calculateTotalPrice, deleteFromCartList}) => {
   const { cartItems, dispatch } = useCartContext();
   const [count, setCount] = useState(itemCount);
   const PICTURE_BASE = "http://localhost:8080/api/v1/file/";
 
-  const addToCart = (count) => {
+  const updateCartItem = (count) => {
     setCount(count);
     let id = `${product.id}`;
-    let data = { "key" : id, "value" : count};
-    dispatch(addItem(data));
+    cartItems[id] = count;
+    dispatch(updateCart(cartItems));
+    if (count == 0) {
+      deleteFromCartList(product.id);
+    }
+    calculateTotalPrice(cartItems);
   }
 
   const deleteFromCart = () => {
     let id = `${product.id}`;
-    dispatch(removeItem(id));
+    delete cartItems[id];
+    dispatch(updateCart(cartItems));
+    deleteFromCartList(product.id);
+    calculateTotalPrice(cartItems);
     setCount(0);
   }
 
@@ -48,10 +56,10 @@ const CartItem = ({product, itemCount}) => {
               }
             </Text>
           </Col>
-          <Col span={5}>
-            <ItemCountInput count={count} addToCart={addToCart} deleteFromCart={deleteFromCart}/>
+          <Col span={4}>
+            <ItemCountInput count={count} addToCart={updateCartItem} deleteFromCart={deleteFromCart}/>
           </Col>
-          <Col span={3}>
+          <Col span={4}>
             {product.discount == 0
                   ? <Text> {(product.price * count).toFixed(2)}</Text>
                   : <>

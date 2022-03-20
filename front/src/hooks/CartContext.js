@@ -27,38 +27,41 @@ export function removeItem(index) {
 
 // Reducer - update the state based on given action
 export function cartReducer(state, action) {
+  let products;
   switch (action.type) {
     case UPDATE_CART:
-      let prods = action?.items;
-      localStorage.setItem("products", JSON.stringify(prods));
-      return prods;
+      products = {...action?.items};
+      localStorage.setItem("products", JSON.stringify(products));
+      return products;
     case ADD_ITEM:
       console.log(state);
-      let products = localStorage.getItem("products");
+      products = localStorage.getItem("products");
       products = products ? JSON.parse(products) : {};
       products[action.item.key] = action.item.value;
       localStorage.setItem("products", JSON.stringify(products));
+      console.log(products);
       return products;
     case REMOVE_ITEM:
-      let products2 = localStorage.getItem("products");
-      products2 = products2 ? JSON.parse(products2) : {};
-      delete products2[action.index];
-      localStorage.setItem("products", JSON.stringify(products2));
-      return products2;
+      products = localStorage.getItem("products");
+      products = products ? JSON.parse(products) : {};
+      delete products[action.index];
+      localStorage.setItem("products", JSON.stringify(products));
+      return products;
     default:
-      let products3 = localStorage.getItem("products");
-      products3 = products3 ? JSON.parse(products3) : {};
-      return products3;
+      products = localStorage.getItem("products");
+      products = products ? JSON.parse(products) : {};
+      return products;
   }
 }
 
 // ----------------------------------------------------------------
 
 const CartContextProvider = (props) => {
-  let products = localStorage.getItem("products");
-  products = products ? JSON.parse(products) : {};
-  const [cartItems, dispatch] = useReducer(cartReducer, products);
+  let prods = localStorage.getItem("products");
+  prods = prods ? JSON.parse(prods) : {};
+  const [cartItems, dispatch] = useReducer(cartReducer, prods);
   const cartData = { cartItems, dispatch };
+  console.log(cartItems);
   return <CartContext.Provider value={cartData} {...props} />;
 };
 
