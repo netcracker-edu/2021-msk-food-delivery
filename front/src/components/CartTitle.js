@@ -14,10 +14,10 @@ const CartTitle = () => {
             <Col span={4}>
               <Text strong>Цена за шт.</Text>
             </Col>
-            <Col span={5}>
+            <Col span={4}>
               <Text strong> Количество </Text>
             </Col>
-            <Col span={3}>
+            <Col span={4}>
               <Text strong> Стоимость </Text>
             </Col>
           </Row>

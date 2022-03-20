@@ -18,7 +18,7 @@ const CartTotalPrice = ({price}) => {
               <Paragraph>Скидка</Paragraph>
               {(price.discount).toFixed(2)}
             </Col>
-            <Col offset={5} span={3}>
+            <Col offset={4} span={4}>
               <Text strong>
                 <Paragraph> К оплате</Paragraph>
                 {(price.overallCost).toFixed(2)}
