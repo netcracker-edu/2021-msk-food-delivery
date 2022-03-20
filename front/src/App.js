@@ -13,7 +13,7 @@ import Profile from "./components/Profile";
 import Logout from "./components/Logout";
 import RegistrationForm from "./components/RegistrationForm";
 import ProductList from "./components/ProductList";
-import Cart from "./components/Cart";
+import Cart from "./components/cart/Cart";
 import { CartContextProvider } from "./hooks/CartContext";
 
 function App() {

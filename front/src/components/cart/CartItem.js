@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { addItem, removeItem, updateCart, useCartContext } from "../hooks/CartContext";
+import { addItem, removeItem, updateCart, useCartContext } from "../../hooks/CartContext";
 import {Row, Col, Avatar, Typography, InputNumber, Divider} from "antd";
 import { DeleteTwoTone } from '@ant-design/icons';
-import ItemCountInput from "./ItemCountInput.js";
+import ItemCountInput from "../ItemCountInput.js";
 const {Text, Link} = Typography;
 
 const CartItem = ({product, itemCount,
