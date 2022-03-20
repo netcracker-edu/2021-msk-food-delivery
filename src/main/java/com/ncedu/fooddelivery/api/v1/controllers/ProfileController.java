@@ -1,5 +1,6 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
+import com.ncedu.fooddelivery.api.v1.dto.file.FileLinkDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.*;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
@@ -80,6 +81,21 @@ public class ProfileController {
         boolean isModified = false;
         isModified = userService.changePassword(authedUser, passwordChangeDTO);
         return  createModifyResponse(isModified);
+    }
+
+    @PatchMapping("/api/v1/profile/avatar")
+    public ResponseEntity<?> addAvatar(
+            @Valid @RequestBody FileLinkDTO fileLinkDTO,
+            @AuthenticationPrincipal User authedUser) {
+        UserInfoDTO refreshedInfo = userService.addAvatar(authedUser, fileLinkDTO.getFileUuid());
+        return new ResponseEntity<>(refreshedInfo, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/api/v1/profile/avatar")
+    public ResponseEntity<?> deleteAvatar(
+            @AuthenticationPrincipal User authedUser) {
+        userService.deleteAvatar(authedUser);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     private ResponseEntity<?> createModifyResponse(boolean isModified) {
