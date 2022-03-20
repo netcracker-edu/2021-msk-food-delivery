@@ -1,23 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Layout, Card, Row, Col, Space} from "antd";
-import { UserOutlined, HomeOutlined, CreditCardOutlined, ShoppingOutlined } from "@ant-design/icons";
+import { UserOutlined, HomeOutlined, CreditCardOutlined, ShoppingOutlined, ProfileFilled } from "@ant-design/icons";
 import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
-import Config from "../../api/Config";
-import { commonFetch } from "../../helpers/fetchers";
-import ProfileClient from '../../api/ProfileClient';
 import UserRatingChanger from './UserRatingChanger';
 import OrderDetailsProductCard from "./OrderDetailsProductCard";
 import './styles/style.css';
 import OrderSteps from "./OrderSteps";
 import OrderCancelButton from "./OrderCancelButton";
 import OrderFinishButton from "./OrderFinishButton";
+import OrderClient from "../../api/OrderClient";
+import ProfileClient from "../../api/ProfileClient";
 
 const {Content} = Layout;
 
 const OrderDetails = (props) => {
-    const config = new Config();
-    const profileClient = new ProfileClient(props.auth);
-
     const {orderId} = useParams();
     const navigate = useNavigate();
  
@@ -34,15 +30,19 @@ const OrderDetails = (props) => {
     const [orderStatus, setOrderStatus] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    const profileClient = new ProfileClient(props.auth);
+    const orderClient = new OrderClient(props.auth);
+
+    const NOT_FOUND_PAGE = "http://localhost:8080/api/v1/notFound";
+
     const fetchData = async () => {
         let response = await profileClient.get();
         if (response && response.success) {
           setProfile(response.data);
         }
-
-        response = await commonFetch(config.ORDER_URL + `/${orderId}`, 'GET', 
-        config.headersWithAuthorization(), null); 
         
+        response = await orderClient.getOrderById(orderId);
+
         if(response.success){
             setOrder(response.data);
             setOrderStatus(response.data.status);
@@ -52,7 +52,7 @@ const OrderDetails = (props) => {
             setIsLoading(false);
 
         } else {
-            navigate(config.BASE_PATH + 'notFound');
+            navigate(NOT_FOUND_PAGE);
         }
     }
 
@@ -75,7 +75,7 @@ const OrderDetails = (props) => {
                 <Space direction='vertical' size={4}>   
                     <Row>
                         <Col span={24} >
-                            <span style={{fontSize: '24px', fontWeight: 'bold'}}>{`Order № ${order.id}`}</span>
+                            <h2>{`Order № ${order.id}`}</h2>
                         </Col>
                     </Row>
                     <Row>

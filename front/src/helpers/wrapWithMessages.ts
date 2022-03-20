@@ -1,9 +1,8 @@
-import React from "react";
 import { message } from "antd";
 
-export default function useWrapWithMessages(action: () => Promise<any>, actionOnSuccess: () => void = null,
+export function wrapWithMessages (action: () => Promise<any>, actionOnSuccess: () => void = null,
 loadingText: string = 'In progress...', successText: string = 'Success!', errorText: string = 'Error!',
- delay: number = 2.5){ 
+ delay: number = 2.5) { 
     
     function wrappedAction(){
         message.loading(loadingText);

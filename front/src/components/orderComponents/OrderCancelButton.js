@@ -1,23 +1,17 @@
 import React, { useState } from "react";
 import { Button, Popconfirm } from "antd";
-import Config from "../../api/Config";
-import { patchFetch} from "../../helpers/fetchers";
-import useWrapWithMessages from "../../hooks/useWrapWithMessages.ts";
+import { wrapWithMessages } from "../../helpers/wrapWithMessages.ts";
+import OrderClient from "../../api/OrderClient";
 
 const OrderCancelButton = (props) => {
-    const config = new Config();
     const {auth, orderId, setCancelButtonPressed, setOrderStatus} = {...props};
+    const orderClient = new OrderClient(auth);
+
     const [disabled, setDisabled] = useState(false);
 
-    async function cancelOrder(){
-        if (config.tokenExpired()) {
-            await auth.refreshToken();
-        }
-        return await patchFetch(config.ORDER_URL + `/${orderId}/status`, 
-        config.headersWithAuthorization(), JSON.stringify({newStatus: "CANCELLED"}));        
-    }
-
-    const wrappedCancelOrder = useWrapWithMessages(cancelOrder, () => {
+    const wrappedCancelOrder = wrapWithMessages( async () => {
+        await orderClient.changeOrderStatus(orderId, "CANCELLED")
+    }, () => {
         setDisabled(true);
         setCancelButtonPressed(true);
         setOrderStatus("CANCELLED");

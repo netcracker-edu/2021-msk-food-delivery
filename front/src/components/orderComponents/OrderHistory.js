@@ -1,15 +1,13 @@
 import {useState, useEffect, React} from 'react';
 import { Layout, Pagination, Row, Col, Empty } from 'antd';
 import OrderHistoryCard from './OrderHistoryCard';
-import { commonFetch } from '../../helpers/fetchers';
-import Config from '../../api/Config';
 import './styles/style.css';
 import { useLocation } from 'react-router-dom';
+import OrderClient from '../../api/OrderClient';
 
 const OrderHistory = ({auth}) => {
 
   const { Content } = Layout;
-  const config = new Config();
 
   const location = useLocation();
 
@@ -19,20 +17,10 @@ const OrderHistory = ({auth}) => {
   const [overallOrdersAmount, setOverallOrderAmount] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  async function getOverallOrdersAmount(){
-    return await commonFetch(config.ORDERS_AMOUNT_URL, 'GET', config.headersWithAuthorization(), null);
-  }
-
-  function buildPaginationQuery(page, size){
-    return config.ORDER_HISTORY_URL + `?page=${page - 1}&size=${size}`;
-  }
+  const orderClient = new OrderClient(auth);
 
   async function fetchData(){
-    if (config.tokenExpired()) {
-      await auth.refreshToken();
-    }
-
-    let response = await getOverallOrdersAmount();
+    let response = await orderClient.getOverallOrdersAmount();
     if (response && response.success) {
       setOverallOrderAmount(response.data.amount);
       if(overallOrdersAmount === 0){
@@ -43,8 +31,7 @@ const OrderHistory = ({auth}) => {
       console.log(JSON.stringify(response.error));
     }
 
-    setOrders(await commonFetch(buildPaginationQuery(page, size), 'GET', 
-    config.headersWithAuthorization(), null)
+    setOrders(await orderClient.fetchOrderPage(page, size)
     .then(result => [...result.data]));
     setIsLoading(false);
   }
@@ -56,8 +43,7 @@ const OrderHistory = ({auth}) => {
   const onPageChange = async (newPageNumber, newOrdersPerPage) => {
     setPage(newPageNumber);
     setSize(newOrdersPerPage);
-    setOrders(await commonFetch(buildPaginationQuery(newPageNumber, newOrdersPerPage), 'GET', 
-    config.headersWithAuthorization(), null)
+    setOrders(await orderClient.fetchOrderPage(newPageNumber, newOrdersPerPage)
     .then(result => [...result.data]));
   }
 

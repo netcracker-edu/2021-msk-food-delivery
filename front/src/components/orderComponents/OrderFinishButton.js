@@ -1,23 +1,17 @@
 import React, { useState } from "react";
 import { Button } from "antd";
-import Config from "../../api/Config";
-import { patchFetch } from "../../helpers/fetchers";
-import useWrapWithMessages from "../../hooks/useWrapWithMessages.ts";
+import {wrapWithMessages} from "../../helpers/wrapWithMessages.ts";
+import OrderClient from "../../api/OrderClient";
 
-const OrderFinishButton = (props) => {
-    const config = new Config();
+const OrderFinishButton = (props) => {    
     const [disabled, setDisabled] = useState(false);
     const {auth, orderId, setOrderStatus, setFinishButtonPressed} = {...props};
-
-    async function finishOrder(){
-        if (config.tokenExpired()) {
-            await auth.refreshToken();
-        }
-        return await patchFetch(config.ORDER_URL + `/${orderId}/status`, 
-        config.headersWithAuthorization(), JSON.stringify({newStatus: "DELIVERED"}));
-    }
     
-    const wrappedFinishOrder = useWrapWithMessages(finishOrder, () => {
+    const orderClient = new OrderClient(auth);
+
+    const wrappedFinishOrder = wrapWithMessages(async () => {
+        await orderClient.changeOrderStatus(orderId, "DELIVERED");
+    }, () => {
         setDisabled(true);
         setOrderStatus("DELIVERED");
         setFinishButtonPressed(true);
