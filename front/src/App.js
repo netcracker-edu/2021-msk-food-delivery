@@ -23,8 +23,8 @@ function App() {
   return (
     <Layout className="App">
        <Router>
-        <HeaderCustom auth={auth} />
         <CartContextProvider>
+        <HeaderCustom auth={auth} />
           <Routes>
             <Route
               path="/"
