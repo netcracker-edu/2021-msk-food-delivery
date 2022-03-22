@@ -12,15 +12,17 @@ import NotFound from "./components/NotFound";
 import Profile from "./components/Profile";
 import Logout from "./components/Logout";
 import RegistrationForm from "./components/RegistrationForm";
+import OrderHistory from "./components/orderComponents/OrderHistory";
+import OrderDetails from "./components/orderComponents/OrderDetails";
 
 function App() {
   const { token, setToken } = useToken();
   const auth = new Auth(token, setToken);
 
   return (
-    <Layout className="App">
+    <Layout className="App" style={{minHeight: "100vh"}}>
        <Router>
-        <HeaderCustom auth={auth} />
+        <HeaderCustom auth={auth}/>
           <Routes>
             <Route
               path="/"
@@ -28,8 +30,16 @@ function App() {
             />
             <Route
               path="/profile"
-              element={<Profile auth={auth}/>}
-            />
+            >
+              <Route index={true} element={<Profile auth={auth}/>} />
+              <Route
+                path="/profile/orderHistory"
+              >
+                <Route index={true} element={<OrderHistory auth={auth}/>}/>
+                <Route index={false} path=':orderId' element={<OrderDetails auth={auth} />}/>
+              </Route>
+            </Route>
+            
             <Route
               path="/signin"
               element={<LoginForm auth={auth}/>}

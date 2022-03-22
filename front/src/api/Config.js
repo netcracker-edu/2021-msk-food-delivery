@@ -10,20 +10,24 @@ class Config {
   SIGNUP_URL = `${this.BASE_PATH}auth/signup`;
   REFRESH_TOKEN_URL = `${this.BASE_PATH}auth/refresh`;
   PROFILE_URL = `${this.BASE_PATH}profile`;
+  ORDER_URL = `${this.BASE_PATH}order`;
+  ORDER_HISTORY_URL = `${this.PROFILE_URL}/orders`;
+  ORDERS_AMOUNT_URL = `${this.ORDER_HISTORY_URL}/amount`;
+  FILE_URL = `${this.BASE_PATH}file`;
   ACCESS_TOKEN = "accessToken";
   EXPIRATION = "expiration";
 
   defaultHeaders() {
     return {
       "Content-Type": "application/json",
-      Accept: "application/json",
+      "Accept": "application/json",
     };
   }
 
   headersWithAuthorization() {
     return {
       ...this.defaultHeaders(),
-      Authorization: localStorage.getItem(this.ACCESS_TOKEN),
+      "Authorization": localStorage.getItem(this.ACCESS_TOKEN),
     };
   }
 

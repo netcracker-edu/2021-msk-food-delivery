@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.ClientInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.CourierInfoDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
@@ -12,12 +13,16 @@ import com.ncedu.fooddelivery.api.v1.entities.*;
 import com.ncedu.fooddelivery.api.v1.entities.orderProductPosition.OrderNotHierarchicalProductPosition;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -71,12 +76,22 @@ public class OrderInfoDTO {
 
     private BigDecimal deliveryRating;
 
-    private List<OrderNotHierarchicalProductPosition> productPositions;
+    private List<ProductAmountPair> products;
+
+    @AllArgsConstructor
+    @Data
+    public static class ProductAmountPair{
+        ProductDTO product;
+        Integer amount;
+
+        public ProductAmountPair(){}
+    }
 
     public OrderInfoDTO(Long id, Client client, String address, Geometry coordinates,
                         Warehouse warehouse, Courier courier, OrderStatus status, LocalDateTime dateStart,
                         LocalDateTime dateEnd, Double overallCost, Double highDemandCoeff,
-                        Double discount, Long promoCodeId, BigDecimal clientRating, BigDecimal deliveryRating, List<OrderNotHierarchicalProductPosition> productPositions) {
+                        Double discount, Long promoCodeId, BigDecimal clientRating, BigDecimal deliveryRating,
+                        List<ProductAmountPair> products) {
         this.id = id;
         User userClient = client.getUser();
         this.client = new ClientInfoDTO(
@@ -105,6 +120,6 @@ public class OrderInfoDTO {
         this.promoCodeId = promoCodeId;
         this.clientRating = clientRating;
         this.deliveryRating = deliveryRating;
-        this.productPositions = productPositions;
+        this.products = products;
     }
 }
