@@ -8,15 +8,16 @@ import PhoneInput from './user_form/PhoneInput';
 import EmailInput from './user_form/EmailInput';
 import PasswordInput from './user_form/PasswordInput';
 import PasswordInputConfirm from './user_form/PasswordInputConfirm';
+import useProfile from "../hooks/useProfile";
 
 const { Meta } = Card;
 const { Content } = Layout;
 
-const Profile = ({auth}) => {
+const Profile = ({auth, profile, setProfile}) => {
   const AVATAR_BASE = "http://localhost:8080/api/v1/file/";
 
   const profileClient = new ProfileClient(auth);
-  const [profile, setProfile] = useState({});
+
   const [isEditInfoVisible, setIsEditInfoVisible] = useState(false);
   const [isEditEmailVisible, setIsEditEmailVisible] = useState(false);
   const [isEditPassVisible, setIsEditPassVisible] = useState(false);
@@ -85,9 +86,9 @@ const Profile = ({auth}) => {
     }
   }
 
-  useEffect(() => {
-    getProfile();
-  }, []);
+  // useEffect(() => {
+  //   getProfile();
+  // }, []);
 
   return (
     <Content className="wrapper">

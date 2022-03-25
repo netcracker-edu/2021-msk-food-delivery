@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 const { Header } = Layout;
 const { Item } = Menu;
 
-const HeaderCustom = ({ auth }) => {
+const HeaderCustom = ({ auth, profile }) => {
   return (
     <Header>
       <Menu theme="dark" mode="horizontal">
@@ -16,7 +16,13 @@ const HeaderCustom = ({ auth }) => {
           </Item>)
           : <></>
         }
-        <Item key={auth.token ? 3 : 2}>
+        { auth.token && profile?.role === 'COURIER' ? 
+          <Item key={3}>
+            <Link to="/deliverySessions">Deliveries</Link>
+          </Item>
+          : <></>
+        }
+        <Item key={auth.token ? (profile?.role === "COURIER" ? 4 : 3) : 2}>
           <Link to={auth.token ? "/signout" : "/signin"}>
             {auth.token ? "SignOut" : "SignIn"}
           </Link>

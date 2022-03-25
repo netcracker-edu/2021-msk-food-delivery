@@ -10,12 +10,17 @@ class Config {
   SIGNUP_URL = `${this.BASE_PATH}auth/signup`;
   REFRESH_TOKEN_URL = `${this.BASE_PATH}auth/refresh`;
   PROFILE_URL = `${this.BASE_PATH}profile`;
-  ORDER_URL = `${this.BASE_PATH}order`;
-  ORDER_HISTORY_URL = `${this.PROFILE_URL}/orders`;
-  ORDERS_AMOUNT_URL = `${this.ORDER_HISTORY_URL}/amount`;
   FILE_URL = `${this.BASE_PATH}file`;
   ACCESS_TOKEN = "accessToken";
   EXPIRATION = "expiration";
+
+  DELIVERY_SESSIONS_HISTORY_URL = `${this.PROFILE_URL}/deliverySessions`;
+  DELIVERY_SESSIONS_AMOUNT_URL = `${this.PROFILE_URL}/deliverySessions/amount`;
+  DELIVERY_SESSION_URL = `${this.BASE_PATH}deliverySession/`;
+
+  ORDER_URL = `${this.BASE_PATH}order`;
+  ORDER_HISTORY_URL = `${this.PROFILE_URL}/orders`;
+  ORDERS_AMOUNT_URL = `${this.ORDER_HISTORY_URL}/amount`;
 
   defaultHeaders() {
     return {

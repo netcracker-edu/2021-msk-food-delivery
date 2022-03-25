@@ -19,12 +19,12 @@ const OrderItem = (props) => {
     return (
         <>
         <Card hoverable className='order_history_card'
-        onClick={() => navigate(`${location.pathname}/${order.id}`, { state : {
+        onClick={() => navigate(`/profile/orderHistory/${order.id}`, { state : {
             page: page,
             size: size
         }})}>
         <Row justify="space-between" className="order_card_header">
-                <Col>{`Order №${order.id}`}</Col>
+                <Col>{`Order id: ${order.id}`}</Col>
                 <Col>{`Started: ${order.dateStart}`}</Col>
         </Row>
         <Divider style={{margin: '14px'}}/>

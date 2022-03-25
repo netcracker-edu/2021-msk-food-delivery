@@ -1,6 +1,9 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
+import com.ncedu.fooddelivery.api.v1.dto.user.CourierInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Courier;
+import com.ncedu.fooddelivery.api.v1.entities.User;
+import com.ncedu.fooddelivery.api.v1.errors.notfound.NotFoundEx;
 import com.ncedu.fooddelivery.api.v1.errors.orderRegistration.CourierAvailabilityEx;
 import com.ncedu.fooddelivery.api.v1.repos.CourierRepo;
 import com.ncedu.fooddelivery.api.v1.services.CourierService;
@@ -22,6 +25,13 @@ public class CourierServiceImpl1 implements CourierService {
     }
 
     @Override
+    public CourierInfoDTO getCourierDTOById(Long id) {
+        Courier c = getCourier(id);
+        if(c == null) throw new NotFoundEx(id.toString());
+        return convertToDTO(c);
+    }
+
+    @Override
     public Courier findFreeCourier(Long warehouseId){
         Courier courier = new Courier();
         int i = 0;
@@ -34,5 +44,11 @@ public class CourierServiceImpl1 implements CourierService {
         } catch (InterruptedException ex){}
         if(i == 15) throw new CourierAvailabilityEx();
         return courier;
+    }
+
+    private CourierInfoDTO convertToDTO(Courier c){
+        return new CourierInfoDTO(c.getId(), c.getUser().getRole().toString(), c.getUser().getFullName(),
+                c.getUser().getEmail(), c.getUser().getLastSigninDate(), c.getUser().getAvatarId(),
+                c.getPhoneNumber(), c.getRating(), c.getWarehouse().getId(), c.getAddress(), c.getCurrentBalance());
     }
 }

@@ -14,15 +14,18 @@ import Logout from "./components/Logout";
 import RegistrationForm from "./components/RegistrationForm";
 import OrderHistory from "./components/orderComponents/OrderHistory";
 import OrderDetails from "./components/orderComponents/OrderDetails";
+import SessionDetails from "./components/deliverySessionComponents/SessionDetails";
+import History from "./components/deliverySessionComponents/History";
+import useProfile from "./hooks/useProfile";
 
 function App() {
   const { token, setToken } = useToken();
   const auth = new Auth(token, setToken);
-
+  const { profile, setProfile } = useProfile();
   return (
     <Layout className="App" style={{minHeight: "100vh"}}>
        <Router>
-        <HeaderCustom auth={auth}/>
+        <HeaderCustom auth={auth} profile={profile}/>
           <Routes>
             <Route
               path="/"
@@ -30,19 +33,18 @@ function App() {
             />
             <Route
               path="/profile"
-            >
-              <Route index={true} element={<Profile auth={auth}/>} />
-              <Route
+              element={<Profile auth={auth} profile={profile} setProfile={setProfile}/>}
+            />
+            <Route
                 path="/profile/orderHistory"
               >
                 <Route index={true} element={<OrderHistory auth={auth}/>}/>
                 <Route index={false} path=':orderId' element={<OrderDetails auth={auth} />}/>
-              </Route>
             </Route>
-            
+                          
             <Route
               path="/signin"
-              element={<LoginForm auth={auth}/>}
+              element={<LoginForm auth={auth} profile={profile} setProfile={setProfile}/>}
             />
             <Route
               path="/signup"
@@ -52,6 +54,17 @@ function App() {
               path="/signout"
               element={<Logout auth={auth}/>}
             />
+
+            <>
+              {profile?.role === 'COURIER' ? 
+                <Route 
+                  path="/deliverySessions"
+                >
+                  <Route index={true} element={<History auth={auth} />}/>
+                  <Route index={false} path=':sessionId' element={<SessionDetails auth={auth} />}/>
+                </Route> : <></>
+               }
+            </>
             <Route path="*" element={<NotFound/>} />
           </Routes>
         <FooterCustom />

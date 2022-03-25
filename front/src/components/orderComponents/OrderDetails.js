@@ -75,7 +75,7 @@ const OrderDetails = (props) => {
                 <Space direction='vertical' size={4}>   
                     <Row>
                         <Col span={24} >
-                            <h2>{`Order № ${order.id}`}</h2>
+                            <h2>{`Order id: ${order.id}`}</h2>
                         </Col>
                     </Row>
                     <Row>

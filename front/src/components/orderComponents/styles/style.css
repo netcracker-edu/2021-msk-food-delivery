@@ -72,6 +72,7 @@
 
 .order_history_wrapper{
   min-height: 163px;
+  flex-grow: 1;
 }  
 
 .empty_wrapper{

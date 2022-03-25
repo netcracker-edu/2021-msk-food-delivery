@@ -15,35 +15,46 @@ export default class OrderClient{
     }
 
     async getOrderById(id){
-        this.checkToken();
+        await this.checkToken();
         return await commonFetch(this.config.ORDER_URL + `/${id}`, 'GET', 
         this.config.headersWithAuthorization(), null);
     }
 
     async changeOrderStatus(orderId, newStatus){
-        this.checkToken();
+        await this.checkToken();
         return await patchFetch(this.config.ORDER_URL + `/${orderId}/status`, 
         this.config.headersWithAuthorization(), JSON.stringify({newStatus: newStatus}));
     }
 
     async changeRating(orderId, role, newRating){
-        this.checkToken();
+        await this.checkToken();
         return patchFetch(this.config.ORDER_URL + `/${orderId}/` + (role === 'COURIER' ? 'clientRating' : 'courierRating'),
         this.config.headersWithAuthorization(), JSON.stringify({rating: newRating}));
     }
 
     async getOverallOrdersAmount(){
-        this.checkToken();
+        await this.checkToken();
         return await commonFetch(this.config.ORDERS_AMOUNT_URL, 'GET', this.config.headersWithAuthorization(), null);
     }
 
     async fetchOrderPage(page, size){
-        this.checkToken();
+        await this.checkToken();
         return await commonFetch(this.buildPaginationQuery(page, size), 'GET', 
         this.config.headersWithAuthorization(), null);
     }   
 
     buildPaginationQuery(page, size){
         return this.config.ORDER_HISTORY_URL + `?page=${page - 1}&size=${size}`;
+    }
+
+    async getOrdersFromSession(sessionId){
+        await this.checkToken();
+        return await commonFetch(this.config.DELIVERY_SESSION_URL + `${sessionId}/orders`, 'GET', 
+        this.config.headersWithAuthorization(), null);
+    }
+
+    async getCurrentOrder(){
+        await this.checkToken();
+        return await commonFetch(this.config.ORDER_URL, 'GET', this.config.headersWithAuthorization(), null);
     }
 }

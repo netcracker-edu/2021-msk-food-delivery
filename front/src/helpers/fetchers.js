@@ -67,6 +67,24 @@ exports.clearTokenFetch = async (url, headers, body, clear) => {
     .catch((e) => handleError(e));
 };
 
+exports.profileFetch = async (url, method, headers, body) => {
+  return fetch(url, {
+    method: method,
+    mode: "cors",
+    headers: { ...headers, },
+    body: body,
+  })
+    .then((response) => Promise.all([response, response.json()]))
+    .then(([response, json]) => {
+      console.log("Response JSON: " + JSON.stringify(json));
+      if (!response.ok) {
+        return { success: false, error: json };
+      }
+        return { success: true, data: json };
+    })
+    .catch((e) => handleError(e));
+}; 
+
 function handleError(error) {
   const err = new Map([
     [TypeError, "Can't connect to server."],
