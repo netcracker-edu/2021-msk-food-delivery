@@ -61,3 +61,7 @@ body {
     transform: rotate(360deg);
   }
 }
+
+.ant-btn{
+  border-radius: 6px;
+}

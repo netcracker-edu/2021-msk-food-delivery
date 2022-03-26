@@ -1,13 +1,18 @@
 import { Col, Row, Card, Tag, Typography, Divider, Button, Popconfirm, message, Spin} from "antd";
 import { Link, useLocation, useParams } from "react-router-dom";
 import React, {useState, useEffect} from "react";
+
 import DeliverySessionClient from "../../api/DeliverySessionClient";
 import OrderClient from "../../api/OrderClient";
 import OrderHistoryCard from "../orderComponents/OrderHistoryCard";
 
+const ERROR_MESSAGE_DELAY = 3.5;
+const SUCCESS_MESSAGE_DELAY = 2.0;
+const REQUEST_INTERVAL = 5000;
+
+let needToFindOrder = null;
+
 const SessionDetails = ({auth}) => {
-    const ERROR_MESSAGE_DELAY = 3.5;
-    const SUCCESS_MESSAGE_DELAY = 2.0;
 
     const deliverySessionClient = new DeliverySessionClient(auth);
     const orderClient = new OrderClient(auth);
@@ -22,7 +27,6 @@ const SessionDetails = ({auth}) => {
     const location = useLocation();
     let page = location.state?.page;
     let size = location.state?.size;
-    // debugger;
 
     async function fetchSession(){
         setIsLoading(true);
@@ -42,7 +46,10 @@ const SessionDetails = ({auth}) => {
                 }
             }
             setIsLoading(false);
-            if(!found) await fetchCurrentOrder(orders.data);
+            if(!found){
+                needToFindOrder = true;
+                await fetchCurrentOrder(orders.data);
+            }
             return;
         }
         setIsLoading(false);
@@ -58,6 +65,7 @@ const SessionDetails = ({auth}) => {
             setIsLoading(false); 
             message.destroy();
             message.success("Finished!", SUCCESS_MESSAGE_DELAY);
+            needToFindOrder = false;
         } else {    // else getting not finished orderId
             message.destroy();
             message.error(`You're still appointed to order! (ID: ${finishResult})`, ERROR_MESSAGE_DELAY);
@@ -66,25 +74,25 @@ const SessionDetails = ({auth}) => {
 
     async function fetchCurrentOrder(orders){
        if(currentOrder) return;
-       while(true){
+       while(needToFindOrder){
             const response = await orderClient.getCurrentOrder();
             if(response.data != null){
                 orders.unshift(response.data);
                 setOrders(orders);
                 setCurrentOrder(response.data);
+                needToFindOrder = false;
                 return;
             }
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            await new Promise(resolve => setTimeout(resolve, REQUEST_INTERVAL));
         }
     }
 
     useEffect(() => {
-        fetchSession(); 
+        fetchSession();
+        return () => {
+            needToFindOrder = false;     // on unmount
+        }
     }, []);
-
-    // useEffect(() => {
-    //     fetchCurrentOrder();
-    // }, currentOrder);
 
     return ( 
         <>{isLoading ? <></> : 

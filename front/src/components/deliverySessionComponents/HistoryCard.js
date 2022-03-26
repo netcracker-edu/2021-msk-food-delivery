@@ -1,7 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Card, Row, Col, Divider, Descriptions, Tag} from "antd";
-
-const ACTIVE_CARD_FONT_COLOR = '#00FF7F';
+import { Card, Row, Col, Divider, Tag} from "antd";
 
 const HistoryCard = ({session, page, size, activeSessionStyle}) => {
     const navigate = useNavigate();

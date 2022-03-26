@@ -48,9 +48,9 @@ export default class DeliverySessionClient {
 
     async handleFinishResponse(response){
         if(response.status !== 200){
-            const errMsg = (await response.json()).message;
+            const errMsgJson = await response.json();
+            const errMsg = errMsgJson.message;
             const currentOrderId = errMsg.substring(errMsg.indexOf("id=") + 3);
-            debugger;
             return currentOrderId;
         }
 

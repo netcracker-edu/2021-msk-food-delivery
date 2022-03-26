@@ -1,7 +1,9 @@
 import useToken from "./hooks/useToken";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import useProfile from "./hooks/useProfile";
 
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Layout } from 'antd';
+
 import './App.css';
 import Auth from "./api/Auth";
 import HeaderCustom from "./components/HeaderCustom";
@@ -16,7 +18,6 @@ import OrderHistory from "./components/orderComponents/OrderHistory";
 import OrderDetails from "./components/orderComponents/OrderDetails";
 import SessionDetails from "./components/deliverySessionComponents/SessionDetails";
 import History from "./components/deliverySessionComponents/History";
-import useProfile from "./hooks/useProfile";
 
 function App() {
   const { token, setToken } = useToken();
@@ -65,6 +66,7 @@ function App() {
                 </Route> : <></>
                }
             </>
+            
             <Route path="*" element={<NotFound/>} />
           </Routes>
         <FooterCustom />
