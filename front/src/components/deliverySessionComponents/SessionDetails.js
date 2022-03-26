@@ -177,7 +177,7 @@ const SessionDetails = ({auth}) => {
                 <Row gutter={[0, 24]}>          
                     {orders.map((order) => 
                     <Col span={24}>
-                        <OrderHistoryCard order={order} page={page} size={size}/>
+                        <OrderHistoryCard order={order} page={page} customPrevPath={`/deliverySessions/${params.sessionId}`} size={size}/>
                     </Col>)}
                 </Row>
             </div>

@@ -20,7 +20,8 @@ const OrderDetails = (props) => {
     const location = useLocation();
     const page = location.state?.page;
     const size = location.state?.size;
-       
+    const prevPath = location.state?.prevPath;
+    
     const [order, setOrder] = useState({client: {}, courier: {}});
     const [profile, setProfile] = useState({});
     const [products, setProducts] = useState([]);
@@ -66,10 +67,20 @@ const OrderDetails = (props) => {
             <><Space direction='vertical' size={8} style={{marginBottom: '8px'}}>
                 <Row>
                     <Col>
-                    <Link to={"/profile/orderHistory"} state={{ page: page, size: size}} 
-                    style={{fontSize: '13px'}}>
-                        Back to order history
-                    </Link>
+                    {
+                        prevPath === "/profile/orderHistory" ? 
+                            <Link to={prevPath} state={{ page: page, size: size}} 
+                            style={{fontSize: '13px'}}>
+                                Back to order history
+                            </Link> 
+                        :
+                        prevPath.search("^\/deliverySessions\/[0-9]+$") !== -1 ?
+                            <Link to={prevPath} state={{ page: page, size: size}} 
+                            style={{fontSize: '13px'}}>
+                                Back to session
+                            </Link> 
+                        : <></>   
+                    }
                     </Col>
                 </Row>
                 <Space direction='vertical' size={4}>   
