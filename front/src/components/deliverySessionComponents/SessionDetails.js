@@ -22,23 +22,30 @@ const SessionDetails = ({auth}) => {
     const location = useLocation();
     let page = location.state?.page;
     let size = location.state?.size;
+    // debugger;
 
     async function fetchSession(){
         setIsLoading(true);
         const session = await deliverySessionClient.getSessionById(params.sessionId);
         setSession(session);
         setIsCurrentSession(session?.endTime === null);
-        const orders = await orderClient.getOrdersFromSession(params.sessionId).data;
-        setOrders(orders);
-        for (let i = 0; i < orders?.length; i++) {
-            const order = orders[i];
-            if(order.status !== "CANCELLED" && order.status !== "DELIVERED"){
-                setCurrentOrder(order);
-                break;
+        const orders = await orderClient.getOrdersFromSession(params.sessionId);
+        if(orders != null) setOrders(orders.data);
+        if(session.endTime == null){
+            let found = false;
+            for (let i = 0; i < orders?.length; i++) {
+                const order = orders[i];
+                if(order.status !== "CANCELLED" && order.status !== "DELIVERED"){
+                    setCurrentOrder(order);
+                    found = true;
+                    break;
+                }
             }
+            setIsLoading(false);
+            if(!found) await fetchCurrentOrder(orders.data);
+            return;
         }
         setIsLoading(false);
-        if(session && !session.endTime) await fetchCurrentOrder();
     }
 
     async function finishSession(){
@@ -47,6 +54,7 @@ const SessionDetails = ({auth}) => {
         if(finishResult === true){
             setIsLoading(true);
             setSession(await deliverySessionClient.getSessionById(params.sessionId));
+            setIsCurrentSession(false);
             setIsLoading(false); 
             message.destroy();
             message.success("Finished!", SUCCESS_MESSAGE_DELAY);
@@ -56,14 +64,13 @@ const SessionDetails = ({auth}) => {
         }
     }
 
-    async function fetchCurrentOrder(){
+    async function fetchCurrentOrder(orders){
        if(currentOrder) return;
        while(true){
             const response = await orderClient.getCurrentOrder();
-            if(response){
-                const ordersCopy = orders.slice();
-                ordersCopy.unshift(response.data);
-                setOrders(ordersCopy);
+            if(response.data != null){
+                orders.unshift(response.data);
+                setOrders(orders);
                 setCurrentOrder(response.data);
                 return;
             }
@@ -129,9 +136,10 @@ const SessionDetails = ({auth}) => {
                         : <></>
                     } 
                 </div>
-                <Divider></Divider>
-                <>{!session.endTime ?  
+                <>{session.endTime == null ?  
+                    <><Divider />
                     <div className="buttons_container">
+
                         <Popconfirm
                             title="Are you sure?"
                             onConfirm={finishSession}
@@ -140,7 +148,7 @@ const SessionDetails = ({auth}) => {
                         >
                             <Button type="primary">Finish session</Button>
                         </Popconfirm>
-                    </div>
+                    </div></>
                     : <></>
                 }</> 
 
@@ -148,7 +156,7 @@ const SessionDetails = ({auth}) => {
             <Divider>
                 <Typography.Title level={4}>Orders</Typography.Title>
             </Divider>
-            {!isCurrentSession && currentOrder ? <></> : 
+            {isCurrentSession && currentOrder == null ? 
                 <Card style={{borderRadius: '10px', width: '40%', margin: '0 auto'}}>
                     <div style={{display: 'flex', justifyContent: 'center'}}>
                         
@@ -158,13 +166,14 @@ const SessionDetails = ({auth}) => {
                         
                     </div>
                 </Card>
+                : <></>
             }
-            <>{!orders?.length ? 
-            <div style={{margin: '0 auto'}}><Typography.Text level={5} strong >
+            <>{!isCurrentSession && !orders.length ? 
+            <div style={{textAlign: 'center', margin: '0 auto'}}><Typography.Text level={5} strong >
                 No orders in this session
             </Typography.Text></div> 
             :
-                <div style={{marginBottom: '24px'}}>
+            <div style={{margin: '24px auto'}}>
                 <Row gutter={[0, 24]}>          
                     {orders.map((order) => 
                     <Col span={24}>

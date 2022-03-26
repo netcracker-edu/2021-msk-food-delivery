@@ -17,6 +17,7 @@ const OrderItem = (props) => {
     const location = useLocation();
     
     return (
+        <>{!order ? <></> : 
         <>
         <Card hoverable className='order_history_card'
         onClick={() => navigate(`/profile/orderHistory/${order.id}`, { state : {
@@ -54,7 +55,7 @@ const OrderItem = (props) => {
                 : null}
             </Descriptions>
         </Card>
-        </>
+        </>}</>
     );
 }
 

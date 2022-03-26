@@ -67,6 +67,8 @@ public class OrderController {
     @PreAuthorize("hasAuthority('COURIER')")
     @GetMapping("/api/v1/order")
     public ResponseEntity<OrderInfoDTO> getCurrentOrder(@AuthenticationPrincipal User user){
+        OrderInfoDTO orderInfoDTO = orderService.getCurrentOrder(user);
+        if(orderInfoDTO == null) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(orderService.getCurrentOrder(user),
                 HttpStatus.OK);
     }

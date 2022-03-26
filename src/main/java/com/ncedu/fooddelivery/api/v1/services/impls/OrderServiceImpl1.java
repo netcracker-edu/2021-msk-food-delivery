@@ -135,6 +135,12 @@ public class OrderServiceImpl1 implements OrderService {
                                 || order.getDateEnd().isBefore(deliverySession.getEndTime()));
                     }
                 })
+                .sorted(new Comparator<Order>() {
+                    @Override
+                    public int compare(Order o1, Order o2) {
+                        return o2.getDateStart().compareTo(o1.getDateStart());
+                    }
+                })
                 .map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
     }
 
