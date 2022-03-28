@@ -17,6 +17,9 @@ class Config {
   ACCESS_TOKEN = "accessToken";
   EXPIRATION = "expiration";
 
+  WAREHOUSES_URL = `${this.BASE_PATH}warehouses`;
+  ACTIVE_WAREHOUSES_URL = `${this.WAREHOUSES_URL}/active`;
+  
   defaultHeaders() {
     return {
       "Content-Type": "application/json",

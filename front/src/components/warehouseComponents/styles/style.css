@@ -1,0 +1,23 @@
+.ant-card{
+    border-radius: 10px;
+}
+.ant-card-body{
+    padding: 22px;
+}
+
+.warehouse_list_wrapper{
+    width: 80%;
+    margin: 0 auto;
+    flex-grow: 1;
+}
+
+.warehouse_list_cards{
+    width: 80%;
+    margin: 0 auto;
+    margin-bottom: 24px;
+}
+
+.warehouse_list_card{
+    flex-basis: 30%;
+    height: 100%;
+}

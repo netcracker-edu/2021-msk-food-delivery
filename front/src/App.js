@@ -17,6 +17,7 @@ import OrderHistory from "./components/orderComponents/OrderHistory";
 import OrderDetails from "./components/orderComponents/OrderDetails";
 
 import './App.css';
+import WarehouseList from "./components/warehouseComponents/WarehouseList";
 
 
 function App() {
@@ -48,7 +49,13 @@ function App() {
 
             <>{
               profile?.role === 'ADMIN' ? 
-                <Route path='/warehouses'/>
+                <Route 
+                path='/warehouses'
+                >
+                  <Route 
+                  index={true} element={<WarehouseList auth={auth}/>}
+                  />
+                </Route>
               : profile?.role === 'MODERATOR' ? 
                 <Route path={`/warehouses/${profile.warehouseId}`}/> : <></>
             }</>
