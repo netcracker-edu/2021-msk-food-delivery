@@ -1,8 +1,9 @@
 import useToken from "./hooks/useToken";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import useProfile from "./hooks/useProfile";
 
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Layout } from 'antd';
-import './App.css';
+
 import Auth from "./api/Auth";
 import HeaderCustom from "./components/HeaderCustom";
 import FooterCustom from "./components/FooterCustom";
@@ -15,14 +16,18 @@ import RegistrationForm from "./components/RegistrationForm";
 import OrderHistory from "./components/orderComponents/OrderHistory";
 import OrderDetails from "./components/orderComponents/OrderDetails";
 
+import './App.css';
+
+
 function App() {
   const { token, setToken } = useToken();
   const auth = new Auth(token, setToken);
+  const { profile, setProfile } = useProfile();
 
   return (
     <Layout className="App" style={{minHeight: "100vh"}}>
        <Router>
-        <HeaderCustom auth={auth}/>
+          <HeaderCustom auth={auth} profile={profile}/>
           <Routes>
             <Route
               path="/"
@@ -30,6 +35,7 @@ function App() {
             />
             <Route
               path="/profile"
+              element={<Profile auth={auth} profile={profile} setProfile={setProfile}/>}
             >
               <Route index={true} element={<Profile auth={auth}/>} />
               <Route
@@ -39,10 +45,17 @@ function App() {
                 <Route index={false} path=':orderId' element={<OrderDetails auth={auth} />}/>
               </Route>
             </Route>
+
+            <>{
+              profile?.role === 'ADMIN' ? 
+                <Route path='/warehouses'/>
+              : profile?.role === 'MODERATOR' ? 
+                <Route path={`/warehouses/${profile.warehouseId}`}/> : <></>
+            }</>
             
             <Route
               path="/signin"
-              element={<LoginForm auth={auth}/>}
+              element={<LoginForm auth={auth} profile={profile} setProfile={setProfile}/>}
             />
             <Route
               path="/signup"
@@ -50,7 +63,7 @@ function App() {
             />
             <Route
               path="/signout"
-              element={<Logout auth={auth}/>}
+              element={<Logout auth={auth} setProfile={setProfile}/>}
             />
             <Route path="*" element={<NotFound/>} />
           </Routes>
