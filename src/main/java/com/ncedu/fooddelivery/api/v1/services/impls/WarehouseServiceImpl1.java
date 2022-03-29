@@ -61,7 +61,9 @@ public class WarehouseServiceImpl1 implements WarehouseService {
                 return warehouseInfoDTO.getDeliveryZone().covers(geo);
             }
         }).collect(Collectors.toList());
-        if(availableWarehouses.size() == 0) return null;
+        if (availableWarehouses.size() == 0) {
+            throw new NotFoundEx(geo.toString());
+        }
         availableWarehouses.sort(new Comparator<WarehouseInfoDTO>() {
             @Override
             public int compare(WarehouseInfoDTO o1, WarehouseInfoDTO o2) {
