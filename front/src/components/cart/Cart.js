@@ -33,7 +33,6 @@ const Cart = ({auth}) => {
     if (response && response.success) {
       setTotalPrice(response.data);
     } else {
-      console.log(response.error);
       setTotalPrice();
     }
   }
@@ -43,7 +42,6 @@ const Cart = ({auth}) => {
   }
 
   useEffect(() => {
-    console.log(cartItems);
     if (cartItems) {
       fetchCartProducts(cartItems);
       calculateTotalPrice(cartItems);

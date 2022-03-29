@@ -17,9 +17,7 @@ const ProductList = ({auth}) => {
     const responseCount = await productClient.count();
     if (responseCount && responseCount.success) {
       setTotal(responseCount.data.count);
-      console.log(responseCount.data.count);
       const queryString = `?page=${page-1}&size=${pageSize}`;
-      console.log(queryString);
       const response = await productClient.fetchList(queryString);
       if (response && response.success) {
         setProductList(response.data);
@@ -36,7 +34,6 @@ const ProductList = ({auth}) => {
     const responseCount = await productClient.searchCount(phrase);
     if (responseCount && responseCount.success) {
       setTotal(responseCount.data.count);
-      console.log(responseCount.data.count);
       const queryString = page != null ? `?page=${page-1}&size=${pageSize}` : "";
       const response = await productClient.search(phrase, queryString);
       if (response && response.success) {
