@@ -1,6 +1,7 @@
 import ProfileClient from "../api/ProfileClient";
 import {useState, useEffect} from 'react';
-import { List, Card, Layout, Avatar, Menu, Dropdown, Modal, Form, Input } from 'antd';
+import {useNavigate} from "react-router-dom";
+import { List, Card, Layout, Avatar, Menu, Dropdown, Modal, Form, Input} from 'antd';
 import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import FullNameInput from './user_form/FullNameInput';
@@ -26,6 +27,7 @@ const Profile = ({auth}) => {
   const [emailForm] = Form.useForm();
   const [passForm] = Form.useForm();
   const [avatarForm] = Form.useForm();
+  const navigate = useNavigate();
 
   const editMenu = (
     <Menu>
@@ -52,7 +54,7 @@ const Profile = ({auth}) => {
       <Menu.Item key="full">
           Full info
       </Menu.Item>
-      <Menu.Item key="cart">
+      <Menu.Item key="cart" onClick={() => navigate("/profile/cart")}>
           Shoping Cart
       </Menu.Item>
     </Menu>
@@ -224,7 +226,6 @@ const Profile = ({auth}) => {
         </Form>
       </Modal>
 
-      TODO: rewrite. Not working
       <Modal title="Edit avatar"
              visible={isEditAvatarVisible}
              okText="Edit"

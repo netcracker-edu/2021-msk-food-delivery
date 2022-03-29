@@ -1,6 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
 import com.ncedu.fooddelivery.api.v1.dto.CoordsDTO;
+import com.ncedu.fooddelivery.api.v1.dto.CountDTO;
 import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductCreateDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductDTO;
@@ -126,6 +127,42 @@ public class ProductServiceImpl implements ProductService {
         Long warehouseId = getWarehouseIdByCoordinates(searchDTO.getGeo());
         String resultPhrase = preparePhraseToSearch(searchDTO.getPhrase());
         Iterable<Product> products = productRepo.searchProductsInShowcase(resultPhrase, warehouseId,pageable);
+        return createProductsDtoFromIterable(products);
+    }
+
+    @Override
+    public CountDTO getProductsCount(CoordsDTO coordinates) {
+        Long warehouseId = getWarehouseIdByCoordinates(coordinates);
+        int count = productRepo.findAllCount(warehouseId);
+        return new CountDTO(count);
+    }
+
+    @Override
+    public CountDTO getProductsCountInShowcase(CoordsDTO coordinates) {
+        Long warehouseId = getWarehouseIdByCoordinates(coordinates);
+        int countInShowcase = productRepo.findAllByInShowcaseCount(warehouseId);
+        return new CountDTO(countInShowcase);
+    }
+
+    @Override
+    public CountDTO searchCountProducts(SearchProductDTO searchDTO) {
+        Long warehouseId = getWarehouseIdByCoordinates(searchDTO.getGeo());
+        String resultPhrase = preparePhraseToSearch(searchDTO.getPhrase());
+        int count = productRepo.searchProductsCount(resultPhrase, warehouseId);
+        return new CountDTO(count);
+    }
+
+    @Override
+    public CountDTO searchProductsCountInShowcase(SearchProductDTO searchDTO) {
+        Long warehouseId = getWarehouseIdByCoordinates(searchDTO.getGeo());
+        String resultPhrase = preparePhraseToSearch(searchDTO.getPhrase());
+        int countInShowcase = productRepo.searchProductsCountInShowcase(resultPhrase, warehouseId);
+        return new CountDTO(countInShowcase);
+    }
+
+    @Override
+    public List<ProductDTO> getProductsByIds(List<Long> productIds) {
+        Iterable<Product> products = productRepo.findByIds(productIds);
         return createProductsDtoFromIterable(products);
     }
 

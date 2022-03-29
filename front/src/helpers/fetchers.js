@@ -68,6 +68,7 @@ exports.clearTokenFetch = async (url, headers, body, clear) => {
 };
 
 function handleError(error) {
+  console.error(error);
   const err = new Map([
     [TypeError, "Can't connect to server."],
     [SyntaxError, "There was a problem parsing the response."],

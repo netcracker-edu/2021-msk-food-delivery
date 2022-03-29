@@ -10,6 +10,7 @@ class Config {
   SIGNUP_URL = `${this.BASE_PATH}auth/signup`;
   REFRESH_TOKEN_URL = `${this.BASE_PATH}auth/refresh`;
   PROFILE_URL = `${this.BASE_PATH}profile`;
+  PRODUCTS_URL = `${this.BASE_PATH}products`;
   ORDER_URL = `${this.BASE_PATH}order`;
   ORDER_HISTORY_URL = `${this.PROFILE_URL}/orders`;
   ORDERS_AMOUNT_URL = `${this.ORDER_HISTORY_URL}/amount`;
