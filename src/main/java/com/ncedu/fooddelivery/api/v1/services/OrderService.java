@@ -38,4 +38,6 @@ public interface OrderService {
     void changeClientRating(Order order, ChangeRatingDTO dto, User user);
 
     Order findCouriersActiveOrder(Courier courier);
+
+    OrdersAmountDTO getOrdersAmount(User user);
 }

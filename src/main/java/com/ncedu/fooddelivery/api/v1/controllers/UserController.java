@@ -122,6 +122,14 @@ public class UserController {
         return userService.unlockUser(user);
     }
 
+    @DeleteMapping("/api/v1/user/{user}/avatar")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public ResponseEntity<?> deleteAvatar(
+            @PathVariable User targetUser,
+            @AuthenticationPrincipal User authedUser) {
+        userService.deleteAvatar(targetUser, authedUser);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
     @GetMapping("/api/v1/admins")
     @PreAuthorize("hasAuthority('ADMIN')")

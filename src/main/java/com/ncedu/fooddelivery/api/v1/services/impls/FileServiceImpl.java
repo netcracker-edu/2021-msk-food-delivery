@@ -288,6 +288,15 @@ public class FileServiceImpl implements FileService {
         return filesDTO;
     }
 
+    @Override
+    public File getFile(UUID fileUuid) {
+        Optional<File> fileOptional = fileRepo.findById(fileUuid);
+        if (!fileOptional.isPresent()) {
+            throw new NotFoundEx(fileUuid.toString());
+        }
+        return fileOptional.get();
+    }
+
     private FileInfoDTO createFileDTO(File file) {
         String fileLink = createFileLink(file.getId());
         return new FileInfoDTO(file.getId().toString(), file.getType().getMediaType(),

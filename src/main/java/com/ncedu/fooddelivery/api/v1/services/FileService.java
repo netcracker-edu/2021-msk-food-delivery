@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface FileService {
     public FileLinkDTO save(MultipartFile file, User owner);
@@ -17,4 +18,5 @@ public interface FileService {
     public void delete(File file, User authedUser);
     public FileLinkDTO replace(MultipartFile newFile, File oldFile, User authedUser);
     public List<FileInfoDTO> getAllFiles(Pageable pageable);
+    public File getFile(UUID fileUuid);
 }

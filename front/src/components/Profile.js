@@ -3,6 +3,7 @@ import {useState, useEffect} from 'react';
 import {useNavigate} from "react-router-dom";
 import { List, Card, Layout, Avatar, Menu, Dropdown, Modal, Form, Input} from 'antd';
 import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 import FullNameInput from './user_form/FullNameInput';
 import PhoneInput from './user_form/PhoneInput';
 import EmailInput from './user_form/EmailInput';
@@ -48,7 +49,7 @@ const Profile = ({auth}) => {
   const moreMenu = (
     <Menu>
       <Menu.Item key="history">
-          Orders History
+          <Link to="/profile/orderHistory">Order History</Link>
       </Menu.Item>
       <Menu.Item key="full">
           Full info
@@ -224,7 +225,6 @@ const Profile = ({auth}) => {
           <PasswordInputConfirm dependency="newPassword" inputName="newPasswordConfirm"/>
         </Form>
       </Modal>
-
 
       <Modal title="Edit avatar"
              visible={isEditAvatarVisible}

@@ -28,4 +28,7 @@ public interface OrderRepo extends JpaRepository<Order, Long> {
                    "WHERE courier_id = :id AND status NOT IN ('CANCELLED', 'DELIVERED')",
             nativeQuery = true)
     Order findCouriersActiveOrder(@Param(value = "id") Long id);
+
+    @Query(value = "SELECT COUNT(*) FROM orders WHERE courier_id = :id OR client_id = :id", nativeQuery = true)
+    Integer getOrdersAmount(@Param(value = "id") Long userId);
 }
