@@ -48,12 +48,13 @@ const ProductCard = ({ auth, product }) => {
 
         <Title level={5}>
           Цена: {product.discount == 0
-                  ? product.price
+                  ? product.price.toFixed(2)
                   : <>
                       <Text delete type="danger">
-                        {product.price}
+                        {product.price.toFixed(2)}
                       </Text>
-                      {product.price - product.discount}
+                      {" "}
+                      {(product.price - product.discount).toFixed(2)}
                     </>
                 }
         </Title>
