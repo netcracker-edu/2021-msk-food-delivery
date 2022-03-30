@@ -6,20 +6,16 @@ import ProfileClient from '../api/ProfileClient';
 const { Content } = Layout;
 
 
-const LoginForm = ({ auth, setProfile }) => {
+const LoginForm = ({ auth}) => {
   const [errMsg, setErrMsg] = useState();
   const navigate = useNavigate();
 
   const profileClient = new ProfileClient(auth);
 
   const handleFinish = async (values) => {
-    let res = await auth.loginUser(values);
+    const res = await auth.loginUser(values);
     if (res && res.success) {
       setErrMsg(null);
-      res = await profileClient.get();
-      if (res && res.success) {
-        setProfile(res.data);
-      }
       navigate("/");
     } else {
       setErrMsg(

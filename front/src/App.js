@@ -1,5 +1,4 @@
 import useToken from "./hooks/useToken";
-import useProfile from "./hooks/useProfile";
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Layout } from 'antd';
@@ -22,11 +21,12 @@ import History from "./components/deliverySessionComponents/History";
 function App() {
   const { token, setToken } = useToken();
   const auth = new Auth(token, setToken);
-  const { profile, setProfile } = useProfile();
+  const userRole = token?.user.role;
+  
   return (
     <Layout className="App" style={{minHeight: "100vh"}}>
        <Router>
-        <HeaderCustom auth={auth} profile={profile}/>
+        <HeaderCustom auth={auth} userRole={userRole}/>
           <Routes>
             <Route
               path="/"
@@ -34,7 +34,7 @@ function App() {
             />
             <Route
               path="/profile"
-              element={<Profile auth={auth} profile={profile} setProfile={setProfile}/>}
+              element={<Profile auth={auth}/>}
             />
             <Route
                 path="/profile/orderHistory"
@@ -45,7 +45,7 @@ function App() {
                           
             <Route
               path="/signin"
-              element={<LoginForm auth={auth} profile={profile} setProfile={setProfile}/>}
+              element={<LoginForm auth={auth}/>}
             />
             <Route
               path="/signup"
@@ -57,7 +57,7 @@ function App() {
             />
 
             <>
-              {profile?.role === 'COURIER' ? 
+              {userRole === 'COURIER' ? 
                 <Route 
                   path="/deliverySessions"
                 >
