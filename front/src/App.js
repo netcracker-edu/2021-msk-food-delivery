@@ -1,4 +1,5 @@
 import useToken from "./hooks/useToken";
+import useAddress from "./hooks/useAddress";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import { Layout } from 'antd';
@@ -22,12 +23,13 @@ import OrderDetails from "./components/orderComponents/OrderDetails";
 function App() {
   const { token, setToken } = useToken();
   const auth = new Auth(token, setToken);
+  const { address, setAddress } = useAddress();
 
   return (
     <Layout className="App" style={{minHeight: "100vh"}}>
        <Router>
         <CartContextProvider>
-        <HeaderCustom auth={auth} />
+        <HeaderCustom auth={auth} address={address} setAddress={setAddress} />
           <Routes>
             <Route
               path="/"
@@ -44,14 +46,14 @@ function App() {
                 <Route index={false} path=':orderId' element={<OrderDetails auth={auth} />}/>
               </Route>
             </Route>
-            
+
             <Route
               path="/profile/cart"
               element={<Cart auth={auth}/>}
             />
             <Route
               path="/products"
-              element={<ProductList auth={auth}/>}
+              element={<ProductList auth={auth} address={address} setAddress={setAddress}/>}
             />
             <Route
               path="/signin"
@@ -63,7 +65,7 @@ function App() {
             />
             <Route
               path="/signout"
-              element={<Logout auth={auth}/>}
+              element={<Logout auth={auth} setAddress={setAddress}/>}
             />
             <Route path="*" element={<NotFound/>} />
           </Routes>

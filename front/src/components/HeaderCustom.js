@@ -8,12 +8,11 @@ import { useCartContext } from "../hooks/CartContext";
 const { Header } = Layout;
 const { Item, SubMenu } = Menu;
 
-const HeaderCustom = ({ auth }) => {
+const HeaderCustom = ({ auth, address, setAddress }) => {
   const { cartItems } = useCartContext();
   const warehouseClient = new WarehouseClient(auth);
   const [isMapVisible, setIsMapVisible] = useState(false);
   const defaultMapState = { center: [55.76, 37.64], zoom: 10, controls: [] };
-  const [placemark, setPlacemark] = useState({});
   const [mapState, setMapState] = useState(defaultMapState);
   const [errorMsg, setErrorMsg] = useState();
   const [yaMaps, setYaMaps] = useState();
@@ -65,13 +64,13 @@ const HeaderCustom = ({ auth }) => {
           if (response && response.success) {
             console.log(response.data);
             const warehouseId = response.data.id;
-            setPlacemark({fullAddress, shortAddress, coord, warehouseId});
+            setAddress({fullAddress, shortAddress, coord, warehouseId});
             setMapState({center: coord, zoom: 17, controls: []});
             setErrorMsg(null);
           } else {
             setErrorMsg("Доставка в указанную зону недоступна.");
             setMapState(defaultMapState);
-            setPlacemark({});
+            setAddress({});
           }
         }
   }
@@ -111,9 +110,9 @@ const HeaderCustom = ({ auth }) => {
           }
           {auth.token ? (
             <Item key={5} onClick={()=>setIsMapVisible(true)}>
-              {placemark && Object.keys(placemark).length == 0
+              {address && Object.keys(address).length == 0
                 ? <>Address</>
-                : <>{placemark.shortAddress}</>
+                : <>{address.shortAddress}</>
               }
             </Item>)
             : <></>
@@ -125,10 +124,14 @@ const HeaderCustom = ({ auth }) => {
           </Item>
         </Menu>
       <Modal
-              width={700}
-              centered={true}
-             title="Delivery address"
-             visible={isMapVisible}
+             width={700}
+             centered={true}
+             title={
+               address && Object.keys(address).length == 0
+               ? "Select delivery address"
+               : "Edit delivery address"
+             }
+             visible={isMapVisible || (auth.token && address && Object.keys(address).length == 0)}
              okText="Choose"
              onCancel = {() => setIsMapVisible(false)}
              onOk = {() => setIsMapVisible(false)}
@@ -138,7 +141,7 @@ const HeaderCustom = ({ auth }) => {
         <button onClick={() => onAddressSelect()}>Применить</button>
         <button onClick={() =>
             {setMapState(defaultMapState);
-              setPlacemark({});
+              setAddress({});
               setErrorMsg(null);
               searchRef.current.value = '';}}>Удалить</button>
         <YMaps
@@ -154,9 +157,9 @@ const HeaderCustom = ({ auth }) => {
             onLoad={onYmapsLoad}
             instanceRef={m => (map = m)}
           >
-            {placemark && Object.keys(placemark).length == 0
+            {address && Object.keys(address).length == 0
               ? <></>
-              : <Placemark geometry={placemark.coord} />
+              : <Placemark geometry={address.coord} />
             }
           </Map>
         </YMaps>
