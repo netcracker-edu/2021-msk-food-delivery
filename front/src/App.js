@@ -17,6 +17,7 @@ import OrderDetails from "./components/orderComponents/OrderDetails";
 
 import './App.css';
 import WarehouseList from "./components/warehouseComponents/WarehouseList";
+import PendingOrders from "./components/warehouseComponents/PendingOrders";
 
 
 function App() {
@@ -31,32 +32,38 @@ function App() {
           <Routes>
             <Route
               path="/"
+              exact
               element={<Home auth={auth}/>}
             />
             <Route
               path="/profile"
               element={<Profile auth={auth}/>}
             />
+
+            <Route path="/order" />          
+            
+            <Route path="/order/:orderId" element={<OrderDetails auth={auth} />}/>
+
             <Route
-                path="/profile/orderHistory"
-              >
-                <Route index={true} element={<OrderHistory auth={auth}/>}/>
-                <Route index={false} path=':orderId' element={<OrderDetails auth={auth} />}/>
+              path="/profile/orderHistory"
+            >
+              <Route index={true} element={<OrderHistory auth={auth}/>}/>
             </Route>
 
             <>{
-              userRole === "ADMIN" || userRole === "MODERATOR" ? 
+              userRole === "ADMIN" || userRole === "MODERATOR" ?
               <Route path="/warehouses">
                 {userRole === 'ADMIN' ?   
                   <Route 
                   index={true} element={<WarehouseList auth={auth}/>}
                   /> : <></>
                 }                
-                  <Route index={false} path=':warehouseId'/>
+                  <Route index={false} path=':warehouseId' element={<PendingOrders auth={auth} />} />
               </Route>
               : <></>  
-            }</>
-            
+              }
+            </>
+
             <Route
               path="/signin"
               element={<LoginForm auth={auth}/>}

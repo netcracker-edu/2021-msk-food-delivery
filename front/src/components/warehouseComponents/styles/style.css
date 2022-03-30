@@ -21,3 +21,14 @@
     flex-basis: 30%;
     height: 100%;
 }
+
+
+.pending_orders_wrapper{
+    width: 80%;
+    margin: 10px auto;
+    flex-grow: 1;
+}
+
+.ant-collapse-item{
+    border-radius: 10px;
+}

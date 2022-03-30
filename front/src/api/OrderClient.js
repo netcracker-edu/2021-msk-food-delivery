@@ -43,7 +43,27 @@ export default class OrderClient{
         this.config.headersWithAuthorization(), null);
     }   
 
+    async fetchFilteredOrderPage(warehouseId, status, page, size){
+        await this.checkToken();
+        return commonFetch(this.buildFilterQuery(warehouseId, status, page, size), 'GET', 
+        this.config.headersWithAuthorization(), null);    
+    }
+
+    async fetchFilteredAmount(warehouseId, status, page, size){
+        await this.checkToken();
+        return commonFetch(this.buildFilterAmountQuery(warehouseId, status, page, size), 'GET', 
+        this.config.headersWithAuthorization(), null);
+    }
+
     buildPaginationQuery(page, size){
         return this.config.ORDER_HISTORY_URL + `?page=${page - 1}&size=${size}`;
+    }
+
+    buildFilterQuery(warehouseId, status, page, size){
+        return this.config.FILTER_ORDERS_URL + `?warehouseId=${warehouseId}&status=${status}&page=${page - 1}&size=${size}`;
+    }
+
+    buildFilterAmountQuery(warehouseId, status, page, size){
+        return this.config.AMOUNT_FILTER_ORDERS_URL + `?warehouseId=${warehouseId}&status=${status}&page=${page - 1}&size=${size}`;
     }
 }

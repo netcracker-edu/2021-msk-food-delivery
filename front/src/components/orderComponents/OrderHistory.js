@@ -4,6 +4,7 @@ import OrderHistoryCard from './OrderHistoryCard';
 import './styles/style.css';
 import { useLocation } from 'react-router-dom';
 import OrderClient from '../../api/OrderClient';
+import OrderRowColList from './OrderRowColList';
 
 const OrderHistory = ({auth}) => {
 
@@ -53,10 +54,8 @@ const OrderHistory = ({auth}) => {
       {isLoading ? <></> : !orders.length ? 
         <div className='empty_wrapper'><Empty description='No orders currently'/></div> :
       <>
-        <Row gutter={[0, 24]}>          
-          {orders.map((order) => <Col span={24}><OrderHistoryCard order={order} 
-          page={page} size={size}/></Col>)}
-        </Row>
+
+        <OrderRowColList page={page} size={size} orders={orders} />
 
         <div className='pagination' style={{margin: '15px 0'}}>
           <Pagination showSizeChanger current={page} onChange={onPageChange} 

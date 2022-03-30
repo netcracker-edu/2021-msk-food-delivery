@@ -32,8 +32,15 @@ public class OrderController {
             @Valid OrderFilterDTO dto,
             @AuthenticationPrincipal User user,
             Pageable pageable){
-
         return new ResponseEntity<>(orderService.findFiltered(user, dto, pageable), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
+    @GetMapping("/api/v1/orders/amount")
+    public ResponseEntity<OrdersAmountDTO> findFilteredAmount(
+            @Valid OrderFilterDTO dto,
+            @AuthenticationPrincipal User user){
+        return new ResponseEntity<>(orderService.findFilteredAmount(user, dto), HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")

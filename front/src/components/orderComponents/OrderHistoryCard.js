@@ -1,9 +1,9 @@
 import React from "react";
 import { Card, Tag, Descriptions, Row, Col, Divider } from "antd";
-import { useNavigate, useLocation} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import './styles/style.css';
 
-const OrderItem = (props) => {
+const OrderHistoryCard = (props) => {
     const statusTagMap = new Map();
     statusTagMap.set('CREATED', ['cyan', 'Created']);
     statusTagMap.set('COURIER_APPOINTED', ['blue', 'Courier is appointed']);
@@ -12,16 +12,16 @@ const OrderItem = (props) => {
     statusTagMap.set('DELIVERED', ['green', 'Delivered']);
     statusTagMap.set('CANCELLED', ['red', 'Cancelled']);
     
-    const {order, page, size} = {...props}; 
+    const {order, page, size, customPrevPath} = {...props}; 
     const navigate = useNavigate();
-    const location = useLocation();
-    
+
     return (
         <>
         <Card hoverable className='order_history_card'
-        onClick={() => navigate(`${location.pathname}/${order.id}`, { state : {
+        onClick={() => navigate(`/order/${order.id}`, { state : {
             page: page,
-            size: size
+            size: size,
+            prevPath: customPrevPath != null? customPrevPath : '/profile/orderHistory',
         }})}>
         <Row justify="space-between" className="order_card_header">
                 <Col>{`Order №${order.id}`}</Col>
@@ -58,4 +58,4 @@ const OrderItem = (props) => {
     );
 }
 
-export default OrderItem;
+export default OrderHistoryCard;
