@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
 import { YMaps, Map, Placemark  } from 'react-yandex-maps';
 import WarehouseClient from '../api/WarehouseClient.js';
-import { Layout, Menu, Modal, Button, Alert, Row, Col, Badge, Typography } from 'antd';
+import { Layout, Menu, Modal, Button, Alert, Row, Col, Badge, Typography, Input } from 'antd';
+import { CloseOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useCartContext } from "../hooks/CartContext";
 
@@ -126,6 +127,7 @@ const HeaderCustom = ({ auth, address, setAddress }) => {
       <Modal
              width={700}
              centered={true}
+             footer={null}
              title={
                address && Object.keys(address).length == 0
                ? "Select delivery address"
@@ -136,14 +138,35 @@ const HeaderCustom = ({ auth, address, setAddress }) => {
              onCancel = {() => setIsMapVisible(false)}
              onOk = {() => setIsMapVisible(false)}
       >
+        <Row justify="center">
+        <Col>
         {errorMsg ? <Alert message={errorMsg} type="error"/> : <></>}
-        <input style={{width:450}} ref={searchRef} placeholder="Введите адрес доставки." />
-        <button onClick={() => onAddressSelect()}>Применить</button>
-        <button onClick={() =>
-            {setMapState(defaultMapState);
-              setAddress({});
-              setErrorMsg(null);
-              searchRef.current.value = '';}}>Удалить</button>
+
+            <span className="ant-input-group-wrapper" style={{width:600}}>
+              <span className="ant-input-wrapper ant-input-group">
+                <input  className="ant-input" ref={searchRef}
+                        placeholder="Введите адрес доставки."
+                />
+                <span className="ant-input-group-addon">
+                  <Typography.Link
+                    onClick={() =>
+                    {setMapState(defaultMapState);
+                      setAddress({});
+                      setErrorMsg(null);
+                      searchRef.current.value = '';}}
+                  >
+                    <CloseOutlined style={{ fontSize: '20px' }} />
+                  </Typography.Link>
+
+                </span>
+                <span className="ant-input-group-addon">
+                  <Typography.Link onClick={() => onAddressSelect()}>
+                    Choose
+                  </Typography.Link>
+                </span>
+              </span>
+            </span>
+        <br/><br/>
         <YMaps
           query={
             { load: "package.full",
@@ -163,6 +186,8 @@ const HeaderCustom = ({ auth, address, setAddress }) => {
             }
           </Map>
         </YMaps>
+        </Col>
+        </Row>
       </Modal>
     </Header>
   );
