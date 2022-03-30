@@ -2,24 +2,17 @@ import { Form, Input, Button, Alert, Layout, Card } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useNavigate, Link } from "react-router-dom";
-import ProfileClient from '../api/ProfileClient';
 const { Content } = Layout;
 
 
-const LoginForm = ({ auth, setProfile }) => {
+const LoginForm = ({ auth }) => {
   const [errMsg, setErrMsg] = useState();
   const navigate = useNavigate();
 
-  const profileClient = new ProfileClient(auth);
-  
   const handleFinish = async (values) => {
-    let res = await auth.loginUser(values);
+    const res = await auth.loginUser(values);
     if (res && res.success) {
       setErrMsg(null);
-      res = await profileClient.get();
-      if (res && res.success) {
-        setProfile(res.data);
-      }
       navigate("/");
     } else {
       setErrMsg(

@@ -1,5 +1,4 @@
 import useToken from "./hooks/useToken";
-import useProfile from "./hooks/useProfile";
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Layout } from 'antd';
@@ -23,12 +22,12 @@ import WarehouseList from "./components/warehouseComponents/WarehouseList";
 function App() {
   const { token, setToken } = useToken();
   const auth = new Auth(token, setToken);
-  const { profile, setProfile } = useProfile();
+  const userRole = token?.user.role;
 
   return (
     <Layout className="App" style={{minHeight: "100vh"}}>
        <Router>
-          <HeaderCustom auth={auth} profile={profile}/>
+          <HeaderCustom auth={auth} user={token?.user}/>
           <Routes>
             <Route
               path="/"
@@ -36,33 +35,31 @@ function App() {
             />
             <Route
               path="/profile"
-              element={<Profile auth={auth} profile={profile} setProfile={setProfile}/>}
-            >
-              <Route index={true} element={<Profile auth={auth}/>} />
-              <Route
+              element={<Profile auth={auth}/>}
+            />
+            <Route
                 path="/profile/orderHistory"
               >
                 <Route index={true} element={<OrderHistory auth={auth}/>}/>
                 <Route index={false} path=':orderId' element={<OrderDetails auth={auth} />}/>
-              </Route>
             </Route>
 
             <>{
-              profile?.role === 'ADMIN' ? 
-                <Route 
-                path='/warehouses'
-                >
+              userRole === "ADMIN" || userRole === "MODERATOR" ? 
+              <Route path="/warehouses">
+                {userRole === 'ADMIN' ?   
                   <Route 
                   index={true} element={<WarehouseList auth={auth}/>}
-                  />
-                </Route>
-              : profile?.role === 'MODERATOR' ? 
-                <Route path={`/warehouses/${profile.warehouseId}`}/> : <></>
+                  /> : <></>
+                }                
+                  <Route index={false} path=':warehouseId'/>
+              </Route>
+              : <></>  
             }</>
             
             <Route
               path="/signin"
-              element={<LoginForm auth={auth} profile={profile} setProfile={setProfile}/>}
+              element={<LoginForm auth={auth}/>}
             />
             <Route
               path="/signup"
@@ -70,7 +67,7 @@ function App() {
             />
             <Route
               path="/signout"
-              element={<Logout auth={auth} setProfile={setProfile}/>}
+              element={<Logout auth={auth} />}
             />
             <Route path="*" element={<NotFound/>} />
           </Routes>

@@ -1,5 +1,5 @@
 import ProfileClient from "../api/ProfileClient";
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import { List, Card, Layout, Avatar, Menu, Dropdown, Modal, Form, Input } from 'antd';
 import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
@@ -12,10 +12,11 @@ import PasswordInputConfirm from './user_form/PasswordInputConfirm';
 const { Meta } = Card;
 const { Content } = Layout;
 
-const Profile = ({auth, profile, setProfile}) => {
+const Profile = ({auth}) => {
   const AVATAR_BASE = "http://localhost:8080/api/v1/file/";
 
   const profileClient = new ProfileClient(auth);
+  const [profile, setProfile] = useState({});
   const [isEditInfoVisible, setIsEditInfoVisible] = useState(false);
   const [isEditEmailVisible, setIsEditEmailVisible] = useState(false);
   const [isEditPassVisible, setIsEditPassVisible] = useState(false);
@@ -83,6 +84,10 @@ const Profile = ({auth, profile, setProfile}) => {
       console.error(response.error);
     }
   }
+
+  useEffect(() => {
+    getProfile();
+  }, []);
 
   return (
     <Content className="wrapper">
