@@ -13,36 +13,31 @@ export default class OrderClient{
             await this.auth.refreshToken();
         }
     }
-  
-    async calculateTotalPrice(cartItems) {
+
+    async calculateTotalPrice(cartItems, coords, warehouseId) {
       if (this.config.tokenExpired()) {
         await this.auth.refreshToken();
       }
-      const geo = {
-        "lat" : 55.809327,
-        "lon" : 37.632502,
-      };
-      const warehouseId = 4;
       return commonFetch(this.config.ORDER_URL+"/price",
                     "POST",
                     this.config.headersWithAuthorization(),
                     JSON.stringify(
                         {
-                          "geo" : geo,
+                          "geo" : coords,
                           "warehouseId" : warehouseId,
                           "products" : cartItems
                         }));
     }
-  
+
     async getOrderById(id){
         this.checkToken();
-        return await commonFetch(this.config.ORDER_URL + `/${id}`, 'GET', 
+        return await commonFetch(this.config.ORDER_URL + `/${id}`, 'GET',
         this.config.headersWithAuthorization(), null);
     }
 
     async changeOrderStatus(orderId, newStatus){
         this.checkToken();
-        return await patchFetch(this.config.ORDER_URL + `/${orderId}/status`, 
+        return await patchFetch(this.config.ORDER_URL + `/${orderId}/status`,
         this.config.headersWithAuthorization(), JSON.stringify({newStatus: newStatus}));
     }
 
@@ -59,9 +54,9 @@ export default class OrderClient{
 
     async fetchOrderPage(page, size){
         this.checkToken();
-        return await commonFetch(this.buildPaginationQuery(page, size), 'GET', 
+        return await commonFetch(this.buildPaginationQuery(page, size), 'GET',
         this.config.headersWithAuthorization(), null);
-    }   
+    }
 
     buildPaginationQuery(page, size){
         return this.config.ORDER_HISTORY_URL + `?page=${page - 1}&size=${size}`;

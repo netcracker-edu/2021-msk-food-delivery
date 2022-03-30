@@ -49,11 +49,11 @@ function App() {
 
             <Route
               path="/profile/cart"
-              element={<Cart auth={auth}/>}
+              element={<Cart auth={auth} address={address}/>}
             />
             <Route
               path="/products"
-              element={<ProductList auth={auth} address={address} setAddress={setAddress}/>}
+              element={<ProductList auth={auth} address={address}/>}
             />
             <Route
               path="/signin"
