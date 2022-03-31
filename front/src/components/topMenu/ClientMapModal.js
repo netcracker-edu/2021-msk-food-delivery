@@ -14,7 +14,7 @@ const ClientMapModal = ({auth, isMapVisible, setIsMapVisible,
   const [errorMsg, setErrorMsg] = useState();
   const [yaMaps, setYaMaps] = useState();
   const searchRef = useRef(null);
-  let map;
+  const [map, setMap] = useState();
 
   const onYmapsLoad = ymaps => {
     setYaMaps(ymaps);
@@ -25,7 +25,6 @@ const ClientMapModal = ({auth, isMapVisible, setIsMapVisible,
     const fullAddress = searchRef.current.value;
     console.log(fullAddress);
     console.log(yaMaps);
-    console.log(map);
     const result = await yaMaps.geocode(fullAddress);
         let geoObject = result.geoObjects.get(0),
                   error,
@@ -84,8 +83,9 @@ const ClientMapModal = ({auth, isMapVisible, setIsMapVisible,
              }
              visible={isMapVisible || (auth.token && address && Object.keys(address).length == 0)}
              okText="Choose"
-             onCancel = {() => setIsMapVisible(false)}
-             onOk = {() => setIsMapVisible(false)}
+             onCancel = {() => {setIsMapVisible(false);
+                                searchRef.current.value = address.fullAddress;}
+                        }
       >
         <Row justify="center">
         <Col>
@@ -95,7 +95,6 @@ const ClientMapModal = ({auth, isMapVisible, setIsMapVisible,
               <span className="ant-input-wrapper ant-input-group">
                 <input  className="ant-input" ref={searchRef}
                         placeholder="Введите адрес доставки."
-                        value={address ? address.fullAddress : ''}
                 />
                 <span className="ant-input-group-addon">
                   <Link
@@ -128,7 +127,7 @@ const ClientMapModal = ({auth, isMapVisible, setIsMapVisible,
             height={500}
             state={mapState}
             onLoad={onYmapsLoad}
-            instanceRef={m => (map = m)}
+            instanceRef={m => setMap(m)}
           >
             {address && Object.keys(address).length == 0
               ? <></>
