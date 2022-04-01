@@ -62,7 +62,7 @@ build/
 .DS_Store
 
 ### FILES STORAGE ###
-
+/files/
 ### LOGS STORAGE ###
 /logs/
 ### FILES STORAGE FOR TESTS ###
