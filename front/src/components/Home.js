@@ -2,7 +2,6 @@ import { Layout, Button } from 'antd';
 const { Content } = Layout;
 
 const Home = ({ auth }) => {
-
   const handleRefreshToken = async (event) => {
     let response = await auth.refreshToken();
     if (response.success) {

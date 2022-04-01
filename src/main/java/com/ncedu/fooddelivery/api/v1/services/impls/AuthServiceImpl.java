@@ -4,8 +4,7 @@ import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.jwt.JwtRequestDTO;
 import com.ncedu.fooddelivery.api.v1.dto.jwt.JwtResponseDTO;
 import com.ncedu.fooddelivery.api.v1.dto.jwt.RefreshTokenDTO;
-import com.ncedu.fooddelivery.api.v1.dto.user.NewUserDTO;
-import com.ncedu.fooddelivery.api.v1.dto.user.UserInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.user.*;
 import com.ncedu.fooddelivery.api.v1.entities.*;
 import com.ncedu.fooddelivery.api.v1.errors.badrequest.RefreshTokenException;
 import com.ncedu.fooddelivery.api.v1.filters.JwtUtil;
@@ -137,8 +136,28 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private UserInfoDTO createUserDTO(User user) {
-        return new UserInfoDTO(user.getId(), user.getRole().name(),
-                user.getFullName(), user.getEmail(),
-                user.getLastSigninDate(), user.getAvatarId());
+        switch (user.getRole()){
+            case MODERATOR:
+                return new ModeratorInfoDTO(user.getId(), user.getRole().name(),
+                        user.getFullName(), user.getEmail(),
+                        user.getLastSigninDate(), user.getAvatarId(), user.getModerator().getWarehouseId());
+            case COURIER:
+                Courier courier = user.getCourier();
+                return new CourierInfoDTO(user.getId(), user.getRole().name(),
+                        user.getFullName(), user.getEmail(),
+                        user.getLastSigninDate(), user.getAvatarId(), courier.getPhoneNumber(),
+                        courier.getRating(), courier.getWarehouse().getId(), courier.getAddress(),
+                        courier.getCurrentBalance());
+            case CLIENT:
+                Client client = user.getClient();
+                return new ClientInfoDTO(user.getId(), user.getRole().name(),
+                        user.getFullName(), user.getEmail(),
+                        user.getLastSigninDate(), user.getAvatarId(), client.getPhoneNumber(),
+                        client.getRating());
+            default:
+                return new UserInfoDTO(user.getId(), user.getRole().name(),
+                        user.getFullName(), user.getEmail(),
+                        user.getLastSigninDate(), user.getAvatarId());
+        }
     }
 }
