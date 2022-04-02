@@ -1,13 +1,15 @@
-import { Layout } from 'antd';
+import { Layout, Menu} from 'antd';
+import { Link } from 'react-router-dom';
 import ClientMenu from "./topMenu/ClientMenu.js";
 import GuestMenu from "./topMenu/GuestMenu.js";
 import AdminMenu from "./topMenu/AdminMenu.js";
 
 const { Header } = Layout;
+const { Item } = Menu;
 
 const HeaderCustom = ({ auth, address, setAddress }) => {
   const userRole = auth.token?.user.role;
-  
+
   const renderSwitch = param => {
     switch (param) {
       case 'CLIENT':
@@ -27,8 +29,8 @@ const HeaderCustom = ({ auth, address, setAddress }) => {
     <Header>
         {auth.token && userRole === 'CLIENT'
           ? renderSwitch(auth.token.user.role)
-          : auth.token && userRole === 'COURIER' 
-              ? 
+          : auth.token && userRole === 'COURIER'
+              ?
                 (<Menu theme="dark" mode="horizontal">
                     <Item key="home">
                       <Link to="/">Home</Link>
@@ -41,9 +43,9 @@ const HeaderCustom = ({ auth, address, setAddress }) => {
                     </Item>
                     <Item key="sign">
                       <Link to="/signout">
-                        "SignOut"
+                        SignOut
                       </Link>
-                    </Item> 
+                    </Item>
                   </Menu>
                 )
               : renderSwitch('')
