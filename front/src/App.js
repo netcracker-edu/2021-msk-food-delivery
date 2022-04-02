@@ -13,6 +13,10 @@ import NotFound from "./components/NotFound";
 import Profile from "./components/Profile";
 import Logout from "./components/Logout";
 import RegistrationForm from "./components/RegistrationForm";
+
+import ProductList from "./components/products/ProductList";
+import Cart from "./components/cart/Cart";
+import { CartContextProvider } from "./hooks/CartContext";
 import OrderHistory from "./components/orderComponents/OrderHistory";
 import OrderDetails from "./components/orderComponents/OrderDetails";
 import SessionDetails from "./components/deliverySessionComponents/SessionDetails";
@@ -26,7 +30,9 @@ function App() {
   return (
     <Layout className="App" style={{minHeight: "100vh"}}>
        <Router>
-        <HeaderCustom auth={auth} userRole={userRole}/>
+
+        <CartContextProvider>
+        <HeaderCustom auth={auth} />
           <Routes>
             <Route
               path="/"
@@ -43,6 +49,14 @@ function App() {
                 <Route index={false} path=':orderId' element={<OrderDetails auth={auth} />}/>
             </Route>
                           
+            <Route
+              path="/profile/cart"
+              element={<Cart auth={auth}/>}
+            />
+            <Route
+              path="/products"
+              element={<ProductList auth={auth}/>}
+            />
             <Route
               path="/signin"
               element={<LoginForm auth={auth}/>}
@@ -69,6 +83,7 @@ function App() {
             
             <Route path="*" element={<NotFound/>} />
           </Routes>
+        </CartContextProvider>
         <FooterCustom />
       </Router>
     </Layout>

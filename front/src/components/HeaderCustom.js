@@ -1,9 +1,14 @@
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Badge, Typography } from 'antd';
 import { Link } from 'react-router-dom';
+import { useCartContext } from "../hooks/CartContext";
+
 const { Header } = Layout;
 const { Item } = Menu;
+const { Text } = Typography;
 
-const HeaderCustom = ({ auth, userRole }) => {
+const HeaderCustom = ({ auth }) => {
+  const { cartItems } = useCartContext();
+  const userRole = auth.token?.user.role;
   return (
     <Header>
       <Menu theme="dark" mode="horizontal">
@@ -17,16 +22,44 @@ const HeaderCustom = ({ auth, userRole }) => {
           : <></>
         }
         { auth.token && userRole === 'COURIER' ? 
+          <>
           <Item key={3}>
             <Link to="/deliverySessions">Deliveries</Link>
           </Item>
+          <Item key={auth.token ? (userRole === "COURIER" ? 4 : 3) : 2}>
+            <Link to={auth.token ? "/signout" : "/signin"}>
+              {auth.token ? "SignOut" : "SignIn"}
+            </Link>
+          </Item>  
+            </>
+            :
+            
+        {auth.token ? (
+          <Item key={3}>
+            <Link to="/products">Products</Link>
+          </Item>)
           : <></>
         }
-        <Item key={auth.token ? (userRole === "COURIER" ? 4 : 3) : 2}>
+        {auth.token ? (
+          <Item key={4}>
+              <Link to="/profile/cart">
+                Cart
+                {
+                  cartItems == null
+                    ? <></>
+                    : <Badge style={{margin:"0px 0px 20px 0px"}} size="small"
+                          count={Object.keys(cartItems).length} />
+                }
+              </Link>
+          </Item>)
+          : <></>
+        }
+        <Item key={auth.token ? 5 : 2}>
           <Link to={auth.token ? "/signout" : "/signin"}>
             {auth.token ? "SignOut" : "SignIn"}
           </Link>
         </Item>
+        }
       </Menu>
     </Header>
   );

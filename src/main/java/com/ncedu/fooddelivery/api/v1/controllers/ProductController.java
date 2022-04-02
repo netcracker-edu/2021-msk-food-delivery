@@ -1,6 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
 import com.ncedu.fooddelivery.api.v1.dto.CoordsDTO;
+import com.ncedu.fooddelivery.api.v1.dto.CountDTO;
 import com.ncedu.fooddelivery.api.v1.dto.SearchDTO;
 import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.product.ProductCreateDTO;
@@ -25,6 +26,7 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -102,6 +104,60 @@ public class ProductController {
             return productService.getProductsInShowcase(coordinates, pageable);
         }
         return productService.getProducts(coordinates, pageable);
+    }
+
+    @PostMapping("/api/v1/products")
+    public List<ProductDTO> getProductsWithPost(
+            @Valid @RequestBody CoordsDTO coordinates,
+            @PageableDefault(sort = { "product_id" }, direction = Sort.Direction.ASC) Pageable pageable,
+            @AuthenticationPrincipal User authedUser) {
+        String authedUserRole = authedUser.getRole().name();
+        if (Role.isCLIENT(authedUserRole)) {
+            return productService.getProductsInShowcase(coordinates, pageable);
+        }
+        return productService.getProducts(coordinates, pageable);
+    }
+
+    @PostMapping("/api/v1/products/count")
+    public CountDTO getProductsCountWithPost(
+            @Valid @RequestBody CoordsDTO coordinates,
+            @AuthenticationPrincipal User authedUser) {
+        String authedUserRole = authedUser.getRole().name();
+        if (Role.isCLIENT(authedUserRole)) {
+            return productService.getProductsCountInShowcase(coordinates);
+        }
+        return productService.getProductsCount(coordinates);
+    }
+
+    @PostMapping("/api/v1/products/search")
+    public List<ProductDTO> searchProductsWithPost(
+            @Valid @RequestBody SearchProductDTO searchDTO,
+            @PageableDefault Pageable pageable,
+            @AuthenticationPrincipal User authedUser) {
+        String authedUserRole = authedUser.getRole().name();
+        if (Role.isCLIENT(authedUserRole)) {
+            return productService.searchProductsInShowcase(searchDTO, pageable);
+        }
+        return productService.searchProducts(searchDTO, pageable);
+    }
+
+    @PostMapping("/api/v1/products/search/count")
+    public CountDTO searchProductsCountWithPost(
+            @Valid @RequestBody SearchProductDTO searchDTO,
+            @AuthenticationPrincipal User authedUser) {
+        String authedUserRole = authedUser.getRole().name();
+        if (Role.isCLIENT(authedUserRole)) {
+            return productService.searchProductsCountInShowcase(searchDTO);
+        }
+        return productService.searchCountProducts(searchDTO);
+    }
+
+    @PostMapping("/api/v1/products/cart")
+    public List<ProductDTO> getProductsFromCartWithPost(
+            @RequestBody HashMap<Long, Integer> productAmountPairs,
+            @AuthenticationPrincipal User authedUser) {
+        List<Long> productIds = productAmountPairs.entrySet().stream().map((entry) -> entry.getKey()).collect(Collectors.toList());
+        return productService.getProductsByIds(productIds);
     }
 
     @GetMapping("/api/v1/products/search")

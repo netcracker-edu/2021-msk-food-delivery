@@ -78,6 +78,12 @@ public class OrderController {
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
+    @PostMapping("/api/v1/order/price")
+    public ResponseEntity<CountOrderCostResponseDTO> countOrderCostWithPost(@Valid @RequestBody CountOrderCostRequestDTO requestDTO){
+        CountOrderCostResponseDTO responseDTO = orderService.countOrderCost(requestDTO);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
     @PreAuthorize("hasAuthority('CLIENT')")
     @PostMapping("/api/v1/order")
     public ResponseEntity<areCreatedDTO> createOrder(@AuthenticationPrincipal User user,
