@@ -124,6 +124,17 @@ public class OrderServiceImpl1 implements OrderService {
     }
 
     @Override
+    public List<OrderInfoDTO> getOrdersFromDeliverySession(User courier, DeliverySession deliverySession) {
+        if(!courier.getId().equals(deliverySession.getCourier().getId())) throw new CustomAccessDeniedException();
+        LocalDateTime endTime = deliverySession.getEndTime() == null ? LocalDateTime.now() : deliverySession.getEndTime();
+        return orderRepo.getOrdersByCourierIdAndTime(courier.getId(),
+                deliverySession.getStartTime(),
+                endTime)
+                .stream().map(order -> convertToOrderInfoDTO(order))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Double[] countOrderCost(CoordsDTO geo,
                                    HashMap<Long, Integer> pairs, Long clientWarehouseId) {
         WarehouseInfoDTO warehouse = warehouseService.getNearestWarehouse(geo.getLat(), geo.getLon());
@@ -401,6 +412,13 @@ public class OrderServiceImpl1 implements OrderService {
                     (ps.getProduct().getPrice() - ps.getProduct().getDiscount()) * amount));
         }
         return order;
+    }
+
+    @Override
+    public OrderInfoDTO getCurrentOrder(User user) {
+        Order o = this.findCouriersActiveOrder(user.getCourier());
+        if(o == null) return null;
+        return convertToOrderInfoDTO(o);
     }
 
     private List<ProductPosition> getSortedProductPositions(Map<Long, Integer> productPosAmountMap){

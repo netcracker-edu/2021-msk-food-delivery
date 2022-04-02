@@ -65,7 +65,7 @@ public class FileController {
                     .body(resource);
     }
 
-    @PutMapping("/api/v1/file/{file}")
+    @PutMapping("/api/v1/newfile/{file}")
     public FileLinkDTO replace(
             @PathVariable File file,
             @RequestParam("newFile") MultipartFile newFile,

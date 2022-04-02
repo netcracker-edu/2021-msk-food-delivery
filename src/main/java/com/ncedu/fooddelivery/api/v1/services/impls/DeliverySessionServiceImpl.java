@@ -1,6 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.services.impls;
 
 import com.ncedu.fooddelivery.api.v1.dto.deliverySession.DeliverySessionInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.deliverySession.DeliverySessionsAmountDTO;
 import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.user.CourierInfoDTO;
 import com.ncedu.fooddelivery.api.v1.entities.*;
@@ -109,6 +110,11 @@ public class DeliverySessionServiceImpl implements DeliverySessionService {
         if(user.getRole() == Role.MODERATOR) checkModeratorAccess(user.getModerator(), targetUser.getCourier());
         return deliverySessionRepo.getSessionsByCourierId(targetUser.getId(), pageable).stream()
                 .map(session -> convertToInfoDto(session)).collect(Collectors.toList());
+    }
+
+    @Override
+    public DeliverySessionsAmountDTO getAmount(User user) {
+        return new DeliverySessionsAmountDTO(this.deliverySessionRepo.getAmountByCourierId(user.getId()));
     }
 
     @Override

@@ -18,6 +18,7 @@ const Profile = ({auth}) => {
 
   const profileClient = new ProfileClient(auth);
   const [profile, setProfile] = useState({});
+
   const [isEditInfoVisible, setIsEditInfoVisible] = useState(false);
   const [isEditEmailVisible, setIsEditEmailVisible] = useState(false);
   const [isEditPassVisible, setIsEditPassVisible] = useState(false);
@@ -112,7 +113,7 @@ const Profile = ({auth}) => {
         <Meta
           avatar = {<Avatar size={100}
                     src={profile?.avatarId == null
-                          ? AVATAR_BASE+"62bbb602-08b0-4b60-b036-8e56c632f861"
+                          ? AVATAR_BASE+"2b5c4886-093b-4054-8fd5-80a6751c1900"
                           : AVATAR_BASE + profile.avatarId}/>}
           title={profile?.fullName}
           description={
