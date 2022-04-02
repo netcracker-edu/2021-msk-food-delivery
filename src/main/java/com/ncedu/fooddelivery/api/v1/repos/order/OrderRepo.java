@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,4 +40,14 @@ public interface OrderRepo extends JpaRepository<Order, Long> {
             nativeQuery = true
     )
     List<Order> getOrdersByCourierId(@Param(value = "id") Long courierId);
+
+    @Query(value = "SELECT * FROM orders " +
+                   "WHERE courier_id = :courierId AND " +
+                   "      date_start >= :startTime " +
+                   "      AND (cast(cast(:endTime as text) as timestamp) IS NULL OR date_start <= cast(cast(:endTime " +
+                   "      as  text) as timestamp))",
+                   nativeQuery = true)
+    List<Order> getOrdersByCourierIdAndTime(@Param(value = "courierId") Long courierId,
+                                            @Param(value = "startTime") LocalDateTime startTime,
+                                            @Param(value = "endTime") LocalDateTime endTime);
 }

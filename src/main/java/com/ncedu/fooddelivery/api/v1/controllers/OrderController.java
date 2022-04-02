@@ -69,8 +69,7 @@ public class OrderController {
     public ResponseEntity<OrderInfoDTO> getCurrentOrder(@AuthenticationPrincipal User user){
         OrderInfoDTO orderInfoDTO = orderService.getCurrentOrder(user);
         if(orderInfoDTO == null) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        return new ResponseEntity<>(orderService.getCurrentOrder(user),
-                HttpStatus.OK);
+        return new ResponseEntity<>(orderInfoDTO, HttpStatus.OK);
     }
 
     @GetMapping("/api/v1/order/price")

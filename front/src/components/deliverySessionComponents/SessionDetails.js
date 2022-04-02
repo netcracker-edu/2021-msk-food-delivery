@@ -6,6 +6,8 @@ import DeliverySessionClient from "../../api/DeliverySessionClient";
 import OrderClient from "../../api/OrderClient";
 import OrderHistoryCard from "../orderComponents/OrderHistoryCard";
 
+const {Title, Text} = Typography;
+
 const ERROR_MESSAGE_DELAY = 3.5;
 const SUCCESS_MESSAGE_DELAY = 2.0;
 const REQUEST_INTERVAL = 5000;
@@ -77,6 +79,7 @@ const SessionDetails = ({auth}) => {
        while(needToFindOrder){
             const response = await orderClient.getCurrentOrder();
             if(response.data != null){
+                if(!orders) orders = [];
                 orders.unshift(response.data);
                 setOrders(orders);
                 setCurrentOrder(response.data);
@@ -109,7 +112,7 @@ const SessionDetails = ({auth}) => {
             <Card className="session_details_card">
                 <Row justify="center">
                     <Col>
-                        <Typography.Title style={{display: "inline-flex"}} level={3}>{`Session id: ${params.sessionId}`}</Typography.Title>
+                        <Title style={{display: "inline-flex"}} level={3}>{`Session id: ${params.sessionId}`}</Title>
                     </Col>
                 </Row>
                 {isCurrentSession ?
@@ -136,10 +139,13 @@ const SessionDetails = ({auth}) => {
                     :   <></>    
                     }
 
+                    <div className="session_details_key_value_wrapper">
+                        <span>Started: </span><span><strong>{session.startTime}</strong></span> 
+                    </div>
                         
                     {session.endTime ? 
                         <div className="session_details_key_value_wrapper">
-                            <span>Finished: </span><span><strong>{session.endTime ?? 0}</strong></span> 
+                            <span>Finished: </span><span><strong>{session.endTime}</strong></span> 
                         </div>
                         : <></>
                     } 
@@ -162,13 +168,13 @@ const SessionDetails = ({auth}) => {
 
             </Card>
             <Divider>
-                <Typography.Title level={4}>Orders</Typography.Title>
+                <Title level={4}>Orders</Title>
             </Divider>
             {isCurrentSession && currentOrder == null ? 
                 <Card style={{borderRadius: '10px', width: '40%', margin: '0 auto'}}>
                     <div style={{display: 'flex', justifyContent: 'center'}}>
                         
-                            <Typography.Text level={5} strong>Searching suitable order...</Typography.Text>
+                            <Text level={5} strong>Searching suitable order...</Text>
                         
                             <Spin style={{marginLeft: '10px'}}/>
                         
@@ -176,14 +182,16 @@ const SessionDetails = ({auth}) => {
                 </Card>
                 : <></>
             }
-            <>{!isCurrentSession && !orders.length ? 
-            <div style={{textAlign: 'center', margin: '0 auto'}}><Typography.Text level={5} strong >
-                No orders in this session
-            </Typography.Text></div> 
+            <>{!isCurrentSession && !orders?.length ? 
+            <div style={{textAlign: 'center', margin: '0 auto'}}>
+                <Text level={5} strong >
+                    No orders in this session
+                </Text>
+            </div> 
             :
             <div style={{margin: '24px auto'}}>
                 <Row gutter={[0, 24]}>          
-                    {orders.map((order) => 
+                    {orders?.map((order) => 
                     <Col span={24}>
                         <OrderHistoryCard order={order} page={page} customPrevPath={`/deliverySessions/${params.sessionId}`} size={size}/>
                     </Col>)}

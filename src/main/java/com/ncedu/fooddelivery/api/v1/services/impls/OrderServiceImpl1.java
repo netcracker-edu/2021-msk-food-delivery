@@ -126,22 +126,12 @@ public class OrderServiceImpl1 implements OrderService {
     @Override
     public List<OrderInfoDTO> getOrdersFromDeliverySession(User courier, DeliverySession deliverySession) {
         if(!courier.getId().equals(deliverySession.getCourier().getId())) throw new CustomAccessDeniedException();
-        return orderRepo.getOrdersByCourierId(courier.getId()).stream()
-                .filter(new Predicate<Order>() {
-                    @Override
-                    public boolean test(Order order) {
-                        return order.getDateStart().isAfter(deliverySession.getStartTime())
-                                && ((deliverySession.getEndTime() == null)
-                                || order.getDateEnd().isBefore(deliverySession.getEndTime()));
-                    }
-                })
-                .sorted(new Comparator<Order>() {
-                    @Override
-                    public int compare(Order o1, Order o2) {
-                        return o2.getDateStart().compareTo(o1.getDateStart());
-                    }
-                })
-                .map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
+        System.out.println(deliverySession.getEndTime());
+        return orderRepo.getOrdersByCourierIdAndTime(courier.getId(),
+                deliverySession.getStartTime(),
+                deliverySession.getEndTime())
+                .stream().map(order -> convertToOrderInfoDTO(order))
+                .collect(Collectors.toList());
     }
 
     @Override
