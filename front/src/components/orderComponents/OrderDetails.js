@@ -32,6 +32,8 @@ const OrderDetails = (props) => {
     const [finishButtonPressed, setFinishButtonPressed] = useState(false);
     const [rating, setRating] = useState(null);
     const [orderStatus, setOrderStatus] = useState(null);
+    const [prevOrderStatus, setPrevOrderStatus] = useState(null);   // needed for OrderSteps rendering
+                                                                    // after OrderCancelButton pressed 
     const [isLoading, setIsLoading] = useState(true);
 
     const profileClient = new ProfileClient(props.auth);
@@ -170,13 +172,13 @@ const OrderDetails = (props) => {
             <div className='order_details_products_wrapper'>
                 
                 <div className='order_details_steps_buttons_wrapper'>
-                    <OrderSteps status={order.status} cancelButtonPressed={cancelButtonPressed} 
-                    finishButtonPressed={finishButtonPressed}/>
+                    <OrderSteps status={orderStatus} cancelButtonPressed={cancelButtonPressed} 
+                    finishButtonPressed={finishButtonPressed} prevStatus={prevOrderStatus}/>
                     {
                     orderStatus === null || orderStatus === "CANCELLED" || orderStatus === "DELIVERED" ? 
                         <></>
                     :   
-                        <>
+                        <div className="order_details_buttons_wrapper">
                         {
                             (profile.role === "ADMIN" || profile.role === "MODERATOR") &&
                             (orderStatus === "COURIER_APPOINTED" || orderStatus === "PACKING") ?
@@ -198,11 +200,13 @@ const OrderDetails = (props) => {
 
                             <div className="order_details_cancel_button_wrapper">
                                 <OrderCancelButton auth={props.auth} orderId={orderId} 
-                                setCancelButtonPressed={setCancelButtonPressed} setOrderStatus={setOrderStatus}/>            
+                                setCancelButtonPressed={setCancelButtonPressed} 
+                                orderStatus={orderStatus} setOrderStatus={setOrderStatus} 
+                                setPrevOrderStatus={setPrevOrderStatus}/>            
                             </div>
                             </>
                         }
-                        </>
+                        </div>
                     }
                 </div> 
                 

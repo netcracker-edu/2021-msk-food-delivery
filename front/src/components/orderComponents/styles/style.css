@@ -52,6 +52,14 @@
       font: 600 15px sans-serif;
 }
 
+.order_details_buttons_wrapper{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 16px;
+}
+
 .order_details_cancel_button_wrapper, .order_details_finish_button_wrapper{
     margin-top: 12px;
   }

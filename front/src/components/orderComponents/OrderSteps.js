@@ -13,13 +13,13 @@ const OrderSteps = (props) => {
         <Step title="Delivered!" status="finish"/>
     ];
 
-    const {status, cancelButtonPressed, finishButtonPressed} = {...props};
-    const stage = statuses.indexOf(status);
-    
+    const {status, prevStatus, cancelButtonPressed, finishButtonPressed} = {...props};
+    const stage = prevStatus == null? statuses.indexOf(status) : statuses.indexOf(prevStatus);
+
     return ( 
         <div className="order_steps">
         {
-            status === "CANCELLED" ? 
+            status === "CANCELLED" && !prevStatus ? 
                 <Steps>
                     <Step title="Order is cancelled." status="error" />
                 </Steps>
@@ -34,7 +34,7 @@ const OrderSteps = (props) => {
                     <Steps direction="vertical" current={stage}>
                         {steps.slice(0, stage).concat(<Step title="Order is cancelled." status="error"/>)}
                     </Steps>    
-                :
+                : 
                     <Steps status="process" direction="vertical" current={stage}>
                         {steps.slice(0, stage + 1)}
                     </Steps> 

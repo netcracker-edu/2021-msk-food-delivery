@@ -4,7 +4,8 @@ import { wrapWithMessages } from "../../helpers/wrapWithMessages.ts";
 import OrderClient from "../../api/OrderClient";
 
 const OrderCancelButton = (props) => {
-    const {auth, orderId, setCancelButtonPressed, setOrderStatus} = {...props};
+    const {auth, orderId, setCancelButtonPressed, setOrderStatus, orderStatus,
+    setPrevOrderStatus} = {...props};
     const orderClient = new OrderClient(auth);
 
     const [disabled, setDisabled] = useState(false);
@@ -14,7 +15,9 @@ const OrderCancelButton = (props) => {
     }, () => {
         setDisabled(true);
         setCancelButtonPressed(true);
+        setPrevOrderStatus(orderStatus.slice());
         setOrderStatus("CANCELLED");
+
     });
 
     return (

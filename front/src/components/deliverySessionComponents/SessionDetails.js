@@ -35,12 +35,12 @@ const SessionDetails = ({auth}) => {
         const session = await deliverySessionClient.getSessionById(params.sessionId);
         setSession(session);
         setIsCurrentSession(session?.endTime === null);
-        const orders = await orderClient.getOrdersFromSession(params.sessionId);
-        if(orders != null) setOrders(orders.data);
+        const ordersResponse = await orderClient.getOrdersFromSession(params.sessionId);
+        setOrders(ordersResponse.data);
         if(session.endTime == null){
             let found = false;
-            for (let i = 0; i < orders?.length; i++) {
-                const order = orders[i];
+            for (let i = 0; i < ordersResponse.data.length; i++) {
+                const order = ordersResponse.data[i];
                 if(order.status !== "CANCELLED" && order.status !== "DELIVERED"){
                     setCurrentOrder(order);
                     found = true;
@@ -50,7 +50,7 @@ const SessionDetails = ({auth}) => {
             setIsLoading(false);
             if(!found){
                 needToFindOrder = true;
-                await fetchCurrentOrder(orders.data);
+                await fetchCurrentOrder(ordersResponse.data);
             }
             return;
         }
