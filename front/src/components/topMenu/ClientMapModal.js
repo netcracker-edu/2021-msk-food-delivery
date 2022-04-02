@@ -51,7 +51,7 @@ const ClientMapModal = ({auth, isMapVisible, setIsMapVisible,
           hint = 'Уточните адрес';
         }
         if (error) {
-          setErrorMsg(error+"\n"+hint);
+          setErrorMsg(<span>{error}<br/>{hint}</span>);
         } else {
           const coord = geoObject.geometry.getCoordinates();
           const shortAddress = geoObject.properties.get('name');
@@ -84,7 +84,8 @@ const ClientMapModal = ({auth, isMapVisible, setIsMapVisible,
              visible={isMapVisible || (auth.token && address && Object.keys(address).length == 0)}
              okText="Choose"
              onCancel = {() => {setIsMapVisible(false);
-                                searchRef.current.value = address.fullAddress;}
+                                if(address.fullAddress) searchRef.current.value = address.fullAddress;
+                                else setErrorMsg("Необходимо ввести и подтвердить адрес");}
                         }
       >
         <Row justify="center">
