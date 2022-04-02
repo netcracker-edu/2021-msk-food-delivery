@@ -13,12 +13,10 @@ const HeaderCustom = ({ auth, address, setAddress }) => {
         return (<ClientMenu auth={auth} address={address}
                   setAddress={setAddress}
         />);
-        break;
       case 'ADMIN':
         return (<AdminMenu auth={auth} address={address}
                   setAddress={setAddress}
         />);
-        break;
       default:
         return (<GuestMenu/>);
     };
