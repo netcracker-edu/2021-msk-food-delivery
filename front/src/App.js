@@ -28,7 +28,7 @@ function App() {
   return (
     <Layout className="App" style={{minHeight: "100vh"}}>
        <Router>
-          <HeaderCustom auth={auth} user={token?.user}/>
+          <HeaderCustom auth={auth}/>
           <Routes>
             <Route
               path="/"

@@ -32,15 +32,13 @@ const PendingOrders = ({auth}) => {
         const appointedOrders = await orderClient.fetchFilteredOrderPage(warehouseId, "COURIER_APPOINTED", 
         courierAppointedPage, courierAppointedSize);
         setCourierAppointedOrders(appointedOrders.data);
-        const appointedAmount = await orderClient.fetchFilteredAmount(warehouseId, "COURIER_APPOINTED",
-        courierAppointedPage, courierAppointedSize);
+        const appointedAmount = await orderClient.fetchFilteredAmount(warehouseId, "COURIER_APPOINTED");
         setAppointedOrdersAmount(appointedAmount.data.amount);
 
         const packingOrders = await orderClient.fetchFilteredOrderPage(warehouseId, "PACKING", 
         packingPage, packingSize);
         setPackingOrders(packingOrders.data);
-        const packingAmount = await orderClient.fetchFilteredAmount(warehouseId, "PACKING",
-        packingPage, packingSize);
+        const packingAmount = await orderClient.fetchFilteredAmount(warehouseId, "PACKING");
         setPackingOrdersAmount(packingAmount.data.amount);
         setIsLoading(false);
     }

@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 const { Header } = Layout;
 const { Item } = Menu;
 
-const HeaderCustom = ({ auth, user }) => {
+const HeaderCustom = ({ auth }) => {
+  const user = auth.token?.user;
   return (
     <Header>
       <Menu theme="dark" mode="horizontal">
