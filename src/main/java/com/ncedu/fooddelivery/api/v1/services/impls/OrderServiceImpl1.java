@@ -126,10 +126,10 @@ public class OrderServiceImpl1 implements OrderService {
     @Override
     public List<OrderInfoDTO> getOrdersFromDeliverySession(User courier, DeliverySession deliverySession) {
         if(!courier.getId().equals(deliverySession.getCourier().getId())) throw new CustomAccessDeniedException();
-        System.out.println(deliverySession.getEndTime());
+        LocalDateTime endTime = deliverySession.getEndTime() == null ? LocalDateTime.now() : deliverySession.getEndTime();
         return orderRepo.getOrdersByCourierIdAndTime(courier.getId(),
                 deliverySession.getStartTime(),
-                deliverySession.getEndTime())
+                endTime)
                 .stream().map(order -> convertToOrderInfoDTO(order))
                 .collect(Collectors.toList());
     }
