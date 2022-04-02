@@ -1,67 +1,53 @@
-import { Layout, Menu, Badge, Typography } from 'antd';
-import { Link } from 'react-router-dom';
-import { useCartContext } from "../hooks/CartContext";
+import { Layout } from 'antd';
+import ClientMenu from "./topMenu/ClientMenu.js";
+import GuestMenu from "./topMenu/GuestMenu.js";
+import AdminMenu from "./topMenu/AdminMenu.js";
 
 const { Header } = Layout;
-const { Item } = Menu;
-const { Text } = Typography;
 
-const HeaderCustom = ({ auth }) => {
-  const { cartItems } = useCartContext();
+const HeaderCustom = ({ auth, address, setAddress }) => {
   const userRole = auth.token?.user.role;
+  
+  const renderSwitch = param => {
+    switch (param) {
+      case 'CLIENT':
+        return (<ClientMenu auth={auth} address={address}
+                  setAddress={setAddress}
+        />);
+      case 'ADMIN':
+        return (<AdminMenu auth={auth} address={address}
+                  setAddress={setAddress}
+        />);
+      default:
+        return (<GuestMenu/>);
+    };
+  }
+
   return (
     <Header>
-      <Menu theme="dark" mode="horizontal">
-        <Item key={1}>
-          <Link to="/">Home</Link>
-        </Item>
-        {auth.token ? (
-          <Item key={2}>
-            <Link to="/profile">Profile</Link>
-          </Item>)
-          : <></>
+        {auth.token && userRole === 'CLIENT'
+          ? renderSwitch(auth.token.user.role)
+          : auth.token && userRole === 'COURIER' 
+              ? 
+                (<Menu theme="dark" mode="horizontal">
+                    <Item key="home">
+                      <Link to="/">Home</Link>
+                    </Item>
+                    <Item key="profile">
+                      <Link to="/profile">Profile</Link>
+                    </Item>
+                    <Item key="deliveries">
+                      <Link to="/deliverySessions">Deliveries</Link>
+                    </Item>
+                    <Item key="sign">
+                      <Link to="/signout">
+                        "SignOut"
+                      </Link>
+                    </Item> 
+                  </Menu>
+                )
+              : renderSwitch('')
         }
-        
-        { auth.token && userRole === 'COURIER' ? 
-          <>
-          <Item key={3}>
-            <Link to="/deliverySessions">Deliveries</Link>
-          </Item>
-          <Item key={4}>
-            <Link to={auth.token ? "/signout" : "/signin"}>
-              {auth.token ? "SignOut" : "SignIn"}
-            </Link>
-          </Item>  
-            </>
-          :  
-          <>{auth.token ? (
-            <Item key={3}>
-              <Link to="/products">Products</Link>
-            </Item>)
-            : <></>
-          }
-          {auth.token ? (
-            <Item key={4}>
-                <Link to="/profile/cart">
-                  Cart
-                  {
-                    cartItems == null
-                      ? <></>
-                      : <Badge style={{margin:"0px 0px 20px 0px"}} size="small"
-                            count={Object.keys(cartItems).length} />
-                  }
-                </Link>
-            </Item>)
-            : <></>
-          }
-          <Item key={auth.token ? 5 : 2}>
-            <Link to={auth.token ? "/signout" : "/signin"}>
-              {auth.token ? "SignOut" : "SignIn"}
-            </Link>
-          </Item>
-          </>
-        }
-      </Menu>
     </Header>
   );
 }

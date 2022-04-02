@@ -5,7 +5,7 @@ import { DeleteTwoTone } from '@ant-design/icons';
 import ItemCountInput from "../ItemCountInput.js";
 const {Text, Link} = Typography;
 
-const CartItem = ({product, itemCount,
+const CartItem = ({product, itemCount, coords, warehouseId,
                     calculateTotalPrice, deleteFromCartList}) => {
   const { cartItems, dispatch } = useCartContext();
   const [count, setCount] = useState(itemCount);
@@ -19,7 +19,7 @@ const CartItem = ({product, itemCount,
     if (count == 0) {
       deleteFromCartList(product.id);
     }
-    calculateTotalPrice(cartItems);
+    calculateTotalPrice(cartItems, coords, warehouseId);
   }
 
   const deleteFromCart = () => {
@@ -27,7 +27,7 @@ const CartItem = ({product, itemCount,
     delete cartItems[id];
     dispatch(updateCart(cartItems));
     deleteFromCartList(product.id);
-    calculateTotalPrice(cartItems);
+    calculateTotalPrice(cartItems, coords, warehouseId);
     setCount(0);
   }
 

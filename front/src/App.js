@@ -1,4 +1,6 @@
 import useToken from "./hooks/useToken";
+import useAddress from "./hooks/useAddress";
+
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Layout } from 'antd';
@@ -25,14 +27,15 @@ import History from "./components/deliverySessionComponents/History";
 function App() {
   const { token, setToken } = useToken();
   const auth = new Auth(token, setToken);
+  const { address, setAddress } = useAddress();
   const userRole = token?.user.role;
-  
+
   return (
     <Layout className="App" style={{minHeight: "100vh"}}>
        <Router>
 
         <CartContextProvider>
-        <HeaderCustom auth={auth} />
+        <HeaderCustom auth={auth} address={address} setAddress={setAddress} />
           <Routes>
             <Route
               path="/"
@@ -48,14 +51,14 @@ function App() {
                 <Route index={true} element={<OrderHistory auth={auth}/>}/>
                 <Route index={false} path=':orderId' element={<OrderDetails auth={auth} />}/>
             </Route>
-                          
+
             <Route
               path="/profile/cart"
-              element={<Cart auth={auth}/>}
+              element={<Cart auth={auth} address={address}/>}
             />
             <Route
               path="/products"
-              element={<ProductList auth={auth}/>}
+              element={<ProductList auth={auth} address={address}/>}
             />
             <Route
               path="/signin"
@@ -67,7 +70,7 @@ function App() {
             />
             <Route
               path="/signout"
-              element={<Logout auth={auth}/>}
+              element={<Logout auth={auth} setAddress={setAddress}/>}
             />
 
             <>

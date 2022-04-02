@@ -8,35 +8,27 @@ export default class ProductClient {
     this.auth = auth;
   }
 
-  async fetchList(queryString) {
+  async fetchList(queryString, coords) {
     if (this.config.tokenExpired()) {
       await this.auth.refreshToken();
     }
     return commonFetch(this.config.PRODUCTS_URL+queryString,
                     "POST",
                     this.config.headersWithAuthorization(),
-                    JSON.stringify(
-                        {
-                          "lat" : 55.809327,
-                          "lon" : 37.632502,
-                        }));
+                    JSON.stringify(coords));
   }
 
-  async count() {
+  async count(coords) {
     if (this.config.tokenExpired()) {
       await this.auth.refreshToken();
     }
     return commonFetch(this.config.PRODUCTS_URL+"/count",
                     "POST",
                     this.config.headersWithAuthorization(),
-                    JSON.stringify(
-                        {
-                          "lat" : 55.809327,
-                          "lon" : 37.632502,
-                        }));
+                    JSON.stringify(coords));
   }
 
-  async search(phrase, queryString) {
+  async search(phrase, queryString, coords) {
     if (this.config.tokenExpired()) {
       await this.auth.refreshToken();
     }
@@ -44,15 +36,12 @@ export default class ProductClient {
                     "POST",
                     this.config.headersWithAuthorization(),
                     JSON.stringify(
-                        { "geo" : {
-                            "lat" : 55.809327,
-                            "lon" : 37.632502,
-                          },
+                        { "geo" : coords,
                           "phrase" : phrase
                         }));
   }
 
-  async searchCount(phrase) {
+  async searchCount(phrase, coords) {
     if (this.config.tokenExpired()) {
       await this.auth.refreshToken();
     }
@@ -60,10 +49,7 @@ export default class ProductClient {
                     "POST",
                     this.config.headersWithAuthorization(),
                     JSON.stringify(
-                        { "geo" : {
-                            "lat" : 55.809327,
-                            "lon" : 37.632502,
-                          },
+                        { "geo" : coords,
                           "phrase" : phrase
                         }));
   }

@@ -17,6 +17,7 @@ class Config {
   ORDERS_AMOUNT_URL = `${this.ORDER_HISTORY_URL}/amount`;
 
   FILE_URL = `${this.BASE_PATH}file`;
+  WAREHOUSE_URL = `${this.BASE_PATH}warehouse`;
   ACCESS_TOKEN = "accessToken";
   EXPIRATION = "expiration";
 

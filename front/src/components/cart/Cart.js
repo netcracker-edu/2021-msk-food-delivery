@@ -11,12 +11,13 @@ import CartTotalPrice from "./CartTotalPrice.js";
 const { Content } = Layout;
 const { Text, Title } = Typography;
 
-const Cart = ({auth}) => {
+const Cart = ({auth, address}) => {
   const { cartItems, dispatch } = useCartContext();
   const productClient = new ProductClient(auth);
   const orderClient = new OrderClient(auth);
   const [cartList, setCartList] = useState([]);
   const [totalPrice, setTotalPrice] = useState();
+  const coords = { "lat" : address.coord[0], "lon" : address.coord[1]};
   const PICTURE_BASE = "http://localhost:8080/api/v1/file/";
 
   const fetchCartProducts = async (cartItems) => {
@@ -29,7 +30,7 @@ const Cart = ({auth}) => {
   }
 
   const calculateTotalPrice = async (cartItems) => {
-    const response = await orderClient.calculateTotalPrice(cartItems);
+    const response = await orderClient.calculateTotalPrice(cartItems, coords, address.warehouseId);
     if (response && response.success) {
       setTotalPrice(response.data);
     } else {
@@ -44,7 +45,7 @@ const Cart = ({auth}) => {
   useEffect(() => {
     if (cartItems) {
       fetchCartProducts(cartItems);
-      calculateTotalPrice(cartItems);
+      calculateTotalPrice(cartItems, coords, address.warehouseId);
     } else {
       setCartList([]);
       setTotalPrice();
@@ -84,6 +85,8 @@ const Cart = ({auth}) => {
                   itemCount={cartItems[`${product.id}`]}
                   calculateTotalPrice={calculateTotalPrice}
                   deleteFromCartList={deleteFromCartList}
+                  coords={coords}
+                  warehouseId={address.warehouseId}
                 />
               )}
               <CartTotalPrice price={totalPrice}/>
