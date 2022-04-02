@@ -1,7 +1,8 @@
 import useToken from "./hooks/useToken";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Layout } from 'antd';
+
 import './App.css';
 import Auth from "./api/Auth";
 import HeaderCustom from "./components/HeaderCustom";
@@ -18,14 +19,18 @@ import Cart from "./components/cart/Cart";
 import { CartContextProvider } from "./hooks/CartContext";
 import OrderHistory from "./components/orderComponents/OrderHistory";
 import OrderDetails from "./components/orderComponents/OrderDetails";
+import SessionDetails from "./components/deliverySessionComponents/SessionDetails";
+import History from "./components/deliverySessionComponents/History";
 
 function App() {
   const { token, setToken } = useToken();
   const auth = new Auth(token, setToken);
-
+  const userRole = token?.user.role;
+  
   return (
     <Layout className="App" style={{minHeight: "100vh"}}>
        <Router>
+
         <CartContextProvider>
         <HeaderCustom auth={auth} />
           <Routes>
@@ -35,16 +40,15 @@ function App() {
             />
             <Route
               path="/profile"
-            >
-              <Route index={true} element={<Profile auth={auth}/>} />
-              <Route
+              element={<Profile auth={auth}/>}
+            />
+            <Route
                 path="/profile/orderHistory"
               >
                 <Route index={true} element={<OrderHistory auth={auth}/>}/>
                 <Route index={false} path=':orderId' element={<OrderDetails auth={auth} />}/>
-              </Route>
             </Route>
-            
+                          
             <Route
               path="/profile/cart"
               element={<Cart auth={auth}/>}
@@ -65,6 +69,18 @@ function App() {
               path="/signout"
               element={<Logout auth={auth}/>}
             />
+
+            <>
+              {userRole === 'COURIER' ? 
+                <Route 
+                  path="/deliverySessions"
+                >
+                  <Route index={true} element={<History auth={auth} />}/>
+                  <Route index={false} path=':sessionId' element={<SessionDetails auth={auth} />}/>
+                </Route> : <></>
+               }
+            </>
+            
             <Route path="*" element={<NotFound/>} />
           </Routes>
         </CartContextProvider>

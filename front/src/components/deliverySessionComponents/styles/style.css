@@ -1,0 +1,74 @@
+.ant-card-body{
+    padding: 20px;
+}
+
+.history_wrapper, .session_details_wrapper{
+    text-align: start;
+    width: 60%;
+    flex-grow: 1;
+    margin: 0 auto;
+    height: 100%;
+}
+
+.new_session_starter_wrapper{
+    display: flex;
+    justify-content: space-around;
+}
+
+.history_pagination_wrapper{
+    width: 80%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.new_session_starter{
+    width: 60%;
+    border-radius: 10px;
+}
+
+.history_card{
+    min-width: 400px;
+    width: 100%;
+    border-radius: 10px;
+}
+
+.history_card_header{
+    font: 600 16px sans-serif;
+    color: grey;
+}
+
+.history_card_descriptions{
+    display: flex;
+    flex-direction: column;
+}
+
+.session_details_card{
+    width: 60%;
+    margin: 0 auto;
+    border-radius: 10px;
+
+}
+
+.session_details_properties{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.session_details_key_value_wrapper{
+    text-align: center;
+}
+.session_details_card_header{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+}
+
+.buttons_container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

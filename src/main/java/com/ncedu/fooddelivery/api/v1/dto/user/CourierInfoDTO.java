@@ -14,7 +14,9 @@ public class CourierInfoDTO extends UserInfoDTO {
     private String address;
     private Float currentBalance;
 
-    public CourierInfoDTO(Long id, String role, String fullName, String email, Timestamp lastSigninDate, UUID avatarId, String phoneNumber, Float rating, Long warehouseId, String address, Float currentBalance) {
+    public CourierInfoDTO(Long id, String role, String fullName, String email,
+                          Timestamp lastSigninDate, UUID avatarId, String phoneNumber,
+                          Float rating, Long warehouseId, String address, Float currentBalance) {
         super(id, role, fullName, email, lastSigninDate, avatarId);
         this.phoneNumber = phoneNumber;
         this.rating = rating;

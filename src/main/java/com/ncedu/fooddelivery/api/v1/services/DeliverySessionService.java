@@ -1,6 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.services;
 
 import com.ncedu.fooddelivery.api.v1.dto.deliverySession.DeliverySessionInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.deliverySession.DeliverySessionsAmountDTO;
 import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Courier;
 import com.ncedu.fooddelivery.api.v1.entities.DeliverySession;
@@ -17,6 +18,7 @@ public interface DeliverySessionService {
     void finishSession(User user, DeliverySession deliverySession);
     List<DeliverySessionInfoDTO> getSessionsHistory(User user, Pageable pageable);
     List<DeliverySessionInfoDTO> getSessionsHistory(User user, User targetUser, Pageable pageable);
+    DeliverySessionsAmountDTO getAmount(User user);
     DeliverySessionInfoDTO getCurrentSessionInfo(User user);
     DeliverySessionInfoDTO getCurrentSessionInfo(User user, User targetUser);
 }

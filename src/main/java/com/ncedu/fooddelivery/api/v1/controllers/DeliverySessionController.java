@@ -1,6 +1,7 @@
 package com.ncedu.fooddelivery.api.v1.controllers;
 
 import com.ncedu.fooddelivery.api.v1.dto.deliverySession.DeliverySessionInfoDTO;
+import com.ncedu.fooddelivery.api.v1.dto.deliverySession.DeliverySessionsAmountDTO;
 import com.ncedu.fooddelivery.api.v1.dto.isCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.entities.Courier;
 import com.ncedu.fooddelivery.api.v1.entities.DeliverySession;
@@ -77,7 +78,13 @@ public class DeliverySessionController {
     }
 
     @PreAuthorize("hasAuthority('COURIER')")
-    @GetMapping("/api/v1/profile/deliverySession")
+    @GetMapping("api/v1/profile/deliverySessions/amount")
+    public ResponseEntity<DeliverySessionsAmountDTO> getAmount(@AuthenticationPrincipal User user){
+        return new ResponseEntity<>(deliverySessionService.getAmount(user), HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('COURIER')")
+    @GetMapping("/api/v1/deliverySession")
     public ResponseEntity<DeliverySessionInfoDTO> getCurrentSessionInfo(@AuthenticationPrincipal User user){
         return new ResponseEntity<>(deliverySessionService.getCurrentSessionInfo(user), HttpStatus.OK);
     }

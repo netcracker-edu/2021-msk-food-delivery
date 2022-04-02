@@ -18,6 +18,7 @@ const Profile = ({auth}) => {
 
   const profileClient = new ProfileClient(auth);
   const [profile, setProfile] = useState({});
+
   const [isEditInfoVisible, setIsEditInfoVisible] = useState(false);
   const [isEditEmailVisible, setIsEditEmailVisible] = useState(false);
   const [isEditPassVisible, setIsEditPassVisible] = useState(false);

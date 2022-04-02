@@ -9,6 +9,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Repository
 public interface OrderRepo extends JpaRepository<Order, Long> {
 
@@ -31,4 +35,18 @@ public interface OrderRepo extends JpaRepository<Order, Long> {
 
     @Query(value = "SELECT COUNT(*) FROM orders WHERE courier_id = :id OR client_id = :id", nativeQuery = true)
     Integer getOrdersAmount(@Param(value = "id") Long userId);
+
+    @Query(value = "SELECT * FROM orders WHERE courier_id = :id",
+            nativeQuery = true
+    )
+    List<Order> getOrdersByCourierId(@Param(value = "id") Long courierId);
+
+    @Query(value = "SELECT * FROM orders " +
+                   "WHERE courier_id = :courierId AND " +
+                   "      date_start >= :startTime " +
+                   "      AND date_start <= :endTime",
+                   nativeQuery = true)
+    List<Order> getOrdersByCourierIdAndTime(@Param(value = "courierId") Long courierId,
+                                            @Param(value = "startTime") LocalDateTime startTime,
+                                            @Param(value = "endTime") LocalDateTime endTime);
 }
