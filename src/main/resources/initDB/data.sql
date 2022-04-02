@@ -2186,20 +2186,6 @@ BEGIN
 END;
 ' language plpgsql;
 
-
-DO ' DECLARE
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM delivery_sessions WHERE delivery_session_id = 1) THEN
-        INSERT INTO delivery_sessions(courier_id, start_time, end_time, orders_completed, average_time_per_order, money_earned)
-        SELECT courier_id, date_start, date_end, 1, (date_end - date_start)::INTERVAL, ROUND(overall_cost / 10, 2) FROM orders WHERE (courier_id IS NOT NULL AND status = ''DELIVERED'') ORDER BY courier_id ASC;
-        INSERT INTO delivery_sessions(courier_id, start_time, end_time, orders_completed, average_time_per_order, money_earned)
-        SELECT courier_id, date_start, date_end, 1, (date_end - date_start)::INTERVAL, 0.0 FROM orders WHERE (courier_id IS NOT NULL AND status = ''CANCELLED'') ORDER BY courier_id ASC;
-
-    END IF;
-END;
-' language plpgsql;
-
-
 DO ' DECLARE
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM delivery_sessions WHERE delivery_session_id = 1) THEN

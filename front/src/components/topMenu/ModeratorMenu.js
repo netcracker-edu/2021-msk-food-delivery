@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, Badge } from 'antd';
 import { useCartContext } from "../../hooks/CartContext";
+
 import ClientMapModal from "./ClientMapModal.js";
 
 const { Item } = Menu;
 
-const AdminMenu = ({auth, address, setAddress}) => {
+const ModeratorMenu = ({auth, address, setAddress}) => {
   const { cartItems } = useCartContext();
   const [isMapVisible, setIsMapVisible] = useState(false);
   return (
@@ -18,9 +19,9 @@ const AdminMenu = ({auth, address, setAddress}) => {
         <Item key="profile">
           <Link to="/profile">Profile</Link>
         </Item>
-        <Item key="warehouses">
-            <Link to="/warehouses">Warehouses</Link>
-          </Item>
+        <Item key="warehouse">
+            <Link to={`/warehouses/${auth.token?.user.warehouseId}`}>Warehouse</Link>
+        </Item>
         <Item key="products">
           <Link to="/products">Products</Link>
         </Item>
@@ -56,4 +57,4 @@ const AdminMenu = ({auth, address, setAddress}) => {
   );
 }
 
-export default AdminMenu;
+export default ModeratorMenu;

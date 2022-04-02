@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Repository
-public interface OrderRepo extends JpaRepository<Order, Long> {
+public interface OrderRepo extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
 
     @Query(value = "SELECT * FROM orders WHERE courier_id = :id",
             countQuery = "SELECT COUNT(*) FROM orders WHERE courier_id = :id",
@@ -27,6 +28,8 @@ public interface OrderRepo extends JpaRepository<Order, Long> {
     Page<Order> getClientOrdersHistory(@Param(value = "id") Long userId, Pageable pageable);
 
     Page<Order> findAll(Specification<Order> spec, Pageable pageable);
+
+    long count(Specification<Order> spec);
 
     @Query(value = "SELECT * FROM orders " +
                    "WHERE courier_id = :id AND status NOT IN ('CANCELLED', 'DELIVERED')",

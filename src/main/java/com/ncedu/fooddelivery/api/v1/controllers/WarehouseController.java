@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Validated
 @RestController
@@ -55,5 +56,11 @@ public class WarehouseController {
         Point geo = geometryFactory.createPoint(new Coordinate(lon.doubleValue(), lat.doubleValue()));
         WarehouseInfoDTO nearestWarehouse = warehouseService.getNearestWarehouse(geo);
         return new ResponseEntity<>(nearestWarehouse, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping(path = "/api/v1/warehouses/active")
+    public ResponseEntity<List<WarehouseInfoDTO>> getActiveWarehouses(@AuthenticationPrincipal User user){
+        return new ResponseEntity<>(warehouseService.getActiveWarehouses(), HttpStatus.OK);
     }
 }

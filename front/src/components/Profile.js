@@ -1,8 +1,8 @@
 import ProfileClient from "../api/ProfileClient";
 import {useState, useEffect} from 'react';
 import {useNavigate} from "react-router-dom";
-import { List, Card, Layout, Avatar, Menu, Dropdown, Modal, Form, Input} from 'antd';
-import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
+import { Card, Layout, Avatar, Menu, Dropdown, Modal, Form, Input} from 'antd';
+import { EditOutlined, EllipsisOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import FullNameInput from './user_form/FullNameInput';
 import PhoneInput from './user_form/PhoneInput';

@@ -4,11 +4,11 @@ import lombok.Data;
 
 @Data
 public class OrdersAmountDTO {
-    private Integer amount;
+    private long amount;
 
     public OrdersAmountDTO(){}
 
-    public OrdersAmountDTO(Integer amount) {
+    public OrdersAmountDTO(long amount) {
         this.amount = amount;
     }
 }

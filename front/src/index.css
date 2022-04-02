@@ -11,3 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.empty_wrapper{
+  position: sticky;
+  top: calc(50% - 81.5px);
+  left: calc(50% - 100px);
+}

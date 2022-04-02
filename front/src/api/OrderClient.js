@@ -31,13 +31,13 @@ export default class OrderClient{
 
     async getOrderById(id){
         await this.checkToken();
-        return await commonFetch(this.config.ORDER_URL + `/${id}`, 'GET', 
+        return commonFetch(this.config.ORDER_URL + `/${id}`, 'GET', 
         this.config.headersWithAuthorization(), null);
     }
 
     async changeOrderStatus(orderId, newStatus){
         await this.checkToken();
-        return await patchFetch(this.config.ORDER_URL + `/${orderId}/status`, 
+        return patchFetch(this.config.ORDER_URL + `/${orderId}/status`, 
         this.config.headersWithAuthorization(), JSON.stringify({newStatus: newStatus}));
     }
 
@@ -49,17 +49,37 @@ export default class OrderClient{
 
     async getOverallOrdersAmount(){
         await this.checkToken();
-        return await commonFetch(this.config.ORDERS_AMOUNT_URL, 'GET', this.config.headersWithAuthorization(), null);
+        return commonFetch(this.config.ORDERS_AMOUNT_URL, 'GET', this.config.headersWithAuthorization(), null);
     }
 
     async fetchOrderPage(page, size){
         await this.checkToken();
-        return await commonFetch(this.buildPaginationQuery(page, size), 'GET', 
+        return commonFetch(this.buildPaginationQuery(page, size), 'GET', 
+        this.config.headersWithAuthorization(), null);
+    }
+
+    async fetchFilteredOrderPage(warehouseId, status, page, size){
+        await this.checkToken();
+        return commonFetch(this.buildFilterQuery(warehouseId, status, page, size), 'GET', 
+        this.config.headersWithAuthorization(), null);    
+    }
+
+    async fetchFilteredAmount(warehouseId, status){
+        await this.checkToken();
+        return commonFetch(this.buildFilterAmountQuery(warehouseId, status), 'GET', 
         this.config.headersWithAuthorization(), null);
     }
 
     buildPaginationQuery(page, size){
         return this.config.ORDER_HISTORY_URL + `?page=${page - 1}&size=${size}`;
+    }
+
+    buildFilterQuery(warehouseId, status, page, size){
+        return this.config.FILTER_ORDERS_URL + `?warehouseId=${warehouseId}&status=${status}&page=${page - 1}&size=${size}`;
+    }
+
+    buildFilterAmountQuery(warehouseId, status){
+        return this.config.AMOUNT_FILTER_ORDERS_URL + `?warehouseId=${warehouseId}&status=${status}`;
     }
 
     async getOrdersFromSession(sessionId){

@@ -84,11 +84,25 @@ public class OrderServiceImpl1 implements OrderService {
             if(dto.getWarehouseId() != null){
                 if(!dto.getWarehouseId().equals(moderatorWarehouseId)) throw new CustomAccessDeniedException();
             }
-
-        } else dto.setWarehouseId(null);
+        }
 
         spec = OrderSpecifications.getFilterSpecification(dto);
         return orderRepo.findAll(spec, pageable).stream().map(order -> convertToOrderInfoDTO(order)).collect(Collectors.toList());
+    }
+
+    @Override
+    public OrdersAmountDTO findFilteredAmount(User user, OrderFilterDTO dto) {
+        Specification<Order> spec;
+
+        if(user.getRole() == Role.MODERATOR){
+            Long moderatorWarehouseId = user.getModerator().getWarehouseId();
+            if(dto.getWarehouseId() != null){
+                if(!dto.getWarehouseId().equals(moderatorWarehouseId)) throw new CustomAccessDeniedException();
+            }
+        }
+
+        spec = OrderSpecifications.getFilterSpecification(dto);
+        return new OrdersAmountDTO(orderRepo.count(spec));
     }
 
     @Override

@@ -17,6 +17,8 @@ public interface OrderService {
 
     List<OrderInfoDTO> findFiltered(User user, OrderFilterDTO dto, Pageable pageable);
 
+    OrdersAmountDTO findFilteredAmount(User user, OrderFilterDTO dto);
+
     List<OrderInfoDTO> getOrdersHistory(User authedUser, User targetUser, Pageable pageable);
 
     List<OrderInfoDTO> getMyOrdersHistory(User user, Pageable pageable);

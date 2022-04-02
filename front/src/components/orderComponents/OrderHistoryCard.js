@@ -1,9 +1,9 @@
 import React from "react";
 import { Card, Tag, Descriptions, Row, Col, Divider } from "antd";
-import { useNavigate, useLocation} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import './styles/style.css';
 
-const OrderItem = (props) => {
+const OrderHistoryCard = (props) => {
     const statusTagMap = new Map();
     statusTagMap.set('CREATED', ['cyan', 'Created']);
     statusTagMap.set('COURIER_APPOINTED', ['blue', 'Courier is appointed']);
@@ -14,16 +14,15 @@ const OrderItem = (props) => {
     
     const {order, page, size, customPrevPath} = {...props}; 
     const navigate = useNavigate();
-    const location = useLocation();
-    
+
     return (
         <>{!order ? <></> : 
         <>
         <Card hoverable className='order_history_card'
-        onClick={() => navigate(`/profile/orderHistory/${order.id}`, { state : {
+        onClick={() => navigate(`/order/${order.id}`, { state : {
             page: page,
             size: size,
-            prevPath: customPrevPath != null? customPrevPath: '/profile/orderHistory',
+            prevPath: customPrevPath != null? customPrevPath : '/profile/orderHistory',
         }})}>
         <Row justify="space-between" className="order_card_header">
                 <Col>{`Order id: ${order.id}`}</Col>
@@ -60,4 +59,4 @@ const OrderItem = (props) => {
     );
 }
 
-export default OrderItem;
+export default OrderHistoryCard;

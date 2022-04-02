@@ -1,9 +1,14 @@
 package com.ncedu.fooddelivery.api.v1.dto.order;
 
 import com.ncedu.fooddelivery.api.v1.entities.OrderStatus;
+import com.vladmihalcea.hibernate.type.basic.PostgreSQLEnumType;
 import lombok.Data;
+import org.hibernate.annotations.TypeDef;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.Date;

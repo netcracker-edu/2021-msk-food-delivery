@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Layout, Card, Row, Col, Space} from "antd";
-import { UserOutlined, HomeOutlined, CreditCardOutlined, ShoppingOutlined, ProfileFilled } from "@ant-design/icons";
+import { UserOutlined, HomeOutlined, CreditCardOutlined, ShoppingOutlined } from "@ant-design/icons";
 import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
+
 import UserRatingChanger from './UserRatingChanger';
 import OrderDetailsProductCard from "./OrderDetailsProductCard";
-import './styles/style.css';
 import OrderSteps from "./OrderSteps";
 import OrderCancelButton from "./OrderCancelButton";
 import OrderFinishButton from "./OrderFinishButton";
 import OrderClient from "../../api/OrderClient";
 import ProfileClient from "../../api/ProfileClient";
+
+import './styles/style.css';
+import OrderPackingButton from "./OrderPackingButton";
 
 const {Content} = Layout;
 
@@ -37,6 +40,7 @@ const OrderDetails = (props) => {
     const NOT_FOUND_PAGE = "http://localhost:8080/api/v1/notFound";
 
     const fetchData = async () => {
+        setIsLoading(true);
         let response = await profileClient.get();
         if (response && response.success) {
           setProfile(response.data);
@@ -50,36 +54,41 @@ const OrderDetails = (props) => {
             setProducts(response.data.products);
             if(profile.role === 'CLIENT') setRating(response.data.deliveryRating);
             else setRating(response.data.clientRating);
-            setIsLoading(false);
-
         } else {
             navigate(NOT_FOUND_PAGE);
         }
+        setIsLoading(false);
     }
 
     useEffect(() => {
         fetchData();
       }, []);
-
+      
     return (
         <Content className="order_details_wrapper">
         {isLoading ? <></> :
             <><Space direction='vertical' size={8} style={{marginBottom: '8px'}}>
                 <Row>
                     <Col>
-                    {
-                        prevPath === "/profile/orderHistory" ? 
+                    {prevPath === "/profile/orderHistory" ? 
                             <Link to={prevPath} state={{ page: page, size: size}} 
                             style={{fontSize: '13px'}}>
                                 Back to order history
                             </Link> 
-                        :
-                        prevPath.search("^\/deliverySessions\/[0-9]+$") !== -1 ?
-                            <Link to={prevPath} state={{ page: page, size: size}} 
+                    : 
+                    prevPath.search("^\/warehouses\/[0-9]+$") !== -1 ? 
+                            <Link to={prevPath} 
                             style={{fontSize: '13px'}}>
-                                Back to session
-                            </Link> 
-                        : <></>   
+                                Back to pending orders
+                            </Link>
+                    : 
+                       
+                    prevPath.search("^\/deliverySessions\/[0-9]+$") !== -1 ?
+                        <Link to={prevPath} state={{ page: page, size: size}} 
+                        style={{fontSize: '13px'}}>
+                            Back to session
+                        </Link> 
+                    : <></>   
                     }
                     </Col>
                 </Row>
@@ -107,17 +116,26 @@ const OrderDetails = (props) => {
                                 <span className='order_details_card_value'>{order.client.email}</span>
                             </div>    
                         </Col>
-
-                        <Col span={8}>
-                            <div>
-                                <ShoppingOutlined className='order_details_card_icon'/>
-                                <span className='order_details_card_key'>Courier</span><br/>
-                                <span className='order_details_card_value'>{order.courier.fullName}</span><br/>
-                                <span className='order_details_card_value'>{order.courier.phoneNumber}</span><br/>
-                                <span className='order_details_card_value'>{order.courier.email}</span>    
-                            </div>
-                        </Col>
-
+                        {
+                            !order.courier?.id ? 
+                            <Col span={8}>
+                                <div>
+                                    <ShoppingOutlined className='order_details_card_icon'/>
+                                    <span className='order_details_card_key'>Courier</span><br/>
+                                    <span className='order_details_card_value'>Not appointed</span><br/>    
+                                </div>
+                            </Col> 
+                            : 
+                            <Col span={8}>
+                                <div>
+                                    <ShoppingOutlined className='order_details_card_icon'/>
+                                    <span className='order_details_card_key'>Courier</span><br/>
+                                    <span className='order_details_card_value'>{order.courier.fullName}</span><br/>
+                                    <span className='order_details_card_value'>{order.courier.phoneNumber}</span><br/>
+                                    <span className='order_details_card_value'>{order.courier.email}</span>    
+                                </div>
+                            </Col>
+                        }
                         <Col span={6}>
                             <div>
                                 <CreditCardOutlined className='order_details_card_icon'/>
@@ -157,17 +175,34 @@ const OrderDetails = (props) => {
                     {
                     orderStatus === null || orderStatus === "CANCELLED" || orderStatus === "DELIVERED" ? 
                         <></>
-                    :   <>{profile.role === "COURIER" && orderStatus === "DELIVERING" ? 
+                    :   
+                        <>
+                        {
+                            (profile.role === "ADMIN" || profile.role === "MODERATOR") &&
+                            (orderStatus === "COURIER_APPOINTED" || orderStatus === "PACKING") ?
+                            <div className="order_details_packing_button_wrapper">
+                                <OrderPackingButton auth={props.auth} orderId={orderId} 
+                                setOrderStatus={setOrderStatus} currentStatus={orderStatus}
+                                />
+                            </div>
+                            : <></>
+                        }
+                        {
+                            <>
+                            {profile.role === "COURIER" && orderStatus === "DELIVERING" ? 
                             <div className="order_details_finish_button_wrapper">
                                 <OrderFinishButton auth={props.auth} orderId={orderId} 
                                 setOrderStatus={setOrderStatus} setFinishButtonPressed={setFinishButtonPressed}/>
                             </div>
-                            : <></>
+                            : <></>}
+
+                            <div className="order_details_cancel_button_wrapper">
+                                <OrderCancelButton auth={props.auth} orderId={orderId} 
+                                setCancelButtonPressed={setCancelButtonPressed} setOrderStatus={setOrderStatus}/>            
+                            </div>
+                            </>
                         }
-                        <div className="order_details_cancel_button_wrapper">
-                            <OrderCancelButton auth={props.auth} orderId={orderId} 
-                            setCancelButtonPressed={setCancelButtonPressed} setOrderStatus={setOrderStatus}/>            
-                        </div></>
+                        </>
                     }
                 </div> 
                 
