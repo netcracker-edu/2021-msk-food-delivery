@@ -16,6 +16,7 @@ const OrderHistoryCard = (props) => {
     const navigate = useNavigate();
 
     return (
+        <>{!order ? <></> : 
         <>
         <Card hoverable className='order_history_card'
         onClick={() => navigate(`/order/${order.id}`, { state : {
@@ -24,7 +25,7 @@ const OrderHistoryCard = (props) => {
             prevPath: customPrevPath != null? customPrevPath : '/profile/orderHistory',
         }})}>
         <Row justify="space-between" className="order_card_header">
-                <Col>{`Order №${order.id}`}</Col>
+                <Col>{`Order id: ${order.id}`}</Col>
                 <Col>{`Started: ${order.dateStart}`}</Col>
         </Row>
         <Divider style={{margin: '14px'}}/>
@@ -54,7 +55,7 @@ const OrderHistoryCard = (props) => {
                 : null}
             </Descriptions>
         </Card>
-        </>
+        </>}</>
     );
 }
 

@@ -81,14 +81,21 @@ const OrderDetails = (props) => {
                             style={{fontSize: '13px'}}>
                                 Back to pending orders
                             </Link>
-                    : <></>
+                    : 
+                       
+                    prevPath.search("^\/deliverySessions\/[0-9]+$") !== -1 ?
+                        <Link to={prevPath} state={{ page: page, size: size}} 
+                        style={{fontSize: '13px'}}>
+                            Back to session
+                        </Link> 
+                    : <></>   
                     }
                     </Col>
                 </Row>
                 <Space direction='vertical' size={4}>   
                     <Row>
                         <Col span={24} >
-                            <h2>{`Order № ${order.id}`}</h2>
+                            <h2>{`Order id: ${order.id}`}</h2>
                         </Col>
                     </Row>
                     <Row>

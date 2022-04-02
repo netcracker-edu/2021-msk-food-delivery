@@ -72,4 +72,11 @@
 
 .order_history_wrapper{
   min-height: 163px;
+  flex-grow: 1;
+}  
+
+.empty_wrapper{
+  position: sticky;
+  top: calc(50% - 81.5px);
+  left: calc(50% - 100px);
 }

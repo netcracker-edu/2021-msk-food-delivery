@@ -4,6 +4,7 @@ import com.ncedu.fooddelivery.api.v1.dto.areCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.CoordsDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.*;
 import com.ncedu.fooddelivery.api.v1.entities.Courier;
+import com.ncedu.fooddelivery.api.v1.entities.DeliverySession;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import org.springframework.data.domain.Pageable;
@@ -42,4 +43,8 @@ public interface OrderService {
     Order findCouriersActiveOrder(Courier courier);
 
     OrdersAmountDTO getOrdersAmount(User user);
+
+    List<OrderInfoDTO> getOrdersFromDeliverySession(User user, DeliverySession deliverySession);
+
+    OrderInfoDTO getCurrentOrder(User user);
 }

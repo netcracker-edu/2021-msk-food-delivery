@@ -1,7 +1,7 @@
 import Config from "./Config";
-import { commonFetch } from "../helpers/fetchers.js";
+import { commonFetch } from "../helpers/fetchers";
 
-export default class ProfileClient {
+export default class WarehouseClient {
   auth;
   constructor(auth) {
     this.auth = auth;
@@ -27,4 +27,15 @@ export default class ProfileClient {
       let response = await commonFetch(this.config.ACTIVE_WAREHOUSES_URL, 'GET', this.config.headersWithAuthorization(), null);
       return this.checkResponse(response);
     }
+
+  async getNearestWarehouse(coords) {
+    if (this.config.tokenExpired()) {
+      await this.auth.refreshToken();
+    }
+    return commonFetch(
+                this.config.WAREHOUSE_URL+`/nearest?lat=${coords.lat}&lon=${coords.lon}`,
+                "GET",
+                this.config.headersWithAuthorization(),
+                null);
+  }
 }

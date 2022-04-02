@@ -21,4 +21,7 @@ public interface DeliverySessionRepo extends JpaRepository<DeliverySession, Long
                         "WHERE courier_id = :id",
            nativeQuery = true)
     Page<DeliverySession> getSessionsByCourierId(Long id, Pageable pageable);
+
+    @Query(value = "SELECT COUNT(*) FROM delivery_sessions WHERE courier_id = :id", nativeQuery = true)
+    Integer getAmountByCourierId(@Param(value = "id") Long id);
 }

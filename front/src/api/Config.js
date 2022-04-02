@@ -13,16 +13,22 @@ class Config {
   FILE_URL = `${this.BASE_PATH}file`;
   ACCESS_TOKEN = "accessToken";
   EXPIRATION = "expiration";
-
+  
+  PRODUCTS_URL = `${this.BASE_PATH}products`;
   ORDER_URL = `${this.BASE_PATH}order`;
   ORDER_HISTORY_URL = `${this.PROFILE_URL}/orders`;
+  ORDERS_AMOUNT_URL = `${this.ORDER_HISTORY_URL}/amount`;
   FILTER_ORDERS_URL = `${this.BASE_PATH}orders`;
   AMOUNT_FILTER_ORDERS_URL = `${this.FILTER_ORDERS_URL}/amount`;
-  ORDERS_AMOUNT_URL = `${this.ORDER_HISTORY_URL}/amount`;
-  
+
+  DELIVERY_SESSIONS_HISTORY_URL = `${this.PROFILE_URL}/deliverySessions`;
+  DELIVERY_SESSIONS_AMOUNT_URL = `${this.PROFILE_URL}/deliverySessions/amount`;
+  DELIVERY_SESSION_URL = `${this.BASE_PATH}deliverySession/`;
+
+  WAREHOUSE_URL = `${this.BASE_PATH}warehouse`;
   WAREHOUSES_URL = `${this.BASE_PATH}warehouses`;
-  ACTIVE_WAREHOUSES_URL = `${this.WAREHOUSES_URL}/active`;
-  
+  ACTIVE_WAREHOUSES_URL = `${this.WAREHOUSES_URL}/active`;  
+
   defaultHeaders() {
     return {
       "Content-Type": "application/json",

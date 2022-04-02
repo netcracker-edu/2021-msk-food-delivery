@@ -1,39 +1,40 @@
-import { Layout, Menu } from 'antd';
-import { Link } from 'react-router-dom';
-const { Header } = Layout;
-const { Item } = Menu;
+import { Layout } from 'antd';
+import ClientMenu from "./topMenu/ClientMenu.js";
+import GuestMenu from "./topMenu/GuestMenu.js";
+import AdminMenu from "./topMenu/AdminMenu.js";
+import ModeratorMenu from './topMenu/ModeratorMenu.js';
+import CourierMenu from './topMenu/CourierMenu.js';
 
-const HeaderCustom = ({ auth }) => {
-  const user = auth.token?.user;
+const { Header } = Layout;
+
+const HeaderCustom = ({ auth, address, setAddress }) => {
+  const renderSwitch = param => {
+    switch (param) {
+      case 'CLIENT':
+        return (<ClientMenu auth={auth} address={address}
+                  setAddress={setAddress}
+        />);
+      case 'ADMIN':
+        return (<AdminMenu auth={auth} address={address}
+                  setAddress={setAddress}
+        />);
+      case 'MODERATOR':
+        return (<ModeratorMenu auth={auth} address={address}
+                 setAddress={setAddress}
+        />);
+      case 'COURIER':
+        return (<CourierMenu/>);
+
+      default:
+        return (<GuestMenu/>);
+    };
+  }
+
   return (
     <Header>
-      <Menu theme="dark" mode="horizontal">
-        <Item key={1}>
-          <Link to="/">Home</Link>
-        </Item>
-        {auth.token ? (
-          <Item key={2}>
-            <Link to="/profile">Profile</Link>
-          </Item>)
-          : <></>
+        {
+          renderSwitch(auth?.token?.user.role)
         }
-        { user?.role === 'MODERATOR' ? 
-          <Item key={3}>
-            <Link to={`/warehouses/${user.warehouseId}`}>Warehouse</Link>
-          </Item>
-          : user?.role === 'ADMIN' ?
-          <Item key={3}>
-            <Link to="/warehouses">Warehouses</Link>
-          </Item>
-          : <></>          
-        }
-        <Item key={user?.role === "COURIER" || user?.role === "MODERATOR" || 
-                   user?.role === "ADMIN" ? 4 : 3}>
-          <Link to={auth.token ? "/signout" : "/signin"}>
-            {auth.token ? "SignOut" : "SignIn"}
-          </Link>
-        </Item>
-      </Menu>
     </Header>
   );
 }

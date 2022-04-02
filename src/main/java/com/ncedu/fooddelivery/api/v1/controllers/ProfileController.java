@@ -5,6 +5,7 @@ import com.ncedu.fooddelivery.api.v1.dto.user.*;
 import com.ncedu.fooddelivery.api.v1.entities.Role;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.services.ClientService;
+import com.ncedu.fooddelivery.api.v1.services.CourierService;
 import com.ncedu.fooddelivery.api.v1.services.ModeratorService;
 import com.ncedu.fooddelivery.api.v1.services.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,9 @@ public class ProfileController {
     ClientService clientService;
     @Autowired
     ModeratorService moderatorService;
+    @Autowired
+    CourierService courierService;
+
 
     @GetMapping("/api/v1/profile")
     public UserInfoDTO getProfile(
@@ -42,7 +46,9 @@ public class ProfileController {
         if (Role.isMODERATOR(authedUserRole)) {
             return moderatorService.getModeratorDTOById(authedUserId);
         }
-
+        if(Role.isCOURIER(authedUserRole)){
+            return courierService.getCourierDTOById(authedUserId);
+        }
         //for admin
         return userService.getUserDTOById(authedUserId);
     }

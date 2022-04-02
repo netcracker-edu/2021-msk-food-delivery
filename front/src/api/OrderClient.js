@@ -14,6 +14,21 @@ export default class OrderClient{
         }
     }
 
+    async calculateTotalPrice(cartItems, coords, warehouseId) {
+      if (this.config.tokenExpired()) {
+        await this.auth.refreshToken();
+      }
+      return commonFetch(this.config.ORDER_URL+"/price",
+                    "POST",
+                    this.config.headersWithAuthorization(),
+                    JSON.stringify(
+                        {
+                          "geo" : coords,
+                          "warehouseId" : warehouseId,
+                          "products" : cartItems
+                        }));
+    }
+
     async getOrderById(id){
         await this.checkToken();
         return commonFetch(this.config.ORDER_URL + `/${id}`, 'GET', 
@@ -41,7 +56,7 @@ export default class OrderClient{
         await this.checkToken();
         return commonFetch(this.buildPaginationQuery(page, size), 'GET', 
         this.config.headersWithAuthorization(), null);
-    }   
+    }
 
     async fetchFilteredOrderPage(warehouseId, status, page, size){
         await this.checkToken();
@@ -65,5 +80,16 @@ export default class OrderClient{
 
     buildFilterAmountQuery(warehouseId, status){
         return this.config.AMOUNT_FILTER_ORDERS_URL + `?warehouseId=${warehouseId}&status=${status}`;
+    }
+
+    async getOrdersFromSession(sessionId){
+        await this.checkToken();
+        return await commonFetch(this.config.DELIVERY_SESSION_URL + `${sessionId}/orders`, 'GET', 
+        this.config.headersWithAuthorization(), null);
+    }
+
+    async getCurrentOrder(){
+        await this.checkToken();
+        return await commonFetch(this.config.ORDER_URL, 'GET', this.config.headersWithAuthorization(), null);
     }
 }

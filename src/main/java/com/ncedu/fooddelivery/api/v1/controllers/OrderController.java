@@ -2,6 +2,7 @@ package com.ncedu.fooddelivery.api.v1.controllers;
 
 import com.ncedu.fooddelivery.api.v1.dto.areCreatedDTO;
 import com.ncedu.fooddelivery.api.v1.dto.order.*;
+import com.ncedu.fooddelivery.api.v1.entities.DeliverySession;
 import com.ncedu.fooddelivery.api.v1.entities.User;
 import com.ncedu.fooddelivery.api.v1.entities.order.Order;
 import com.ncedu.fooddelivery.api.v1.services.OrderService;
@@ -62,8 +63,30 @@ public class OrderController {
         return new ResponseEntity<>(orderService.getMyOrdersHistory(user, pageable), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAuthority('COURIER')")
+    @GetMapping("/api/v1/deliverySession/{deliverySession}/orders")
+    public ResponseEntity<List<OrderInfoDTO>> getOrdersFromSession(@AuthenticationPrincipal User user,
+                                                                   @PathVariable DeliverySession deliverySession){
+        return new ResponseEntity<>(orderService.getOrdersFromDeliverySession(user, deliverySession),
+                HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('COURIER')")
+    @GetMapping("/api/v1/order")
+    public ResponseEntity<OrderInfoDTO> getCurrentOrder(@AuthenticationPrincipal User user){
+        OrderInfoDTO orderInfoDTO = orderService.getCurrentOrder(user);
+        if(orderInfoDTO == null) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(orderInfoDTO, HttpStatus.OK);
+    }
+
     @GetMapping("/api/v1/order/price")
     public ResponseEntity<CountOrderCostResponseDTO> countOrderCost(@Valid @RequestBody CountOrderCostRequestDTO requestDTO){
+        CountOrderCostResponseDTO responseDTO = orderService.countOrderCost(requestDTO);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    @PostMapping("/api/v1/order/price")
+    public ResponseEntity<CountOrderCostResponseDTO> countOrderCostWithPost(@Valid @RequestBody CountOrderCostRequestDTO requestDTO){
         CountOrderCostResponseDTO responseDTO = orderService.countOrderCost(requestDTO);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
