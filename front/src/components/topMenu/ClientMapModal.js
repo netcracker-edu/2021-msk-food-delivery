@@ -51,7 +51,7 @@ const ClientMapModal = ({auth, isMapVisible, setIsMapVisible,
           hint = 'Уточните адрес';
         }
         if (error) {
-          setErrorMsg(error+"\n"+hint);
+          setErrorMsg(<span>{error}<br/>{hint}</span>);
         } else {
           const coord = geoObject.geometry.getCoordinates();
           const shortAddress = geoObject.properties.get('name');
