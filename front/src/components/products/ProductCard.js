@@ -36,6 +36,8 @@ const ProductCard = ({ auth, product }) => {
     <Col span={6}>
       <Card
         cover={ <Image preview={false}
+                  width={274}
+                  height={280}
                   alt={product.name}
                   src={product?.pictureUUID == null
                     ? PICTURE_BASE+"a3026e4e-02b0-4fc0-a92a-bdcdf064fa06"
