@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Layout, List, Avatar, Typography, Row, Col, Button } from "antd";
+import { Layout, List, Avatar, Typography, Row, Col, Button, Spin, Alert } from "antd";
 import {ThunderboltTwoTone} from '@ant-design/icons';
 import { useCartContext } from "../../hooks/CartContext";
 import ProductClient from "../../api/ProductClient.js";
@@ -17,6 +17,8 @@ const Cart = ({auth, address}) => {
   const orderClient = new OrderClient(auth);
   const [cartList, setCartList] = useState([]);
   const [totalPrice, setTotalPrice] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+  const [alert, setAlert] = useState([]);
   const coords = { "lat" : address.coord[0], "lon" : address.coord[1]};
   const PICTURE_BASE = "http://localhost:8080/api/v1/file/";
 
@@ -40,6 +42,23 @@ const Cart = ({auth, address}) => {
 
   const deleteFromCartList = (id) => {
     setCartList(cartList.filter( product => product.id !== id));
+  }
+
+  const orderCheckout = async () => {
+    setAlert(["info", "Проверяем наличие и ищем курьера "]);
+    setIsLoading(true);
+    const response = await orderClient.orderCheckout(totalPrice, address, cartItems);
+    if (response && response.success) {
+      console.log(response.success);
+      setAlert(["success", "Заказ оформлен!"]);
+    } else {
+      console.log(response.error);
+      const UUID = response.error?.errorUUID;
+      if (UUID == "6979bd9b-3a64-46c6-88d5-79917ed78616") {
+        setAlert(["error", "Нет свободных курьеров. Попробуйте позже!"]);
+      }
+    }
+    setIsLoading(false);
   }
 
   useEffect(() => {
@@ -76,6 +95,17 @@ const Cart = ({auth, address}) => {
                   </Text>
                 : <></>
               }
+              {
+                alert.length != 0
+                ? <Alert type={alert[0]}
+                        message={<span>
+                                  {alert[1]}
+                                  {isLoading ? <Spin/> : <></>}
+                                </span>}
+                        closable afterClose={() => setAlert([])}
+                  />
+                : <></>
+              }
               <br></br>
               <CartTitle />
               {cartList.map(product =>
@@ -90,6 +120,10 @@ const Cart = ({auth, address}) => {
                 />
               )}
               <CartTotalPrice price={totalPrice}/>
+              <br/>
+              <Button type="primary" onClick={orderCheckout}>
+                Оформить заказ
+              </Button>
         </Layout>
         }
     </Content>
