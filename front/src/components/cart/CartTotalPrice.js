@@ -6,9 +6,13 @@ const CartTotalPrice = ({price}) => {
   return (
     <>
     {price == null
-      ? "Полная сумма не расчитана"
+      ? (<Paragraph>
+          <Text type="danger">
+            Полная сумма не расчитана
+          </Text>
+        </Paragraph>)
       : <>
-          <Row align="middle">
+          <Row align="middle" className="mb-10">
             <Col span={6}>
               <Title level={4}>
                 Итого

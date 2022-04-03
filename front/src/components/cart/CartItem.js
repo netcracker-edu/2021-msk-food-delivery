@@ -6,7 +6,8 @@ import ItemCountInput from "../ItemCountInput.js";
 const {Text, Link} = Typography;
 
 const CartItem = ({product, itemCount, coords, warehouseId,
-                    calculateTotalPrice, deleteFromCartList}) => {
+                    calculateTotalPrice, deleteFromCartList,
+                    availableAmount}) => {
   const { cartItems, dispatch } = useCartContext();
   const [count, setCount] = useState(itemCount);
   const PICTURE_BASE = "http://localhost:8080/api/v1/file/";
@@ -36,7 +37,7 @@ const CartItem = ({product, itemCount, coords, warehouseId,
     {count == 0
       ? <></>
       : <>
-        <Row align="middle">
+        <Row align="middle" className={availableAmount ? "red-border" : ""}>
           <Col span={2}>
             <Avatar size={50}
                     src={product?.pictureUUID == null
@@ -68,6 +69,11 @@ const CartItem = ({product, itemCount, coords, warehouseId,
             }
           </Col>
         </Row>
+        {availableAmount
+          ? <Text type="danger">
+              Недостаточно продуктов на складе. Уменьшите позицию до {availableAmount}
+            </Text>
+          : <></>}
         <Divider></Divider>
         </>
     }
