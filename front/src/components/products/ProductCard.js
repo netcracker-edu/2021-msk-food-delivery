@@ -33,7 +33,7 @@ const ProductCard = ({ auth, product }) => {
   }
 
   return (
-    <Col span={6}>
+    <Col>
       <Card
         cover={ <Image preview={false}
                   width={274}

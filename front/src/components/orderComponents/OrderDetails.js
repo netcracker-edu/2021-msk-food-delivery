@@ -75,20 +75,20 @@ const OrderDetails = (props) => {
                     {prevPath === "/profile/orderHistory" ? 
                             <Link to={prevPath} state={{ page: page, size: size}} 
                             style={{fontSize: '13px'}}>
-                                Back to order history
+                                К истории заказов
                             </Link> 
                     : 
                     prevPath.search("^\/warehouses\/[0-9]+$") !== -1 ? 
                             <Link to={prevPath} 
                             style={{fontSize: '13px'}}>
-                                Back to pending orders
+                                К текущим заказам
                             </Link>
                     : 
                        
                     prevPath.search("^\/deliverySessions\/[0-9]+$") !== -1 ?
                         <Link to={prevPath} state={{ page: page, size: size}} 
                         style={{fontSize: '13px'}}>
-                            Back to session
+                            К выходу на линию
                         </Link> 
                     : <></>   
                     }
@@ -97,12 +97,12 @@ const OrderDetails = (props) => {
                 <Space direction='vertical' size={4}>   
                     <Row>
                         <Col span={24} >
-                            <h2>{`Order id: ${order.id}`}</h2>
+                            <h2>{`ID заказа: ${order.id}`}</h2>
                         </Col>
                     </Row>
                     <Row>
                         <Col span={24} >
-                            {`Dated ${order.dateStart}`}
+                            {`Создан ${order.dateStart}`}
                         </Col>
                     </Row>
                 </Space>
@@ -112,7 +112,7 @@ const OrderDetails = (props) => {
                         <Col span={8}>
                             <div>
                                 <UserOutlined className='order_details_card_icon'/>
-                                <span className='order_details_card_key'>Client</span><br/>
+                                <span className='order_details_card_key'>Клиент</span><br/>
                                 <span className='order_details_card_value'>{order.client.fullName}</span><br/>
                                 <span className='order_details_card_value'>{order.client.phoneNumber}</span><br/>
                                 <span className='order_details_card_value'>{order.client.email}</span>
@@ -123,15 +123,15 @@ const OrderDetails = (props) => {
                             <Col span={8}>
                                 <div>
                                     <ShoppingOutlined className='order_details_card_icon'/>
-                                    <span className='order_details_card_key'>Courier</span><br/>
-                                    <span className='order_details_card_value'>Not appointed</span><br/>    
+                                    <span className='order_details_card_key'>Курьер</span><br/>
+                                    <span className='order_details_card_value'>Не назначен</span><br/>    
                                 </div>
                             </Col> 
                             : 
                             <Col span={8}>
                                 <div>
                                     <ShoppingOutlined className='order_details_card_icon'/>
-                                    <span className='order_details_card_key'>Courier</span><br/>
+                                    <span className='order_details_card_key'>Курьер</span><br/>
                                     <span className='order_details_card_value'>{order.courier.fullName}</span><br/>
                                     <span className='order_details_card_value'>{order.courier.phoneNumber}</span><br/>
                                     <span className='order_details_card_value'>{order.courier.email}</span>    
@@ -141,9 +141,9 @@ const OrderDetails = (props) => {
                         <Col span={6}>
                             <div>
                                 <CreditCardOutlined className='order_details_card_icon'/>
-                                <span className='order_details_card_key'>Payed</span><br/>
-                                <span className='order_details_card_value'>Discount</span><br/>
-                                <span className='order_details_card_value'>High demand coefficient</span><br/>
+                                <span className='order_details_card_key'>Оплачено</span><br/>
+                                <span className='order_details_card_value'>Скидка</span><br/>
+                                <span className='order_details_card_value'>Высокий спрос</span><br/>
                             </div>
                         </Col>
 
@@ -159,7 +159,7 @@ const OrderDetails = (props) => {
                         <Col>
                             <div>
                                 <HomeOutlined className='order_details_card_icon'/>
-                                <span className='order_details_card_key'>Delivery</span><br/>
+                                <span className='order_details_card_key'>Доставка</span><br/>
                                 <span className='order_details_card_value'>{order.address}</span><br/>
                             </div>
                         </Col>

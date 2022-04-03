@@ -14,22 +14,22 @@ const HistoryCard = ({session, page, size, activeSessionStyle}) => {
             size: size
         }})}>
         <Row justify="space-between" className="history_card_header">
-                <Col>{`Session id: ${session.id}`}</Col>
-                <Col>{`Started: ${session.startTime}`}</Col>
+                <Col>{`ID сессии: ${session.id}`}</Col>
+                <Col>{`Создана: ${session.startTime}`}</Col>
         </Row>
         <Divider style={{margin: '14px'}}/>
         <div className="history_card_descriptions">
             <div className="history_card_key_value_wrapper">
-                <span>Orders completed: </span><span><strong>{session.ordersCompleted ?? 0}</strong></span> 
+                <span>Заказов завершено: </span><span><strong>{session.ordersCompleted ?? 0}</strong></span> 
             </div>
 
             <div className="history_card_key_value_wrapper">
-                <span>Money earned: </span><span><strong>{session.moneyEarned?.toFixed(2) ?? '0.00'}</strong></span> 
+                <span>Заработано: </span><span><strong>{session.moneyEarned?.toFixed(2) ?? '0.00'}</strong></span> 
             </div>
        
             {session.averageTimePerOrder ? 
                 <div className="history_card_key_value_wrapper">
-                    <span>Average time per order: </span><span><strong>{session.averageTimePerOrder}</strong></span> 
+                    <span>Среднее время на заказ: </span><span><strong>{session.averageTimePerOrder}</strong></span> 
                 </div>
             :   <></>    
             }
@@ -37,11 +37,11 @@ const HistoryCard = ({session, page, size, activeSessionStyle}) => {
                 
             {session.endTime ? 
                 <div className="history_card_key_value_wrapper">
-                    <span>Finished: </span><span><strong>{session.endTime ?? 0}</strong></span> 
+                    <span>Завершена: </span><span><strong>{session.endTime ?? 0}</strong></span> 
                 </div>
                 :   
                 <div style={{display: "flex", justifyContent: "flex-end"}}>
-                    <Tag color="green">In progress</Tag> 
+                    <Tag color="green">Текущая</Tag> 
                </div>
 
             }

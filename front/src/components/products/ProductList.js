@@ -8,7 +8,7 @@ const { Search } = Input;
 const ProductList = ({auth, address, setAddress}) => {
 
   const [productList, setProductList] = useState();
-  const [noRecMsg, setNoRecMsg] = useState("Loading...");
+  const [noRecMsg, setNoRecMsg] = useState("Загрузка...");
   const [searchPhrase, setSearchPhrase] = useState("");
   const [total, setTotal] = useState();
   const productClient = new ProductClient(auth);
@@ -58,9 +58,9 @@ const ProductList = ({auth, address, setAddress}) => {
         <>
           <br></br>
           <Search
-            placeholder="input search text"
+            placeholder="Введите название товара"
             allowClear
-            enterButton="Search"
+            enterButton="Поиск"
             size="large"
             onSearch={(value) => value == null || value == ""
                             ? fetchProducts(1, 12)

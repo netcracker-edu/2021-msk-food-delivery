@@ -4,24 +4,24 @@ const PasswordInput = ({inputName, label}) => {
 
   return (
     <Form.Item name={inputName == null ? "password" : inputName}
-      label={label == null ? "Password" : label}
+      label={label == null ? "Пароль" : label}
       rules={[
         {
           required: true,
-          message: 'Please input your password!',
+          message: 'Пожалуйста, введите Ваш пароль!',
         },
         {
           max: 64,
-          message: 'Password too small!',
+          message: 'Пароль слишком длинный!',
         },
         {
           min: 8,
-          message: 'Password too small!',
+          message: 'Пароль слишком короткий!',
         },
       ]}
       hasFeedback
     >
-      <Input.Password placeholder="Enter your password..."/>
+      <Input.Password placeholder="Введите Ваш пароль..."/>
     </Form.Item>
   );
 }

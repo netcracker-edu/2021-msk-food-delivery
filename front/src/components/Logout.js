@@ -23,7 +23,7 @@ const Logout = ({auth, setAddress}) => {
 
   return (
     <div>
-      logout
+      Выйти
     </div>
   )
 }

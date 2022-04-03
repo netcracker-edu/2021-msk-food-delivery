@@ -78,11 +78,11 @@ const ClientMapModal = ({auth, isMapVisible, setIsMapVisible,
              footer={null}
              title={
                address && Object.keys(address).length == 0
-               ? "Select delivery address"
-               : "Edit delivery address"
+               ? "Выбор адреса доставки"
+               : "Измение адреса доставки"
              }
              visible={isMapVisible || (auth.token && address && Object.keys(address).length == 0)}
-             okText="Choose"
+             okText="Выбрать"
              onCancel = {() => {setIsMapVisible(false);
                                 if(address.fullAddress) searchRef.current.value = address.fullAddress;
                                 else setErrorMsg("Необходимо ввести и подтвердить адрес");}
@@ -111,7 +111,7 @@ const ClientMapModal = ({auth, isMapVisible, setIsMapVisible,
                 </span>
                 <span className="ant-input-group-addon">
                   <Link onClick={() => onAddressSelect()}>
-                    Choose
+                    Выбрать
                   </Link>
                 </span>
               </span>

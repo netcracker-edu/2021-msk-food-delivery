@@ -19,14 +19,14 @@ const LoginForm = ({ auth}) => {
       navigate("/");
     } else {
       setErrMsg(
-        res && typeof res === "string" ? res : "Invalid Username/Paasword"
+        res && typeof res === "string" ? res : "Неправильный логин/пароль"
       );
     }
   };
 
   return (
     <Content className="wrapper">
-      <h1> LOGIN FORM </h1>
+      <h1> Вход </h1>
       <Card>
         <Form name="loginForm" onFinish={handleFinish}>
           <span style={{display: errMsg ? "block" : "none"}}>
@@ -36,30 +36,30 @@ const LoginForm = ({ auth}) => {
             rules={[
               {
                 required: true,
-                message: 'Please input your Login!',
+                message: 'Пожалуйста, введите Ваш логин!',
               },
             ]}
           >
             <Input prefix={<UserOutlined className="site-form-item-icon" />}
-              placeholder="Login"/>
+              placeholder="Логин"/>
           </Form.Item>
           <Form.Item name="password"
             rules={[
               {
                 required: true,
-                message: 'Please input your Password!',
+                message: 'Пожалуйста, введите Ваш пароль!',
               },
             ]}
           >
             <Input prefix={<LockOutlined className="site-form-item-icon" />}
-              type="password" placeholder="Password"/>
+              type="password" placeholder="Пароль"/>
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
-              Log in
+              Войти
             </Button>
             <br></br>
-            or <Link to="/signup" >register now!</Link>
+            или <Link to="/signup" >зарегистрируйтесь сейчас!</Link>
           </Form.Item>
         </Form>
       </Card>

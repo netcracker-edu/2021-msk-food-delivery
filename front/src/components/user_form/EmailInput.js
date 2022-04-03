@@ -6,11 +6,11 @@ const EmailInput = () => {
       rules={[
         {
           type: 'email',
-          message: 'The input is not valid E-mail!',
+          message: 'Некорректный E-mail!',
         },
         {
           required: true,
-          message: 'Please input your E-mail!',
+          message: 'Пожалуйста, введите E-mail!',
         },
       ]}
     >

@@ -26,13 +26,13 @@ const RegistrationForm = () => {
        setErrMsg(null);
        navigate("/signin");
     } else {
-      setErrMsg("Registration error");
+      setErrMsg("Ошибка регистрации!");
     }
   }
 
   return (
     <Content className='wrapper'>
-      <h1>REGISTRATION FORM</h1>
+      <h1>Регистрация</h1>
       <span style={{display: errMsg ? "block" : "none"}}>
         <Alert message={errMsg} type="error"/>
       </span>
@@ -41,7 +41,7 @@ const RegistrationForm = () => {
           onFinish={handleFinish}
         >
           <EmailInput/>
-          <PasswordInput inputName="password" label="Password" />
+          <PasswordInput inputName="password" label="Пароль" />
           <PasswordInputConfirm dependency="password"/>
           <FullNameInput/>
           <PhoneInput />
@@ -49,7 +49,7 @@ const RegistrationForm = () => {
 
           <Form.Item >
             <Button type="primary" htmlType="submit" size="large">
-              Register
+              Зарегистрироваться
             </Button>
           </Form.Item>
         </Form>

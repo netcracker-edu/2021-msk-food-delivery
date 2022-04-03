@@ -13,20 +13,20 @@ const AdminMenu = ({auth, address, setAddress}) => {
       <>
       <Menu theme="dark" mode="horizontal">
         <Item key="home">
-          <Link to="/">Home</Link>
+          <Link to="/">Домой</Link>
         </Item>
         <Item key="profile">
-          <Link to="/profile">Profile</Link>
+          <Link to="/profile">Профиль</Link>
         </Item>
         <Item key="warehouses">
-            <Link to="/warehouses">Warehouses</Link>
+            <Link to="/warehouses">Склады</Link>
           </Item>
         <Item key="products">
-          <Link to="/products">Products</Link>
+          <Link to="/products">Продукты</Link>
         </Item>
         <Item key="cart">
             <Link to="/profile/cart">
-              Cart
+              Корзина
               {
                 cartItems == null
                   ? <></>
@@ -38,13 +38,13 @@ const AdminMenu = ({auth, address, setAddress}) => {
         </Item>
         <Item key="address" onClick={()=>setIsMapVisible(true)}>
           {address && Object.keys(address).length == 0
-            ? <>Address</>
+            ? <>Адрес</>
             : <>{address.shortAddress}</>
           }
         </Item>
         <Item key="sign">
           <Link to="/signout" >
-            SignOut
+            Выйти
           </Link>
         </Item>
       </Menu>

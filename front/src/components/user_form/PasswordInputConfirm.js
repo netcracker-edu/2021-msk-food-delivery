@@ -5,12 +5,12 @@ const PasswordInputConfirm = ({inputName, dependency}) => {
 
   return (
     <Form.Item name={inputName == null ? "confirm" : inputName}
-      label="Confirm Password"
+      label="Подтвердите пароль"
       dependencies={dependencies} hasFeedback
       rules={[
         {
           required: true,
-          message: 'Please confirm your password!',
+          message: 'Пожалуйста, подтвердите Ваш пароль!',
         },
         ({ getFieldValue }) => ({
           validator(_, value) {
@@ -18,12 +18,12 @@ const PasswordInputConfirm = ({inputName, dependency}) => {
               return Promise.resolve();
             }
             return Promise.reject(
-              new Error('The two passwords that you entered do not match!'));
+              new Error('Введённые пароли не совпадают!'));
           },
         }),
       ]}
     >
-      <Input.Password placeholder="Repeat your password..."/>
+      <Input.Password placeholder="Повторите Ваш пароль..."/>
     </Form.Item>
   );
 }

@@ -19,7 +19,7 @@ const OrderPackingButton = (props) => {
 
     return (
         <Button type="primary" onClick={wrappedFinishOrder}>
-            {neededStatus === "PACKING" ? "Order is packing" : "Order is packed"}
+            {neededStatus === "PACKING" ? "В упаковке" : "Упаковано"}
         </Button>
     );
 }

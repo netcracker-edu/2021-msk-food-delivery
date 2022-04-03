@@ -51,15 +51,15 @@ const History = ({auth}) => {
 
     return (
         
-        <><h1>Delivery sessions</h1>
+        <><h1>Выходы на линию</h1>
             <div className="history_wrapper">
                 <>{isLoading ? <></> :
                 <>    { currentSession  == null ?
                         <div className="new_session_starter_wrapper">
                             <Card className="new_session_starter" bordered>
-                                <Row justify="center" gutter={[8, 16]}>
-                                    <Col><h3>No active sessions currently. Start new one?</h3></Col>
-                                    <Col><Button disabled={currentSession != null} type="primary" onClick={startNewSession}>Start</Button></Col>
+                                <Row justify="center" gutter={[8, 16]} style={{display: 'flex'}}>
+                                    <Col><h3>Выйти на линию?</h3></Col>
+                                    <Col><Button disabled={currentSession != null} type="primary" onClick={startNewSession}>Выйти</Button></Col>
                                 </Row>
                             </Card>
                         </div>
@@ -68,7 +68,7 @@ const History = ({auth}) => {
                         }
                     {!sessions.length ? <></> :
                         <div className="history_pagination_wrapper">
-                            <Divider><h3>History</h3></Divider>
+                            <Divider><h3>История</h3></Divider>
                             <Row gutter={[0, 24]} style={{width: '100%'}}>
                                 <>{sessions.map((session) => <Col span={24}>
                                     <HistoryCard session={session}

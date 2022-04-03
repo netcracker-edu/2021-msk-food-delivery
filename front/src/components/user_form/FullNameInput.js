@@ -2,25 +2,25 @@ import {Form, Input} from "antd";
 
 const FullNameInput = () => {
   return (
-    <Form.Item name="fullName" label="Full name"
+    <Form.Item name="fullName" label="Полное имя"
 
       rules={[
         {
           required: true,
-          message: 'Please input your full name!',
+          message: 'Пожалуйста, введите полное имя!',
           whitespace: true,
         },
         {
           max: 50,
-          message: 'Full name is too long!',
+          message: 'Имя слишком длинное!',
         },
         {
           min: 6,
-          message: 'Full name is too small!',
+          message: 'Имя слишком короткое!',
         },
       ]}
     >
-      <Input placeholder="Full name"/>
+      <Input placeholder="Полное имя"/>
     </Form.Item>
   );
 }
