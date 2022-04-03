@@ -52,20 +52,28 @@ const CartItem = ({product, itemCount, coords, warehouseId,
               {product.discount == 0
                     ? (product.price).toFixed(2)
                     : <>
-                        <Text delete type="danger">{(product.price).toFixed(2)}</Text> {(product.price - product.discount).toFixed(2)}
+                        <Text delete type="danger">
+                          {(product.price).toFixed(2)}
+                        </Text>
+                        {(product.price - product.discount).toFixed(2)}
                       </>
               }
             </Text>
           </Col>
           <Col span={4}>
-            <ItemCountInput count={count} addToCart={updateCartItem} deleteFromCart={deleteFromCart}/>
+            <ItemCountInput count={count}
+                  addToCart={updateCartItem}
+                  deleteFromCart={deleteFromCart}
+            />
           </Col>
           <Col span={4}>
             {product.discount == 0
-                  ? <Text> {(product.price * count).toFixed(2)}</Text>
-                  : <>
-                      <Text> {((product.price - product.discount) * count).toFixed(2)}</Text>
-                    </>
+                  ? <Text>
+                      {(product.price * count).toFixed(2)}
+                    </Text>
+                  : <Text>
+                      {((product.price - product.discount) * count).toFixed(2)}
+                    </Text>
             }
           </Col>
         </Row>

@@ -39,7 +39,6 @@ const Cart = ({auth, address}) => {
       setTotalPrice(response.data);
       setErrAmount({});
     } else {
-      console.log(response.error);
       const UUID = response.error?.errorUUID;
       if (UUID == "9f5917ca-0440-4615-a7a5-56d65070e751") {
         let subErrors = response.error.subErrors;
@@ -48,8 +47,8 @@ const Cart = ({auth, address}) => {
           errProducts[p.productId] = p.availableAmount
         }
         setErrAmount(errProducts);
-        setTotalPrice();
       }
+      setTotalPrice();
     }
   }
 
@@ -58,11 +57,10 @@ const Cart = ({auth, address}) => {
   }
 
   const orderCheckout = async () => {
-    setAlert(["info", "Проверяем наличие и ищем курьера "]);
+    setAlert(["info", "Проверяем наличие и ищем курьера... "]);
     setIsLoading(true);
     const response = await orderClient.orderCheckout(totalPrice, address, cartItems);
     if (response && response.success) {
-      console.log(response.success);
       setAlert(["success", "Заказ оформлен! Перенаправляем на страницу заказов... "]);
       setTimeout(() => {
         setCartList([]);
@@ -70,7 +68,6 @@ const Cart = ({auth, address}) => {
         navigate('/profile/orderHistory');
       }, 2000);
     } else {
-      console.log(response.error);
       const UUID = response.error?.errorUUID;
       if (UUID == "6979bd9b-3a64-46c6-88d5-79917ed78616") {
         setAlert(["error", "Нет свободных курьеров. Попробуйте позже!"]);
@@ -86,6 +83,7 @@ const Cart = ({auth, address}) => {
           errProducts[p.productId] = p.availableAmount
         }
         setErrAmount(errProducts);
+        setAlert([]);
       }
     }
     setIsLoading(false);
@@ -124,7 +122,10 @@ const Cart = ({auth, address}) => {
             </Link>
           </>
         :
-        <Layout className={totalPrice?.highDemandCoeff > 1 ? "purple-border" : "grey-border"}>
+          <Layout className={totalPrice?.highDemandCoeff > 1
+                                ? "purple-border"
+                                : "grey-border"}
+          >
               {
                 totalPrice?.highDemandCoeff > 1
                 ? <Text style={{textAlign:"left"}}>
@@ -152,10 +153,12 @@ const Cart = ({auth, address}) => {
                 />
               )}
               <CartTotalPrice price={totalPrice}/>
-              <Button type="primary" onClick={orderCheckout} disabled={isLoading}>
+              <Button type="primary" onClick={orderCheckout}
+                    disabled={isLoading}
+              >
                 Оформить заказ
               </Button>
-        </Layout>
+          </Layout>
         }
     </Content>
   );
