@@ -8,17 +8,17 @@ const CourierMenu = () => {
       <>
       <Menu theme="dark" mode="horizontal">
         <Item key="home">
-            <Link to="/">Home</Link>
+            <Link to="/">Домой</Link>
         </Item>
         <Item key="profile">
-            <Link to="/profile">Profile</Link>
+            <Link to="/profile">Профиль</Link>
         </Item>
         <Item key="deliveries">
-            <Link to="/deliverySessions">Deliveries</Link>
+            <Link to="/deliverySessions">Доставки</Link>
         </Item>
         <Item key="sign">
             <Link to="/signout">
-                SignOut
+                Выйти
             </Link>
         </Item>
       </Menu>

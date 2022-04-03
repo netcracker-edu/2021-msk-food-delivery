@@ -1,7 +1,7 @@
 import { message } from "antd";
 
 export function wrapWithMessages (action: () => Promise<any>, actionOnSuccess: () => void = null,
-loadingText: string = 'In progress...', successText: string = 'Success!', errorText: string = 'Error!',
+loadingText: string = 'В процессе...', successText: string = 'Готово!', errorText: string = 'Ошибка!',
  delay: number = 2.5) { 
     
     function wrappedAction(){

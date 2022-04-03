@@ -19,7 +19,7 @@ const OrderFinishButton = (props) => {
 
     return (
         <Button type="primary" onClick={wrappedFinishOrder} disabled={disabled}>
-            Finish delivery
+            Завершить
         </Button>
     );
 }

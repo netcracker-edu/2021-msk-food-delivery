@@ -3,8 +3,8 @@ const {Option} = Select;
 
 const RoleSelect = ({mode}) => {
 
-  const register = ['Client', 'Courier'];
-  const add = ['Client', 'Courier', 'Admin', 'Moderator'];
+  const register = ['Клиент', 'Курьер'];
+  const add = ['Клиент', 'Курьер', 'Админ', 'Модератор'];
   const getOptions = (names) => {
     return (
       <>
@@ -16,15 +16,15 @@ const RoleSelect = ({mode}) => {
   };
 
   return (
-    <Form.Item name="role" label="Role"
+    <Form.Item name="role" label="Роль"
       rules={[
         {
           required: true,
-          message: 'Please select role!',
+          message: 'Пожалуйста, выберите роль!',
         },
       ]}
     >
-      <Select placeholder="select your role">
+      <Select placeholder="Выберите роль">
         {mode === "register" ? getOptions(register) : getOptions(add)}
       </Select>
     </Form.Item>

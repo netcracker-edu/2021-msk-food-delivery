@@ -11,8 +11,8 @@ const OrderDetailsProductCard = (props) => {
     return ( 
         <Card className="order_details_product_card">
                 <Row justify="space-between" className="order_card_header">
-                    <Col>{`Position ${idx + 1}`}</Col>
-                    <Col>{`${amount} `}{amount > 1 ? 'products, ' : 'product, '}{`${product.weight * amount} gm.`}</Col>
+                    <Col>{`Позиция ${idx + 1}`}</Col>
+                    <Col>{`${amount} шт.`}&nbsp;&nbsp;{`${product.weight * amount} г.`}</Col>
                 </Row>
                 <Divider style={{margin: "12px"}}/>
                 <Row align="middle">

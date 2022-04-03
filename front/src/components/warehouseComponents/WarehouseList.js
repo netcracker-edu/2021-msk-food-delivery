@@ -28,9 +28,9 @@ const WarehouseList = ({auth}) => {
 
         <div className="warehouse_list_wrapper">
             {isLoading ? <></> : 
-                <><h1>Active warehouses</h1>
+                <><h1>Активные склады</h1>
                 {
-                    !warehouses.length ? <p>No active warehouses at the moment.</p> 
+                    !warehouses.length ? <p>Активных складов нет.</p> 
                     : 
                     <div className="warehouse_list_cards">
                     <Row gutter={[12, 24]}>  

@@ -65,16 +65,16 @@ const PendingOrders = ({auth}) => {
 
     return (
         <div className="pending_orders_wrapper">
-            <h1>Pending orders</h1>
+            <h1>Текущие заказы</h1>
             {
                 isLoading ? <></> : 
                 !courierAppointedOrders.length && !packingOrders.length ? 
-                <div className='empty_wrapper'><Empty description='No pending orders currently'/></div> 
+                <div className='empty_wrapper'><Empty description='Сейчас заказов нет'/></div> 
             :
             <Collapse>
                 {
                    !courierAppointedOrders.length ? <></> : 
-                    <Panel header="Orders with appointed couriers">
+                    <Panel header="Передать в упаковку">
                         <div className="appointed_orders_wrapper">
                             <OrderRowColList orders={courierAppointedOrders} page={courierAppointedPage}
                             size={courierAppointedSize} customPrevPath={location.pathname}/>
@@ -90,7 +90,7 @@ const PendingOrders = ({auth}) => {
                 
                 {
                    !packingOrders.length ? <></> : 
-                    <Panel header="Orders to pack">
+                    <Panel header="Передать в доставку">
                         <div className="packing_orders_wrapper">
                             <OrderRowColList orders={packingOrders} page={packingPage}
                             size={packingSize} customPrevPath={location.pathname} />

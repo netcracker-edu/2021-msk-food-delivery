@@ -1,4 +1,5 @@
 import { Layout, Button } from 'antd';
+import { Link } from 'react-router-dom';
 const { Content } = Layout;
 
 const Home = ({ auth }) => {
@@ -13,13 +14,18 @@ const Home = ({ auth }) => {
 
   return (
       <Content className="wrapper">
-        <h1>Hello from React, {auth.token ? auth.token.user.fullName : "Guest"}!</h1>
-        <h3 style={{overflowWrap: 'break-word',}}>YOUR TOKEN IS {auth.token ? auth.token.accessToken : "nothing"}</h3>
-        <Button type = "primary"
+        <h1>Привет, {auth.token ? auth.token.user.fullName : "гость"}!</h1>
+        {auth?.token?.accessToken ?        
+          <>
+          <h3 style={{overflowWrap: 'break-word',}}>Текущий токен: {auth.token.accessToken}</h3> 
+          <Button type = "primary"
           disabled = {auth.token ? false : true}
           onClick = {handleRefreshToken}>
-            Refresh token
-        </Button>
+            Обновить токен
+          </Button>
+          </>
+          : <Link to="/signin">Войти/зарегистрироваться</Link>}
+
       </Content>
   );
 }

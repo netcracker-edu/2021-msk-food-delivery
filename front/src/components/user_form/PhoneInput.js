@@ -3,12 +3,12 @@ import {Form, Input} from "antd"
 const PhoneInput = () => {
 
   return (
-    <Form.Item name="phoneNumber" label="Phone Number"
-      tooltip="Phone format +7 (XXX) XXX-XX-XX"
+    <Form.Item name="phoneNumber" label="Номер телефона"
+      tooltip="Формат номера: +7 (XXX) XXX-XX-XX"
       rules={[
         {
           required: false,
-          message: 'Please input your phone number!',
+          message: 'Пожалуйста, введите Ваш номер!',
         },
       ]}
     >

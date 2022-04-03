@@ -24,11 +24,11 @@ const OrderCancelButton = (props) => {
         <>
         {
             disabled === true ? 
-                <Button type="primary" danger disabled={disabled}>Cancel order</Button> 
+                <Button type="primary" danger disabled={disabled}>Отменить</Button> 
             :
                 <Popconfirm title="Are you sure?" okText="Yes" cancelText="No" onConfirm={wrappedCancelOrder}>
                     <Button type="primary" danger disabled={disabled}>
-                        Cancel order
+                        Отменить 
                     </Button>
                 </Popconfirm>
         } 

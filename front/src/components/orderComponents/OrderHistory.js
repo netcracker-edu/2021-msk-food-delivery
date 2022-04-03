@@ -50,9 +50,9 @@ const OrderHistory = ({auth}) => {
 
   return (
   <Content className='order_history_wrapper'>
-      <><h1>Order history</h1>
+      <><h1>История заказов</h1>
       {isLoading ? <></> : !orders.length ? 
-        <div className='empty_wrapper'><Empty description='No orders currently'/></div> :
+        <div className='empty_wrapper'><Empty description='Пока заказов нет'/></div> :
       <>
 
         <OrderRowColList page={page} size={size} orders={orders} />

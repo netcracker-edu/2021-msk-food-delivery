@@ -12,6 +12,11 @@ import PasswordInputConfirm from './user_form/PasswordInputConfirm';
 
 const { Meta } = Card;
 const { Content } = Layout;
+const roles = new Map();
+roles.set("CLIENT", 'Клиент');
+roles.set("COURIER", 'Курьер');
+roles.set("MODERATOR", 'Модератор');
+roles.set("ADMIN", 'Админ');
 
 const Profile = ({auth}) => {
   const AVATAR_BASE = "http://localhost:8080/api/v1/file/";
@@ -33,16 +38,16 @@ const Profile = ({auth}) => {
   const editMenu = (
     <Menu>
       <Menu.Item key="info" onClick={(e) => setIsEditInfoVisible(true)}>
-          Change Info
+          Редактировать профиль
       </Menu.Item>
       <Menu.Item key="email" onClick={(e) => setIsEditEmailVisible(true)}>
-          Change E-mail
+          Изменить E-mail
       </Menu.Item>
       <Menu.Item key="password" onClick={(e) => setIsEditPassVisible(true)}>
-          Change Password
+          Изменить пароль
       </Menu.Item>
       <Menu.Item key="avatar" onClick={(e) => setIsEditAvatarVisible(true)}>
-          Change Avatar
+          Изменить аватар
       </Menu.Item>
     </Menu>
   );
@@ -50,13 +55,13 @@ const Profile = ({auth}) => {
   const moreMenu = (
     <Menu>
       <Menu.Item key="history">
-          <Link to="/profile/orderHistory">Order History</Link>
+          <Link to="/profile/orderHistory">История заказов</Link>
       </Menu.Item>
       <Menu.Item key="full">
-          Full info
+          Полная информация
       </Menu.Item>
       <Menu.Item key="cart" onClick={() => navigate("/profile/cart")}>
-          Shoping Cart
+          Корзина
       </Menu.Item>
     </Menu>
   );
@@ -94,7 +99,7 @@ const Profile = ({auth}) => {
 
   return (
     <Content className="wrapper">
-      <h1>{profile?.role} PROFILE</h1>
+      <h1>{roles.get(profile.role)}</h1>
       <Card
         style={{ width: 500 }}
         actions={[
@@ -123,9 +128,10 @@ const Profile = ({auth}) => {
           }/>
       </Card>
 
-      <Modal title="Edit common info"
+      <Modal title="Редактировать профиль"
              visible={isEditInfoVisible}
-             okText="Edit"
+             okText="Принять"
+             cancelText="Отменить"
              onCancel = {() => setIsEditInfoVisible(false)}
              onOk={() => {
                     commonInfoForm.validateFields()
@@ -159,9 +165,10 @@ const Profile = ({auth}) => {
         </Form>
       </Modal>
 
-      <Modal title="Edit email"
+      <Modal title="Изменить email"
              visible={isEditEmailVisible}
-             okText="Edit"
+             okText="Принять"
+             cancelText="Отменить"
              onCancel = {() => {
                           setIsEditEmailVisible(false);
                           emailForm.resetFields();
@@ -171,7 +178,7 @@ const Profile = ({auth}) => {
                       .then((values) => {
                         console.log(values);
                         if (values.email == profile.email) {
-                          alert("Email not changed!");
+                          alert("Email не изменён!");
                           return;
                         }
                         editEmail(values)
@@ -195,13 +202,14 @@ const Profile = ({auth}) => {
                 }}
         >
           <EmailInput />
-          <PasswordInput inputName="password" label="Password" />
+          <PasswordInput inputName="password" label="Пароль" />
         </Form>
       </Modal>
 
-      <Modal title="Edit password"
+      <Modal title="Изменить пароль"
              visible={isEditPassVisible}
-             okText="Edit"
+             okText="Принять"
+             cancelText="Отменить"
              onCancel = {() => {
                           passForm.resetFields();
                           setIsEditPassVisible(false);
@@ -221,15 +229,16 @@ const Profile = ({auth}) => {
         <Form name="passEdit" scrollToFirstError
             form={passForm}
         >
-          <PasswordInput inputName="oldPassword" label="Old Password" />
-          <PasswordInput inputName="newPassword" label="New Password" />
+          <PasswordInput inputName="oldPassword" label="Старый пароль" />
+          <PasswordInput inputName="newPassword" label="Новый пароль" />
           <PasswordInputConfirm dependency="newPassword" inputName="newPasswordConfirm"/>
         </Form>
       </Modal>
 
-      <Modal title="Edit avatar"
+      <Modal title="Изменить аватар"
              visible={isEditAvatarVisible}
-             okText="Edit"
+             okText="Принять"
+             cancelText="Отменить"
              onCancel = {() => {
                           avatarForm.resetFields();
                           setIsEditAvatarVisible(false);
@@ -248,7 +257,7 @@ const Profile = ({auth}) => {
         <Form name="avatarEdit" scrollToFirstError
             form={avatarForm}
         >
-            <Input name="file" type="file" placeholder="Choose new avatar" />
+            <Input name="file" type="file" placeholder="Выберите новый аватар" />
         </Form>
       </Modal>
     </Content>

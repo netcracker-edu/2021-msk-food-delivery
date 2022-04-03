@@ -58,7 +58,7 @@ const SessionDetails = ({auth}) => {
     }
 
     async function finishSession(){
-        message.info("In progress...");
+        message.info("В процессе..");
         const finishResult = await deliverySessionClient.finishSession();
         if(finishResult === true){
             setIsLoading(true);
@@ -66,11 +66,11 @@ const SessionDetails = ({auth}) => {
             setIsCurrentSession(false);
             setIsLoading(false); 
             message.destroy();
-            message.success("Finished!", SUCCESS_MESSAGE_DELAY);
+            message.success("Готово!", SUCCESS_MESSAGE_DELAY);
             needToFindOrder = false;
         } else {    // else getting not finished orderId
             message.destroy();
-            message.error(`You're still appointed to order! (ID: ${finishResult})`, ERROR_MESSAGE_DELAY);
+            message.error(`Есть незавершённый заказ! (ID: ${finishResult})`, ERROR_MESSAGE_DELAY);
         }
     }
 
@@ -104,7 +104,7 @@ const SessionDetails = ({auth}) => {
                 <Col>
                     <Link to={"/deliverySessions"} state={{ page: page, size: size}} 
                      style={{fontSize: '13px'}}>
-                        Back to delivery history
+                        Обратно к истории
                     </Link>
                 </Col>
             </Row>
@@ -112,40 +112,40 @@ const SessionDetails = ({auth}) => {
             <Card className="session_details_card">
                 <Row justify="center">
                     <Col>
-                        <Title style={{display: "inline-flex"}} level={3}>{`Session id: ${params.sessionId}`}</Title>
+                        <Title style={{display: "inline-flex"}} level={3}>{`ID сессии: ${params.sessionId}`}</Title>
                     </Col>
                 </Row>
                 {isCurrentSession ?
                 <Row justify="center">    
                     <Col>
-                        <Tag style={{display: "inline-flex"}} color="green">In progress</Tag>
+                        <Tag style={{display: "inline-flex"}} color="green">Текущая</Tag>
                     </Col>
                 </Row>
                 : <></>}
                 <Divider style={{margin: "14px 0"}}></Divider>
                 <div className="session_details_properties">
                     <div className="session_details_key_value_wrapper">
-                        <span>Orders completed: </span><span><strong>{session.ordersCompleted ?? 0}</strong></span> 
+                        <span>Заказов завершено: </span><span><strong>{session.ordersCompleted ?? 0}</strong></span> 
                     </div>
 
                     <div className="session_details_key_value_wrapper">
-                        <span>Money earned: </span><span><strong>{session.moneyEarned?.toFixed(2) ?? '0.00'}</strong></span> 
+                        <span>Заработано: </span><span><strong>{session.moneyEarned?.toFixed(2) ?? '0.00'}</strong></span> 
                     </div>
             
                     {session.averageTimePerOrder ? 
                         <div className="session_details_key_value_wrapper">
-                            <span>Average time per order: </span><span><strong>{session.averageTimePerOrder}</strong></span> 
+                            <span>Среднее время на заказ: </span><span><strong>{session.averageTimePerOrder}</strong></span> 
                         </div>
                     :   <></>    
                     }
 
                     <div className="session_details_key_value_wrapper">
-                        <span>Started: </span><span><strong>{session.startTime}</strong></span> 
+                        <span>Создана: </span><span><strong>{session.startTime}</strong></span> 
                     </div>
                         
                     {session.endTime ? 
                         <div className="session_details_key_value_wrapper">
-                            <span>Finished: </span><span><strong>{session.endTime}</strong></span> 
+                            <span>Завершена: </span><span><strong>{session.endTime}</strong></span> 
                         </div>
                         : <></>
                     } 
@@ -160,7 +160,7 @@ const SessionDetails = ({auth}) => {
                             okText="Yes"
                             cancelText="No"
                         >
-                            <Button type="primary">Finish session</Button>
+                            <Button type="primary">Завершить сессию</Button>
                         </Popconfirm>
                     </div></>
                     : <></>
@@ -168,13 +168,13 @@ const SessionDetails = ({auth}) => {
 
             </Card>
             <Divider>
-                <Title level={4}>Orders</Title>
+                <Title level={4}>Заказы</Title>
             </Divider>
             {isCurrentSession && currentOrder == null ? 
                 <Card style={{borderRadius: '10px', width: '40%', margin: '0 auto'}}>
                     <div style={{display: 'flex', justifyContent: 'center'}}>
                         
-                            <Text level={5} strong>Searching suitable order...</Text>
+                            <Text level={5} strong>Ищем подходящий заказ...</Text>
                         
                             <Spin style={{marginLeft: '10px'}}/>
                         
@@ -185,7 +185,7 @@ const SessionDetails = ({auth}) => {
             <>{!isCurrentSession && !orders?.length ? 
             <div style={{textAlign: 'center', margin: '0 auto'}}>
                 <Text level={5} strong >
-                    No orders in this session
+                    Заказов нет
                 </Text>
             </div> 
             :

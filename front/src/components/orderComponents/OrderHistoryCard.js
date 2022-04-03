@@ -5,12 +5,12 @@ import './styles/style.css';
 
 const OrderHistoryCard = (props) => {
     const statusTagMap = new Map();
-    statusTagMap.set('CREATED', ['cyan', 'Created']);
-    statusTagMap.set('COURIER_APPOINTED', ['blue', 'Courier is appointed']);
-    statusTagMap.set('PACKING', ['geekblue', 'Packing']);
-    statusTagMap.set('DELIVERING', ['purple', 'Delivering']);
-    statusTagMap.set('DELIVERED', ['green', 'Delivered']);
-    statusTagMap.set('CANCELLED', ['red', 'Cancelled']);
+    statusTagMap.set('CREATED', ['cyan', 'Создан']);
+    statusTagMap.set('COURIER_APPOINTED', ['blue', 'Курьер назначен']);
+    statusTagMap.set('PACKING', ['geekblue', 'Упаковка']);
+    statusTagMap.set('DELIVERING', ['purple', 'Доставка']);
+    statusTagMap.set('DELIVERED', ['green', 'Доставлен']);
+    statusTagMap.set('CANCELLED', ['red', 'Отменён']);
     
     const {order, page, size, customPrevPath} = {...props}; 
     const navigate = useNavigate();
@@ -25,29 +25,29 @@ const OrderHistoryCard = (props) => {
             prevPath: customPrevPath != null? customPrevPath : '/profile/orderHistory',
         }})}>
         <Row justify="space-between" className="order_card_header">
-                <Col>{`Order id: ${order.id}`}</Col>
-                <Col>{`Started: ${order.dateStart}`}</Col>
+                <Col>{`ID заказа: ${order.id}`}</Col>
+                <Col>{`Создан: ${order.dateStart}`}</Col>
         </Row>
         <Divider style={{margin: '14px'}}/>
             <Descriptions>
-                <Descriptions.Item label="Status">
+                <Descriptions.Item label="Статус">
                         <Tag color={`${statusTagMap.get(order.status)[0]}`}>
                             {`${statusTagMap.get(order.status)[1]}`}
                         </Tag>
                 </Descriptions.Item>
                 
-                <Descriptions.Item label="Cost">    
+                <Descriptions.Item label="Общая стоимость">    
                     <strong>{order.overallCost}</strong>  
                 </Descriptions.Item>
                 
                 {order.dateEnd ? (
                     order.status === 'DELIVERED' 
                     ?
-                        <Descriptions.Item label='Delivered on'>
+                        <Descriptions.Item label='Доставлен'>
                             <strong>{`${order.dateEnd}`}</strong>
                         </Descriptions.Item>
                     
-                    :   <Descriptions.Item label='Cancelled on'>
+                    :   <Descriptions.Item label='Отменён'>
                             <strong>{`${order.dateEnd}`}</strong>
                         </Descriptions.Item>
                                        
