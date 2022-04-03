@@ -53,7 +53,7 @@ const ProductList = ({auth, address, setAddress}) => {
   }, []);
 
   return (
-    <Content className="wrapper">
+    <Content className="wrapper, width-80">
       {productList ? (
         <>
           <br></br>
