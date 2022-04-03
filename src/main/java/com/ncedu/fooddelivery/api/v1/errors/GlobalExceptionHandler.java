@@ -251,8 +251,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OrderCostChangedEx.class)
     public ResponseEntity<Object> handleOrderCostChangedEx(OrderCostChangedEx ex){
         ApiError err = new ApiError(HttpStatus.NOT_ACCEPTABLE, ex.getMessage(), OrderCostChangedEx.uuid);
-        err.setSubErrors(new ArrayList<>(Arrays.asList(new OrderCostChangedSubError(ex.getCurrentOverallCost(),
-                ex.getCurrentDiscount(), ex.getCurrentHighDemandCoeff()))));
+        err.setSubErrors(new ArrayList<>(Arrays.asList(new OrderCostChangedSubError(ex.getOverallCost(),
+                ex.getDiscount(), ex.getHighDemandCoeff()))));
         return buildResponseEntity(err);
     }
 
