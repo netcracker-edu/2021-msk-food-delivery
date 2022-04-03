@@ -31,13 +31,13 @@ export default class OrderClient{
 
     async getOrderById(id){
         await this.checkToken();
-        return commonFetch(this.config.ORDER_URL + `/${id}`, 'GET', 
+        return commonFetch(this.config.ORDER_URL + `/${id}`, 'GET',
         this.config.headersWithAuthorization(), null);
     }
 
     async changeOrderStatus(orderId, newStatus){
         await this.checkToken();
-        return patchFetch(this.config.ORDER_URL + `/${orderId}/status`, 
+        return patchFetch(this.config.ORDER_URL + `/${orderId}/status`,
         this.config.headersWithAuthorization(), JSON.stringify({newStatus: newStatus}));
     }
 
@@ -54,19 +54,19 @@ export default class OrderClient{
 
     async fetchOrderPage(page, size){
         await this.checkToken();
-        return commonFetch(this.buildPaginationQuery(page, size), 'GET', 
+        return commonFetch(this.buildPaginationQuery(page, size), 'GET',
         this.config.headersWithAuthorization(), null);
     }
 
     async fetchFilteredOrderPage(warehouseId, status, page, size){
         await this.checkToken();
-        return commonFetch(this.buildFilterQuery(warehouseId, status, page, size), 'GET', 
-        this.config.headersWithAuthorization(), null);    
+        return commonFetch(this.buildFilterQuery(warehouseId, status, page, size), 'GET',
+        this.config.headersWithAuthorization(), null);
     }
 
     async fetchFilteredAmount(warehouseId, status){
         await this.checkToken();
-        return commonFetch(this.buildFilterAmountQuery(warehouseId, status), 'GET', 
+        return commonFetch(this.buildFilterAmountQuery(warehouseId, status), 'GET',
         this.config.headersWithAuthorization(), null);
     }
 
@@ -84,12 +84,31 @@ export default class OrderClient{
 
     async getOrdersFromSession(sessionId){
         await this.checkToken();
-        return await commonFetch(this.config.DELIVERY_SESSION_URL + `${sessionId}/orders`, 'GET', 
+        return await commonFetch(this.config.DELIVERY_SESSION_URL + `${sessionId}/orders`, 'GET',
         this.config.headersWithAuthorization(), null);
     }
 
     async getCurrentOrder(){
         await this.checkToken();
         return await commonFetch(this.config.ORDER_URL, 'GET', this.config.headersWithAuthorization(), null);
+    }
+
+    async orderCheckout(totalPrice, address, cartItems) {
+        await this.checkToken();
+        const coords = { "lat" : address.coord[0], "lon" : address.coord[1]};
+        const orderData = {
+          "overallCost" : totalPrice.overallCost,
+          "discount" : totalPrice.discount,
+          "highDemandCoeff": totalPrice.highDemandCoeff,
+          "warehouseId" : address.warehouseId,
+          "geo" : coords,
+          "products" : cartItems,
+          "address" : address.fullAddress
+        };
+        return await commonFetch(
+                this.config.ORDER_URL,
+                'POST',
+                this.config.headersWithAuthorization(),
+                JSON.stringify(orderData));
     }
 }

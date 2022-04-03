@@ -6,7 +6,8 @@ import ItemCountInput from "../ItemCountInput.js";
 const {Text, Link} = Typography;
 
 const CartItem = ({product, itemCount, coords, warehouseId,
-                    calculateTotalPrice, deleteFromCartList}) => {
+                    calculateTotalPrice, deleteFromCartList,
+                    availableAmount}) => {
   const { cartItems, dispatch } = useCartContext();
   const [count, setCount] = useState(itemCount);
   const PICTURE_BASE = "http://localhost:8080/api/v1/file/";
@@ -36,7 +37,7 @@ const CartItem = ({product, itemCount, coords, warehouseId,
     {count == 0
       ? <></>
       : <>
-        <Row align="middle">
+        <Row align="middle" className={availableAmount ? "red-border" : ""}>
           <Col span={2}>
             <Avatar size={50}
                     src={product?.pictureUUID == null
@@ -51,23 +52,36 @@ const CartItem = ({product, itemCount, coords, warehouseId,
               {product.discount == 0
                     ? (product.price).toFixed(2)
                     : <>
-                        <Text delete type="danger">{(product.price).toFixed(2)}</Text> {(product.price - product.discount).toFixed(2)}
+                        <Text delete type="danger">
+                          {(product.price).toFixed(2)}
+                        </Text>
+                        {(product.price - product.discount).toFixed(2)}
                       </>
               }
             </Text>
           </Col>
           <Col span={4}>
-            <ItemCountInput count={count} addToCart={updateCartItem} deleteFromCart={deleteFromCart}/>
+            <ItemCountInput count={count}
+                  addToCart={updateCartItem}
+                  deleteFromCart={deleteFromCart}
+            />
           </Col>
           <Col span={4}>
             {product.discount == 0
-                  ? <Text> {(product.price * count).toFixed(2)}</Text>
-                  : <>
-                      <Text> {((product.price - product.discount) * count).toFixed(2)}</Text>
-                    </>
+                  ? <Text>
+                      {(product.price * count).toFixed(2)}
+                    </Text>
+                  : <Text>
+                      {((product.price - product.discount) * count).toFixed(2)}
+                    </Text>
             }
           </Col>
         </Row>
+        {availableAmount
+          ? <Text type="danger">
+              Недостаточно продуктов на складе. Уменьшите позицию до {availableAmount}
+            </Text>
+          : <></>}
         <Divider></Divider>
         </>
     }

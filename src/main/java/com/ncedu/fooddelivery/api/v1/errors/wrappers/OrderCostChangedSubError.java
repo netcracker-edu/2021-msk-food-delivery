@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class OrderCostChangedSubError extends ApiSubError{
-    private Double currentOverallCost, currentDiscount, currentHighDemandCoeff;
+    private Double overallCost, discount, highDemandCoeff;
 }
