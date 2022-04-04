@@ -3,7 +3,7 @@ const {Option} = Select;
 
 const RoleSelect = ({mode}) => {
 
-  const register = ['Клиент', 'Курьер'];
+  const register = ['Client', 'Courier'];
   const add = ['Клиент', 'Курьер', 'Админ', 'Модератор'];
   const getOptions = (names) => {
     return (

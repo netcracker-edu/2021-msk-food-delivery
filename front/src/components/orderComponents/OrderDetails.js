@@ -43,19 +43,19 @@ const OrderDetails = (props) => {
 
     const fetchData = async () => {
         setIsLoading(true);
-        let response = await profileClient.get();
-        if (response && response.success) {
-          setProfile(response.data);
+        let profileResponse = await profileClient.get();
+        if (profileResponse && profileResponse.success) {
+          setProfile(profileResponse.data);
         }
         
-        response = await orderClient.getOrderById(orderId);
+        let orderResponse = await orderClient.getOrderById(orderId);
 
-        if(response.success){
-            setOrder(response.data);
-            setOrderStatus(response.data.status);
-            setProducts(response.data.products);
-            if(profile.role === 'CLIENT') setRating(response.data.deliveryRating);
-            else setRating(response.data.clientRating);
+        if(orderResponse.success){
+            setOrder(orderResponse.data);
+            setOrderStatus(orderResponse.data.status);
+            setProducts(orderResponse.data.products);
+            if(profile.role === "CLIENT") setRating(orderResponse.data.deliveryRating);
+            else setRating(orderResponse.data.clientRating);
         } else {
             navigate(NOT_FOUND_PAGE);
         }

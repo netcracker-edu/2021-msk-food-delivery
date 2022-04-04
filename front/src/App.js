@@ -31,7 +31,7 @@ function App() {
   const { token, setToken } = useToken();
   const auth = new Auth(token, setToken);
   const { address, setAddress } = useAddress();
-  const userRole = token?.user.role;
+  const userRole = token?.user?.role;
 
   return (
     <Layout className="App" style={{minHeight: "100vh"}}>
@@ -59,7 +59,7 @@ function App() {
             <>{
               userRole === "ADMIN" || userRole === "MODERATOR" ?
               <Route path="/warehouses">
-                {userRole === 'ADMIN' ?   
+                {userRole === "ADMIN" ?   
                   <Route 
                   index={true} element={<WarehouseList auth={auth}/>}
                   /> : <></>
@@ -71,7 +71,7 @@ function App() {
             </>
 
             <>
-              {userRole === 'COURIER' ? 
+              {userRole === "COURIER" ? 
                 <Route 
                   path="/deliverySessions"
                 >

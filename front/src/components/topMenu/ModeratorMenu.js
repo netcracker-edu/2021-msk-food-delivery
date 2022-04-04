@@ -1,15 +1,10 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, Badge } from 'antd';
-import { useCartContext } from "../../hooks/CartContext";
-
-import ClientMapModal from "./ClientMapModal.js";
+import { Menu } from 'antd';
 
 const { Item } = Menu;
 
-const ModeratorMenu = ({auth, address, setAddress}) => {
-  const { cartItems } = useCartContext();
-  const [isMapVisible, setIsMapVisible] = useState(false);
+const ModeratorMenu = ({auth}) => {
+  
   return (
       <>
       <Menu theme="dark" mode="horizontal">
@@ -20,28 +15,7 @@ const ModeratorMenu = ({auth, address, setAddress}) => {
           <Link to="/profile">Профиль</Link>
         </Item>
         <Item key="warehouse">
-            <Link to={`/warehouses/${auth.token?.user.warehouseId}`}>Склад</Link>
-        </Item>
-        <Item key="products">
-          <Link to="/products">Продукты</Link>
-        </Item>
-        <Item key="cart">
-            <Link to="/profile/cart">
-              Корзина
-              {
-                cartItems == null
-                  ? <></>
-                  : <Badge style={{margin:"0px 0px 20px 0px"}} size="small"
-                        count={Object.keys(cartItems).length} />
-              }
-
-            </Link>
-        </Item>
-        <Item key="address" onClick={()=>setIsMapVisible(true)}>
-          {address && Object.keys(address).length == 0
-            ? <>Адрес</>
-            : <>{address.shortAddress}</>
-          }
+            <Link to={`/warehouses/${auth.token?.user?.warehouseId}`}>Склад</Link>
         </Item>
         <Item key="sign">
           <Link to="/signout" >
@@ -49,10 +23,6 @@ const ModeratorMenu = ({auth, address, setAddress}) => {
           </Link>
         </Item>
       </Menu>
-      <ClientMapModal auth={auth} isMapVisible={isMapVisible}
-               setIsMapVisible={setIsMapVisible}
-               address={address}  setAddress={setAddress}
-      />
       </>
   );
 }

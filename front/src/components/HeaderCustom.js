@@ -33,7 +33,7 @@ const HeaderCustom = ({ auth, address, setAddress }) => {
   return (
     <Header>
         {
-          renderSwitch(auth?.token?.user.role)
+          renderSwitch(auth?.token?.user?.role)
         }
     </Header>
   );
