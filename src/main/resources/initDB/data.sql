@@ -15,6 +15,101 @@ END;
 
 DO ' DECLARE
 BEGIN
+
+    /*
+                USERS
+    */
+    IF NOT EXISTS (SELECT 1 FROM users WHERE user_id = 1) THEN
+        INSERT INTO users
+            VALUES  (1, ''ADMIN'', crypt(''adminadmin'', gen_salt(''bf'', 8)), ''Админов Админ Админович'', ''admin@mail.ru'', now(), null, null, null),
+                    (2, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Aнтонов Антон Антонович'', ''antonov@mail.ru'', now(), null, null, null),
+                    (3, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Иванов Иван Иванович'', ''ivanov@mail.ru'', now(), null, null, null),
+                    (4, ''CLIENT'', crypt(''testtest'', gen_salt(''bf'', 8)), ''Тестов Тест Тестович'', ''test@mail.ru'', now(), null, null, null),
+                    (5, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Князев Князь Князевич'', ''knyazev@mail.ru'', now(), null, null, null),
+                    (6, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Климов Клим Климович'', ''klimov@mail.ru'', now(), null, null, null),
+                    (7, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Петров Петр Петрович'', ''petrov@mail.ru'', now(), null, null, null),
+                    (8, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Павлова Павла Павловна'', ''pavlova@mail.ru'', now(), null, null, null),
+                    (9, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Евгенева Евгенья Евгеньевна'', ''evgeneva@mail.ru'', now(), null, null, null),
+                    (10, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Александрова Александра Александровна'', ''aleksandrova@mail.ru'', now(), null, null, null),
+                    (11, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Владиславова Владислава Владиславовна'', ''vladislavova@mail.ru'', now(), null, null, null),
+                    (12, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Погорелов Зиновий Улебович'', ''pogorelov@mail.ru'', now(), null, null, null),
+                    (13, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Евдокимов Леонтий Натанович'', ''evdokimov@mail.ru'', now(), null, null, null),
+                    (14, ''CLIENT'', crypt(''testtest'', gen_salt(''bf'', 8)), ''Захаров Овидий Иванович'', ''zaharov@mail.ru'', now(), null, null, null),
+                    (15, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Ершов Иван Альбертович'', ''ershov@mail.ru'', now(), null, null, null),
+                    (16, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Никитин Нинель Фролович'', ''nikitin@mail.ru'', now(), null, null, null),
+                    (17, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Дементьев Марк Михайлович'', ''dementev@mail.ru'', now(), null, null, null),
+                    (18, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Зимин Даниил Дмитриевич'', ''zimin@mail.ru'', now(), null, null, null),
+                    (19, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Беляев Давид Пётрович'', ''belyaev@mail.ru'', now(), null, null, null),
+                    (20, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Фёдоров Альберт Никитевич'', ''fedorov@mail.ru'', now(), null, null, null),
+                    (21, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Меркушев Роберт Феликсович'', ''merkushev@mail.ru'', now(), null, null, null),
+                    (22, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Хохлов Ермак Алексеевич'', ''hohlov@mail.ru'', now(), null, null, null),
+                    (23, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Комиссаров Азарий Владленович'', ''komissarov@mail.ru'', now(), null, null, null),
+                    (24, ''CLIENT'', crypt(''testtest'', gen_salt(''bf'', 8)), ''Потапов Алан Семенович'', ''potapov@mail.ru'', now(), null, null, null),
+                    (25, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Денисов Варлам Гордеевич'', ''denisov@mail.ru'', now(), null, null, null),
+                    (26, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Сафонов Игнатий Эдуардович'', ''safonov@mail.ru'', now(), null, null, null),
+                    (27, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Фомичёв Степан Авдеевич'', ''fomichev@mail.ru'', now(), null, null, null),
+                    (28, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Лазарев Матвей Еремеевич'', ''lazarev@mail.ru'', now(), null, null, null),
+                    (29, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Дорофеев Остап Артёмович'', ''dorofeev@mail.ru'', now(), null, null, null),
+                    (30, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Бандурин Карл Семенович'', ''bandurin@mail.ru'', now(), null, null, null),
+                    (31, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Фокин Герасим Давидович'', ''fokin@mail.ru'', now(), null, null, null),
+                    (32, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Шестакова Снежана Макаровна'', ''shestakova@mail.ru'', now(), null, null, null),
+                    (33, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Суханова Ирина Васильевна'', ''suhanova@mail.ru'', now(), null, null, null),
+                    (34, ''CLIENT'', crypt(''testtest'', gen_salt(''bf'', 8)), ''Журавлёва Эдита Петровна'', ''zhuravleva Edita Petrovna@mail.ru'', now(), null, null, null),
+                    (35, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Носова Жаклин Романовна'', ''nosova@mail.ru'', now(), null, null, null),
+                    (36, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Фадеева Никки Руслановна'', ''fadeeva@mail.ru'', now(), null, null, null),
+                    (37, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Воронцова Бронислава Улебовна'', ''voroncova@mail.ru'', now(), null, null, null),
+                    (38, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Лыткина Юна Кирилловна'', ''lytkina@mail.ru'', now(), null, null, null),
+                    (39, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Самсонова Инга Ярославовна'', ''samsonova@mail.ru'', now(), null, null, null),
+                    (40, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Пахомова Дарьяна Тимуровна'', ''pahomova@mail.ru'', now(), null, null, null),
+                    (41, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Крюкова Арина Борисовна'', ''kryukova@mail.ru'', now(), null, null, null),
+                    (42, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Воробьёва Валентина Юрьевна'', ''vorobyova @mail.ru'', now(), null, null, null),
+                    (43, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Доронина Мария Якуновна'', ''doronina@mail.ru'', now(), null, null, null),
+                    (44, ''CLIENT'', crypt(''testtest'', gen_salt(''bf'', 8)), ''Кулакова Ксения Вадимовна'', ''kulakova@mail.ru'', now(), null, null, null),
+                    (45, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Исакова Златослава Валерьевна'', ''isakova@mail.ru'', now(), null, null, null),
+                    (46, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Волкова Азалия Еремеевна'', ''volkova@mail.ru'', now(), null, null, null),
+                    (47, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Бирюкова Владлена Никитевна'', ''biryukova@mail.ru'', now(), null, null, null),
+                    (48, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Маслова Динара Игнатьевна'', ''maslova@mail.ru'', now(), null, null, null),
+                    (49, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Терентьева Аза Наумовна'', ''terenteva@mail.ru'', now(), null, null, null),
+                    (50, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Сорокина Дарья Никитевна'', ''sorokina@mail.ru'', now(), null, null, null),
+                    (51, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Богданова Инга Глебовна'', ''bogdanova@mail.ru'', now(), null, null, null),
+                    (52, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров Курьер Курьерович'', ''curierov@mail.ru'', now(), null, null, null),
+                    (53, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров2 Курьер2 Курьерович2'', ''curierov2@mail.ru'', now(), null, null, null),
+                    (54, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров3 Курьер3 Курьерович3'', ''curierov3@mail.ru'', now(), null, null, null),
+                    (55, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров4 Курьер4 Курьерович4'', ''curierov4@mail.ru'', now(), null, null, null),
+                    (56, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров5 Курьер5 Курьерович5'', ''curierov5@mail.ru'', now(), null, null, null),
+                    (57, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров6 Курьер6 Курьерович6'', ''curierov6@mail.ru'', now(), null, null, null),
+                    (58, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров7 Курьер7 Курьерович7'', ''curierov7@mail.ru'', now(), null, null, null),
+                    (59, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров8 Курьер8 Курьерович8'', ''curierov8@mail.ru'', now(), null, null, null),
+                    (60, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров9 Курьер9 Курьерович9'', ''curierov9@mail.ru'', now(), null, null, null),
+                    (61, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров10 Курьер10 Курьерович10'', ''curierov10@mail.ru'', now(), null, null, null),
+                    (62, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров11 Курьер11 Курьерович11'', ''curierov11@mail.ru'', now(), null, null, null),
+                    (63, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров12 Курьер12 Курьерович12'', ''curierov12@mail.ru'', now(), null, null, null),
+                    (64, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров13 Курьер13 Курьерович13'', ''curierov13@mail.ru'', now(), null, null, null),
+                    (65, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров14 Курьер14 Курьерович14'', ''curierov14@mail.ru'', now(), null, null, null),
+                    (66, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров15 Курьер15 Курьерович15'', ''curierov15@mail.ru'', now(), null, null, null),
+                    (67, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров16 Курьер16 Курьерович16'', ''curierov16@mail.ru'', now(), null, null, null),
+                    (68, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров17 Курьер17 Курьерович17'', ''curierov17@mail.ru'', now(), null, null, null),
+                    (69, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров18 Курьер18 Курьерович18'', ''curierov18@mail.ru'', now(), null, null, null),
+                    (70, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров19 Курьер19 Курьерович19'', ''curierov19@mail.ru'', now(), null, null, null),
+                    (71, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров20 Курьер20 Курьерович20'', ''curierov20@mail.ru'', now(), null, null, null),
+                    (72, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов Модератор Модераторович'', ''moderatorov@mail.ru'', now(), null, null, null),
+                    (73, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов2 Модератор2 Модераторович2'', ''moderatorov2@mail.ru'', now(), null, null, null),
+                    (74, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов3 Модератор3 Модераторович3'', ''moderatorov3@mail.ru'', now(), null, null, null),
+                    (75, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов4 Модератор4 Модераторович4'', ''moderatorov4@mail.ru'', now(), null, null, null),
+                    (76, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов5 Модератор5 Модераторович5'', ''moderatorov5@mail.ru'', now(), null, null, null),
+                    (77, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов6 Модератор6 Модераторович6'', ''moderatorov6@mail.ru'', now(), null, null, null),
+                    (78, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов7 Модератор7 Модераторович7'', ''moderatorov7@mail.ru'', now(), null, null, null),
+                    (79, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов8 Модератор8 Модераторович8'', ''moderatorov8@mail.ru'', now(), null, null, null),
+                    (80, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов9 Модератор9 Модераторович9'', ''moderatorov9@mail.ru'', now(), null, null, null),
+                    (81, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов10 Модератор10 Модераторович10'', ''moderatorov10@mail.ru'', now(), null, null, null);
+
+        ALTER SEQUENCE IF EXISTS users_user_id_seq RESTART WITH 81;
+        END IF;
+    END;
+' language plpgsql;
+
+DO ' DECLARE
+BEGIN
     IF NOT EXISTS (SELECT 1 FROM files WHERE file_id = ''a3026e4e-02b0-4fc0-a92a-bdcdf064fa06'') THEN
     INSERT INTO files(file_id, owner_id, type, name, size, upload_date)
     VALUES
@@ -143,102 +238,6 @@ BEGIN
         (''2b5c4886-093b-4054-8fd5-80a6751c1900'',	1,	''PNG'',	''user'',	114571,	''2022-04-01 22:56:41.391233'');
     END IF;
 END;
-' language plpgsql;
-
-
-DO ' DECLARE
-BEGIN
-
-    /*
-                USERS
-    */
-    IF NOT EXISTS (SELECT 1 FROM users WHERE user_id = 1) THEN
-        INSERT INTO users
-            VALUES  (1, ''ADMIN'', crypt(''adminadmin'', gen_salt(''bf'', 8)), ''Админов Админ Админович'', ''admin@mail.ru'', now(), null, null, null),
-                    (2, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Aнтонов Антон Антонович'', ''antonov@mail.ru'', now(), null, null, null),
-                    (3, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Иванов Иван Иванович'', ''ivanov@mail.ru'', now(), null, null, null),
-                    (4, ''CLIENT'', crypt(''testtest'', gen_salt(''bf'', 8)), ''Тестов Тест Тестович'', ''test@mail.ru'', now(), null, null, null),
-                    (5, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Князев Князь Князевич'', ''knyazev@mail.ru'', now(), null, null, null),
-                    (6, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Климов Клим Климович'', ''klimov@mail.ru'', now(), null, null, null),
-                    (7, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Петров Петр Петрович'', ''petrov@mail.ru'', now(), null, null, null),
-                    (8, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Павлова Павла Павловна'', ''pavlova@mail.ru'', now(), null, null, null),
-                    (9, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Евгенева Евгенья Евгеньевна'', ''evgeneva@mail.ru'', now(), null, null, null),
-                    (10, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Александрова Александра Александровна'', ''aleksandrova@mail.ru'', now(), null, null, null),
-                    (11, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Владиславова Владислава Владиславовна'', ''vladislavova@mail.ru'', now(), null, null, null),
-                    (12, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Погорелов Зиновий Улебович'', ''pogorelov@mail.ru'', now(), null, null, null),
-                    (13, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Евдокимов Леонтий Натанович'', ''evdokimov@mail.ru'', now(), null, null, null),
-                    (14, ''CLIENT'', crypt(''testtest'', gen_salt(''bf'', 8)), ''Захаров Овидий Иванович'', ''zaharov@mail.ru'', now(), null, null, null),
-                    (15, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Ершов Иван Альбертович'', ''ershov@mail.ru'', now(), null, null, null),
-                    (16, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Никитин Нинель Фролович'', ''nikitin@mail.ru'', now(), null, null, null),
-                    (17, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Дементьев Марк Михайлович'', ''dementev@mail.ru'', now(), null, null, null),
-                    (18, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Зимин Даниил Дмитриевич'', ''zimin@mail.ru'', now(), null, null, null),
-                    (19, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Беляев Давид Пётрович'', ''belyaev@mail.ru'', now(), null, null, null),
-                    (20, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Фёдоров Альберт Никитевич'', ''fedorov@mail.ru'', now(), null, null, null),
-                    (21, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Меркушев Роберт Феликсович'', ''merkushev@mail.ru'', now(), null, null, null),
-                    (22, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Хохлов Ермак Алексеевич'', ''hohlov@mail.ru'', now(), null, null, null),
-                    (23, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Комиссаров Азарий Владленович'', ''komissarov@mail.ru'', now(), null, null, null),
-                    (24, ''CLIENT'', crypt(''testtest'', gen_salt(''bf'', 8)), ''Потапов Алан Семенович'', ''potapov@mail.ru'', now(), null, null, null),
-                    (25, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Денисов Варлам Гордеевич'', ''denisov@mail.ru'', now(), null, null, null),
-                    (26, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Сафонов Игнатий Эдуардович'', ''safonov@mail.ru'', now(), null, null, null),
-                    (27, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Фомичёв Степан Авдеевич'', ''fomichev@mail.ru'', now(), null, null, null),
-                    (28, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Лазарев Матвей Еремеевич'', ''lazarev@mail.ru'', now(), null, null, null),
-                    (29, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Дорофеев Остап Артёмович'', ''dorofeev@mail.ru'', now(), null, null, null),
-                    (30, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Бандурин Карл Семенович'', ''bandurin@mail.ru'', now(), null, null, null),
-                    (31, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Фокин Герасим Давидович'', ''fokin@mail.ru'', now(), null, null, null),
-                    (32, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Шестакова Снежана Макаровна'', ''shestakova@mail.ru'', now(), null, null, null),
-                    (33, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Суханова Ирина Васильевна'', ''suhanova@mail.ru'', now(), null, null, null),
-                    (34, ''CLIENT'', crypt(''testtest'', gen_salt(''bf'', 8)), ''Журавлёва Эдита Петровна'', ''zhuravleva Edita Petrovna@mail.ru'', now(), null, null, null),
-                    (35, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Носова Жаклин Романовна'', ''nosova@mail.ru'', now(), null, null, null),
-                    (36, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Фадеева Никки Руслановна'', ''fadeeva@mail.ru'', now(), null, null, null),
-                    (37, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Воронцова Бронислава Улебовна'', ''voroncova@mail.ru'', now(), null, null, null),
-                    (38, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Лыткина Юна Кирилловна'', ''lytkina@mail.ru'', now(), null, null, null),
-                    (39, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Самсонова Инга Ярославовна'', ''samsonova@mail.ru'', now(), null, null, null),
-                    (40, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Пахомова Дарьяна Тимуровна'', ''pahomova@mail.ru'', now(), null, null, null),
-                    (41, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Крюкова Арина Борисовна'', ''kryukova@mail.ru'', now(), null, null, null),
-                    (42, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Воробьёва Валентина Юрьевна'', ''vorobyova @mail.ru'', now(), null, null, null),
-                    (43, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Доронина Мария Якуновна'', ''doronina@mail.ru'', now(), null, null, null),
-                    (44, ''CLIENT'', crypt(''testtest'', gen_salt(''bf'', 8)), ''Кулакова Ксения Вадимовна'', ''kulakova@mail.ru'', now(), null, null, null),
-                    (45, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Исакова Златослава Валерьевна'', ''isakova@mail.ru'', now(), null, null, null),
-                    (46, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Волкова Азалия Еремеевна'', ''volkova@mail.ru'', now(), null, null, null),
-                    (47, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Бирюкова Владлена Никитевна'', ''biryukova@mail.ru'', now(), null, null, null),
-                    (48, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Маслова Динара Игнатьевна'', ''maslova@mail.ru'', now(), null, null, null),
-                    (49, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Терентьева Аза Наумовна'', ''terenteva@mail.ru'', now(), null, null, null),
-                    (50, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Сорокина Дарья Никитевна'', ''sorokina@mail.ru'', now(), null, null, null),
-                    (51, ''CLIENT'', crypt(''password'', gen_salt(''bf'', 8)), ''Богданова Инга Глебовна'', ''bogdanova@mail.ru'', now(), null, null, null),
-                    (52, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров Курьер Курьерович'', ''curierov@mail.ru'', now(), null, null, null),
-                    (53, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров2 Курьер2 Курьерович2'', ''curierov2@mail.ru'', now(), null, null, null),
-                    (54, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров3 Курьер3 Курьерович3'', ''curierov3@mail.ru'', now(), null, null, null),
-                    (55, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров4 Курьер4 Курьерович4'', ''curierov4@mail.ru'', now(), null, null, null),
-                    (56, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров5 Курьер5 Курьерович5'', ''curierov5@mail.ru'', now(), null, null, null),
-                    (57, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров6 Курьер6 Курьерович6'', ''curierov6@mail.ru'', now(), null, null, null),
-                    (58, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров7 Курьер7 Курьерович7'', ''curierov7@mail.ru'', now(), null, null, null),
-                    (59, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров8 Курьер8 Курьерович8'', ''curierov8@mail.ru'', now(), null, null, null),
-                    (60, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров9 Курьер9 Курьерович9'', ''curierov9@mail.ru'', now(), null, null, null),
-                    (61, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров10 Курьер10 Курьерович10'', ''curierov10@mail.ru'', now(), null, null, null),
-                    (62, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров11 Курьер11 Курьерович11'', ''curierov11@mail.ru'', now(), null, null, null),
-                    (63, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров12 Курьер12 Курьерович12'', ''curierov12@mail.ru'', now(), null, null, null),
-                    (64, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров13 Курьер13 Курьерович13'', ''curierov13@mail.ru'', now(), null, null, null),
-                    (65, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров14 Курьер14 Курьерович14'', ''curierov14@mail.ru'', now(), null, null, null),
-                    (66, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров15 Курьер15 Курьерович15'', ''curierov15@mail.ru'', now(), null, null, null),
-                    (67, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров16 Курьер16 Курьерович16'', ''curierov16@mail.ru'', now(), null, null, null),
-                    (68, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров17 Курьер17 Курьерович17'', ''curierov17@mail.ru'', now(), null, null, null),
-                    (69, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров18 Курьер18 Курьерович18'', ''curierov18@mail.ru'', now(), null, null, null),
-                    (70, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров19 Курьер19 Курьерович19'', ''curierov19@mail.ru'', now(), null, null, null),
-                    (71, ''COURIER'', crypt(''password'', gen_salt(''bf'', 8)), ''Курьеров20 Курьер20 Курьерович20'', ''curierov20@mail.ru'', now(), null, null, null),
-                    (72, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов Модератор Модераторович'', ''moderatorov@mail.ru'', now(), null, null, null),
-                    (73, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов2 Модератор2 Модераторович2'', ''moderatorov2@mail.ru'', now(), null, null, null),
-                    (74, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов3 Модератор3 Модераторович3'', ''moderatorov3@mail.ru'', now(), null, null, null),
-                    (75, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов4 Модератор4 Модераторович4'', ''moderatorov4@mail.ru'', now(), null, null, null),
-                    (76, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов5 Модератор5 Модераторович5'', ''moderatorov5@mail.ru'', now(), null, null, null),
-                    (77, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов6 Модератор6 Модераторович6'', ''moderatorov6@mail.ru'', now(), null, null, null),
-                    (78, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов7 Модератор7 Модераторович7'', ''moderatorov7@mail.ru'', now(), null, null, null),
-                    (79, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов8 Модератор8 Модераторович8'', ''moderatorov8@mail.ru'', now(), null, null, null),
-                    (80, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов9 Модератор9 Модераторович9'', ''moderatorov9@mail.ru'', now(), null, null, null),
-                    (81, ''MODERATOR'', crypt(''moderator'', gen_salt(''bf'', 8)), ''Модераторов10 Модератор10 Модераторович10'', ''moderatorov10@mail.ru'', now(), null, null, null);
-
-        ALTER SEQUENCE IF EXISTS users_user_id_seq RESTART WITH 81;
-        END IF;
-    END;
 ' language plpgsql;
 
 /*

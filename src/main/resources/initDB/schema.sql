@@ -303,7 +303,7 @@ AS '
                     END LOOP;
             END;
             UPDATE orders SET date_end = CURRENT_TIMESTAMP(0) WHERE order_id = NEW.order_id;
-        ELSIF NEW.status = ''DELIVERED'' THEN
+        ELSIF NEW.status = ''DELIVERED'' AND OLD.status = ''DELIVERING'' THEN
             UPDATE orders SET date_end = CURRENT_TIMESTAMP WHERE order_id = NEW.order_id;
             UPDATE delivery_sessions SET orders_completed = coalesce(orders_completed, 0) + 1, money_earned = coalesce(money_earned, 0) + ROUND
             (NEW.overall_cost, 1) / 10, average_time_per_order = ((CURRENT_TIMESTAMP - start_time) /

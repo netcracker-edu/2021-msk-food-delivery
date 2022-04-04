@@ -43,7 +43,7 @@ export default class OrderClient{
 
     async changeRating(orderId, role, newRating){
         await this.checkToken();
-        return patchFetch(this.config.ORDER_URL + `/${orderId}/` + (role === 'COURIER' ? 'clientRating' : 'courierRating'),
+        return patchFetch(this.config.ORDER_URL + `/${orderId}/` + (role === "COURIER" ? 'clientRating' : 'courierRating'),
         this.config.headersWithAuthorization(), JSON.stringify({rating: newRating}));
     }
 
